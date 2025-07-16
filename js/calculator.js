@@ -2,8 +2,7 @@ const pricingData = {
   basePrices: {
     '8.5x11': 0.05,
     '8.5x14': 0.06,
-    '11x17': 0.08,
-    'custom': 0.10
+    '11x17': 0.08
   },
   
   paperMultipliers: {
@@ -31,11 +30,8 @@ const pricingData = {
   },
   
   foldingPrices: {
-    'none': 0,
     'bifold': 0.01,
-    'trifold': 0.015,
-    'gatefold': 0.02,
-    'zfold': 0.015
+    'trifold': 0.015
   },
   
   quantityDiscounts: [
@@ -59,21 +55,16 @@ function calculateBrochurePrice(formData) {
   const quantity = parseInt(formData.get('quantity'));
   const size = formData.get('size');
   const paperType = formData.get('paperType');
-  const colorMode = formData.get('colorMode');
-  const coating = formData.get('coating');
   const foldType = formData.get('foldType');
   
-  const basePrice = pricingData.basePrices[size] || 0.10;
+  const basePrice = pricingData.basePrices[size] || 0.05;
   
   const paperMultiplier = pricingData.paperMultipliers[paperType] || 1.0;
-  const colorMultiplier = pricingData.colorMultipliers[colorMode] || 1.0;
-  
-  const coatingCostPerUnit = pricingData.coatingPrices[coating] || 0;
   const foldingCostPerUnit = pricingData.foldingPrices[foldType] || 0;
   
-  const baseCostPerUnit = basePrice * paperMultiplier * colorMultiplier;
+  const baseCostPerUnit = basePrice * paperMultiplier;
   
-  const subtotalPerUnit = baseCostPerUnit + coatingCostPerUnit + foldingCostPerUnit;
+  const subtotalPerUnit = baseCostPerUnit + foldingCostPerUnit;
   
   const quantityDiscount = getQuantityDiscount(quantity);
   const discountedPricePerUnit = subtotalPerUnit * (1 - quantityDiscount);
@@ -83,8 +74,6 @@ function calculateBrochurePrice(formData) {
   return {
     basePrice: (basePrice * quantity).toFixed(2),
     paperCost: ((basePrice * paperMultiplier - basePrice) * quantity).toFixed(2),
-    colorCost: ((baseCostPerUnit - basePrice * paperMultiplier) * quantity).toFixed(2),
-    coatingCost: (coatingCostPerUnit * quantity).toFixed(2),
     foldingCost: (foldingCostPerUnit * quantity).toFixed(2),
     unitPrice: discountedPricePerUnit.toFixed(3),
     totalPrice: totalPrice.toFixed(2),
@@ -104,8 +93,6 @@ if (form) {
     
     document.getElementById('basePrice').textContent = `$${pricing.basePrice}`;
     document.getElementById('paperCost').textContent = `$${pricing.paperCost}`;
-    document.getElementById('colorCost').textContent = `$${pricing.colorCost}`;
-    document.getElementById('coatingCost').textContent = `$${pricing.coatingCost}`;
     document.getElementById('foldingCost').textContent = `$${pricing.foldingCost}`;
     document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
     document.getElementById('totalPrice').textContent = `$${pricing.totalPrice}`;

@@ -49,18 +49,14 @@
                             <option value="8.5x11">8.5" x 11" (Letter)</option>
                             <option value="8.5x14">8.5" x 14" (Legal)</option>
                             <option value="11x17">11" x 17" (Tabloid)</option>
-                            <option value="custom">Custom Size</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="foldType">Fold Type</label>
                         <select id="foldType" name="foldType" required>
-                            <option value="trifold">Tri-fold</option>
                             <option value="bifold">Bi-fold</option>
-                            <option value="gatefold">Gate-fold</option>
-                            <option value="zfold">Z-fold</option>
-                            <option value="none">No Fold</option>
+                            <option value="trifold">Tri-fold</option>
                         </select>
                     </div>
                 </div>
@@ -75,27 +71,6 @@
                             <option value="150gsm">150gsm Cover</option>
                             <option value="200gsm">200gsm Cover</option>
                             <option value="250gsm">250gsm Cover</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="colorMode">Color Mode</label>
-                        <select id="colorMode" name="colorMode" required>
-                            <option value="4c4c">Full Color Both Sides (4/4)</option>
-                            <option value="4c0">Full Color Front Only (4/0)</option>
-                            <option value="4c1">Full Color Front, B&W Back (4/1)</option>
-                            <option value="1c1">B&W Both Sides (1/1)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="coating">Coating/Finish</label>
-                        <select id="coating" name="coating" required>
-                            <option value="none">No Coating</option>
-                            <option value="matte">Matte Coating</option>
-                            <option value="gloss">Gloss Coating</option>
-                            <option value="uv">UV Coating</option>
-                            <option value="softtouch">Soft Touch Coating</option>
                         </select>
                     </div>
                 </div>
@@ -119,14 +94,6 @@
                     <div class="breakdown-item">
                         <span>Paper Cost:</span>
                         <span id="paperCost">$0.00</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Color Printing:</span>
-                        <span id="colorCost">$0.00</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Coating/Finish:</span>
-                        <span id="coatingCost">$0.00</span>
                     </div>
                     <div class="breakdown-item">
                         <span>Folding:</span>

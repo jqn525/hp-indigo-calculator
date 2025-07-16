@@ -1,4 +1,4 @@
-const CACHE_NAME = 'indigo-calc-v2';
+const CACHE_NAME = 'indigo-calc-v3';
 const urlsToCache = [
   '/hp-indigo-calculator/',
   '/hp-indigo-calculator/index.html',
