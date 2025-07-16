@@ -53,7 +53,10 @@ function setActiveNav() {
   const navItems = document.querySelectorAll('.nav-item');
   
   navItems.forEach(item => {
-    if (item.getAttribute('href') === currentPath) {
+    const href = item.getAttribute('href');
+    const fullPath = new URL(href, window.location.href).pathname;
+    
+    if (fullPath === currentPath) {
       item.classList.add('active');
     } else {
       item.classList.remove('active');

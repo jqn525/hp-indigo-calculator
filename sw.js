@@ -1,14 +1,14 @@
-const CACHE_NAME = 'indigo-calc-v1';
+const CACHE_NAME = 'indigo-calc-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/calculator.js',
-  '/pages/brochures.html',
-  '/pages/postcards.html',
-  '/pages/flyers.html',
-  '/manifest.json'
+  '/hp-indigo-calculator/',
+  '/hp-indigo-calculator/index.html',
+  '/hp-indigo-calculator/css/styles.css',
+  '/hp-indigo-calculator/js/app.js',
+  '/hp-indigo-calculator/js/calculator.js',
+  '/hp-indigo-calculator/pages/brochures.html',
+  '/hp-indigo-calculator/pages/postcards.html',
+  '/hp-indigo-calculator/pages/flyers.html',
+  '/hp-indigo-calculator/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
