@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Tri-fold brochure icon -->
+  <g>
+    <!-- Back panels -->
+    <rect x="8" y="14" width="48" height="36" fill="#e3f2fd" stroke="#0096D6" stroke-width="2" rx="2"/>
+    
+    <!-- Middle fold line -->
+    <line x1="32" y1="14" x2="32" y2="50" stroke="#0096D6" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+    
+    <!-- Right fold line -->
+    <line x1="44" y1="14" x2="44" y2="50" stroke="#0096D6" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+    
+    <!-- Front folded panel -->
+    <path d="M 20 14 L 32 14 L 32 50 L 20 50 Q 14 50 14 44 L 14 20 Q 14 14 20 14" 
+          fill="#0096D6" opacity="0.9"/>
+    
+    <!-- Text lines on front panel -->
+    <line x1="18" y1="22" x2="28" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <line x1="18" y1="28" x2="26" y2="28" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <line x1="18" y1="34" x2="28" y2="34" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Shadow effect -->
+    <rect x="10" y="52" width="44" height="2" fill="#0096D6" opacity="0.2" rx="1"/>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Flyer icon with slight curl effect -->
+  <g>
+    <!-- Shadow -->
+    <ellipse cx="32" cy="54" rx="20" ry="3" fill="#0096D6" opacity="0.2"/>
+    
+    <!-- Main flyer body with curl -->
+    <path d="M 14 10 L 46 10 Q 50 10 50 14 L 50 44 Q 50 46 48 47 L 46 48 Q 44 49 42 48 L 40 46 Q 38 44 38 42 L 38 40 L 16 40 Q 14 40 14 38 L 14 10 Z" 
+          fill="#ffffff" stroke="#0096D6" stroke-width="2"/>
+    
+    <!-- Page curl corner -->
+    <path d="M 38 40 Q 38 42 40 44 L 42 46 Q 44 48 46 48 L 48 47 Q 50 46 50 44 L 44 40 Z" 
+          fill="#e3f2fd" stroke="#0096D6" stroke-width="1.5"/>
+    
+    <!-- Content lines -->
+    <line x1="20" y1="18" x2="40" y2="18" stroke="#0096D6" stroke-width="2" stroke-linecap="round"/>
+    <line x1="20" y1="24" x2="36" y2="24" stroke="#666666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="20" y1="30" x2="38" y2="30" stroke="#666666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="20" y1="36" x2="34" y2="36" stroke="#666666" stroke-width="1.5" stroke-linecap="round"/>
+    
+    <!-- Accent rectangle -->
+    <rect x="20" y="42" width="16" height="4" fill="#00B0A6" rx="1"/>
+  </g>
+</svg>

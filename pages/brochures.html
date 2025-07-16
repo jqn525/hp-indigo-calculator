@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate pricing for HP Indigo brochures">
+    <meta name="theme-color" content="#0096D6">
+    
+    <title>Brochures - HP Indigo Calculator</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>HP Indigo Calculator</h1>
+            <button id="installBtn" class="button" style="display: none;">Install App</button>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="nav-item">Home</a>
+            <a href="/pages/brochures.html" class="nav-item active">Brochures</a>
+            <a href="/pages/postcards.html" class="nav-item">Postcards</a>
+            <a href="/pages/flyers.html" class="nav-item">Flyers</a>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="calculator-container">
+            <h2>Brochure Pricing Calculator</h2>
+            
+            <form id="brochureForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" min="100" step="50" value="500" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="size">Size</label>
+                        <select id="size" name="size" required>
+                            <option value="8.5x11">8.5" x 11" (Letter)</option>
+                            <option value="8.5x14">8.5" x 14" (Legal)</option>
+                            <option value="11x17">11" x 17" (Tabloid)</option>
+                            <option value="custom">Custom Size</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="foldType">Fold Type</label>
+                        <select id="foldType" name="foldType" required>
+                            <option value="trifold">Tri-fold</option>
+                            <option value="bifold">Bi-fold</option>
+                            <option value="gatefold">Gate-fold</option>
+                            <option value="zfold">Z-fold</option>
+                            <option value="none">No Fold</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="paperType">Paper Type</label>
+                        <select id="paperType" name="paperType" required>
+                            <option value="80gsm">80gsm Text</option>
+                            <option value="100gsm">100gsm Text</option>
+                            <option value="120gsm">120gsm Text</option>
+                            <option value="150gsm">150gsm Cover</option>
+                            <option value="200gsm">200gsm Cover</option>
+                            <option value="250gsm">250gsm Cover</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="colorMode">Color Mode</label>
+                        <select id="colorMode" name="colorMode" required>
+                            <option value="4c4c">Full Color Both Sides (4/4)</option>
+                            <option value="4c0">Full Color Front Only (4/0)</option>
+                            <option value="4c1">Full Color Front, B&W Back (4/1)</option>
+                            <option value="1c1">B&W Both Sides (1/1)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="coating">Coating/Finish</label>
+                        <select id="coating" name="coating" required>
+                            <option value="none">No Coating</option>
+                            <option value="matte">Matte Coating</option>
+                            <option value="gloss">Gloss Coating</option>
+                            <option value="uv">UV Coating</option>
+                            <option value="softtouch">Soft Touch Coating</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="button">Calculate Price</button>
+                    <button type="reset" class="button button-secondary">Reset Form</button>
+                </div>
+            </form>
+            
+            <div id="results" class="results-container" style="display: none;">
+                <h3>Price Estimate</h3>
+                <div class="price-display" id="totalPrice">$0.00</div>
+                
+                <div class="price-breakdown">
+                    <h4>Breakdown:</h4>
+                    <div class="breakdown-item">
+                        <span>Base Price:</span>
+                        <span id="basePrice">$0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Paper Cost:</span>
+                        <span id="paperCost">$0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Color Printing:</span>
+                        <span id="colorCost">$0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Coating/Finish:</span>
+                        <span id="coatingCost">$0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Folding:</span>
+                        <span id="foldingCost">$0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Price per Unit:</span>
+                        <span id="unitPrice">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 HP Indigo Print Shop. Internal Use Only.</p>
+    </footer>
+    
+    <script src="/js/sw-register.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/calculator.js"></script>
+</body>
+</html>
