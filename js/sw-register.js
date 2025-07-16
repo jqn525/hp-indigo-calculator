@@ -1,6 +1,16 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/hp-indigo-calculator/sw.js')
+    // Determine the correct service worker path
+    let swPath;
+    if (window.location.hostname === 'localhost') {
+      // For local development, service worker is in the root
+      swPath = window.location.pathname.includes('/pages/') ? '../sw.js' : './sw.js';
+    } else {
+      // For GitHub Pages
+      swPath = '/hp-indigo-calculator/sw.js';
+    }
+    
+    navigator.serviceWorker.register(swPath)
       .then((registration) => {
         console.log('ServiceWorker registration successful with scope: ', registration.scope);
       })
