@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Calculate pricing for HP Indigo flyers">
+    <meta name="description" content="Calculate pricing for custom promotional tote bags">
     <meta name="theme-color" content="#0096D6">
     
-    <title>Flyers - HP Indigo Calculator</title>
+    <title>Custom Tote Bags - Promo Calculator</title>
     
     <link rel="manifest" href="../manifest.json">
     <link rel="stylesheet" href="../css/styles.css">
@@ -18,145 +18,157 @@
 <body>
     <main>
         <div class="calculator-container">
-            <h2>Flyers</h2>
-            <p class="page-description">Get your message out with high-impact flyers. Perfect for events, promotions, and announcements with vibrant colors and professional quality that gets noticed.</p>
+            <h2>Custom Tote Bags</h2>
+            <p class="page-description">High-quality custom tote bags and promotional bags sourced from premium suppliers. Perfect for events, retail, corporate gifts, and eco-friendly marketing campaigns.</p>
             
-            <form id="flyerForm">
+            <form id="toteBagForm">
+                <!-- Type Section -->
+                <div class="selection-section">
+                    <div class="selection-header">
+                        <h3>Bag Type</h3>
+                        <a href="#" class="help-link">What's this?</a>
+                    </div>
+                    <div class="selection-grid">
+                        <div class="selection-card selected" data-value="canvas-tote">
+                            <span>Canvas Tote</span>
+                            <span class="description">Premium Cotton</span>
+                        </div>
+                        <div class="selection-card" data-value="poly-tote">
+                            <span>Poly Tote</span>
+                            <span class="description">Reusable Bag</span>
+                        </div>
+                        <div class="selection-card" data-value="jute-tote">
+                            <span>Jute Tote</span>
+                            <span class="description">Eco-Friendly</span>
+                        </div>
+                        <div class="selection-card" data-value="drawstring">
+                            <span>Drawstring Bag</span>
+                            <span class="description">Lightweight</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="bagType" name="bagType" value="canvas-tote" required>
+                </div>
+
                 <!-- Size Section -->
                 <div class="selection-section">
                     <div class="selection-header">
                         <h3>Size</h3>
                         <a href="#" class="help-link">What's this?</a>
                     </div>
-                    <div class="selection-grid size-grid">
-                        <div class="selection-card" data-value="5.5x8.5">
-                            <span>5.5" x 8.5"</span>
+                    <div class="selection-grid">
+                        <div class="selection-card" data-value="small">
+                            <span>Small</span>
+                            <span class="description">12" x 14"</span>
                         </div>
-                        <div class="selection-card selected" data-value="8.5x11">
-                            <span>8.5" x 11"</span>
-                            <span class="popular-badge">Recommended</span>
+                        <div class="selection-card selected" data-value="medium">
+                            <span>Medium</span>
+                            <span class="description">15" x 16"</span>
                         </div>
-                        <div class="selection-card" data-value="8.5x14">
-                            <span>8.5" x 14"</span>
-                        </div>
-                        <div class="selection-card" data-value="11x17">
-                            <span>11" x 17"</span>
+                        <div class="selection-card" data-value="large">
+                            <span>Large</span>
+                            <span class="description">18" x 20"</span>
                         </div>
                     </div>
-                    <input type="hidden" id="size" name="size" value="8.5x11" required>
+                    <input type="hidden" id="size" name="size" value="medium" required>
                 </div>
 
-                <!-- Paper Section -->
+                <!-- Decoration Section -->
                 <div class="selection-section">
                     <div class="selection-header">
-                        <h3>Paper</h3>
+                        <h3>Decoration</h3>
                         <a href="#" class="help-link">What's this?</a>
                     </div>
-                    <div class="selection-grid paper-grid">
-                        <div class="selection-card selected" data-value="LYNO416FSC">
-                            <span>80# Text Uncoated</span>
-                            <span class="popular-badge">Recommended</span>
+                    <div class="selection-grid">
+                        <div class="selection-card selected" data-value="screen-print">
+                            <span>Screen Print</span>
+                            <span class="description">1-4 Colors</span>
                         </div>
-                        <div class="selection-card" data-value="PACDIS42FSC">
-                            <span>80# Text Silk</span>
+                        <div class="selection-card" data-value="heat-transfer">
+                            <span>Heat Transfer</span>
+                            <span class="description">Full Color</span>
                         </div>
-                        <div class="selection-card" data-value="LYNOC76FSC">
-                            <span>80# Cover Uncoated</span>
-                        </div>
-                        <div class="selection-card" data-value="PACDISC7613FSC">
-                            <span>80# Cover Silk</span>
+                        <div class="selection-card" data-value="embroidery">
+                            <span>Embroidery</span>
+                            <span class="description">Premium Look</span>
                         </div>
                     </div>
-                    <input type="hidden" id="paperType" name="paperType" value="LYNO416FSC" required>
+                    <input type="hidden" id="decorationType" name="decorationType" value="screen-print" required>
                 </div>
 
-                <!-- Turnaround Time Section -->
-                <div class="selection-section">
-                    <div class="selection-header">
-                        <h3>Turnaround Time</h3>
-                        <a href="#" class="help-link">What's this?</a>
-                    </div>
-                    <div class="selection-grid turnaround-grid">
-                        <div class="selection-card selected" data-value="standard">
-                            <span>Standard</span>
-                            <small>3-5 business days</small>
-                        </div>
-                        <div class="selection-card" data-value="2-day">
-                            <span>2-Day Rush</span>
-                            <small>+25%</small>
-                        </div>
-                        <div class="selection-card" data-value="next-day">
-                            <span>Next-Day Rush</span>
-                            <small>+50%</small>
-                        </div>
-                        <div class="selection-card" data-value="same-day">
-                            <span>Same-Day Rush</span>
-                            <small>+100%</small>
-                        </div>
-                    </div>
-                    <input type="hidden" id="rushType" name="rushType" value="standard" required>
-                    <small class="rush-note">*Rush orders subject to current capacity</small>
-                </div>
-
-                <!-- Quantity Section (Moved to Bottom) -->
+                <!-- Quantity Section -->
                 <div class="selection-section">
                     <div class="selection-header">
                         <h3>Quantity</h3>
                     </div>
-                    <div class="form-group">
-                        <input type="number" id="quantity" name="quantity" 
-                               min="25" max="2500" value="25" 
-                               inputmode="numeric" pattern="[0-9]*" 
-                               placeholder="Enter quantity" required>
+                    <div class="quantity-input-container">
+                        <input type="number" id="quantity" name="quantity" value="50" min="25" max="5000" step="25" required>
+                        <div class="quantity-note">Minimum: 25 pieces</div>
                     </div>
                 </div>
-                
-                <div class="selection-grid button-grid">
-                    <button type="submit" class="button-card button-primary">Calculate Price</button>
-                    <button type="button" class="button-card button-secondary" id="addToCartBtn" style="display: none;">Add to Cart</button>
-                    <button type="reset" class="button-card button-tertiary">Clear</button>
+
+                <!-- Rush Options Section -->
+                <div class="selection-section">
+                    <div class="selection-header">
+                        <h3>Production Time</h3>
+                        <a href="#" class="help-link">What's this?</a>
+                    </div>
+                    <div class="selection-grid">
+                        <div class="selection-card selected" data-value="standard">
+                            <span>7-10 Business Days</span>
+                            <span class="description">Standard</span>
+                        </div>
+                        <div class="selection-card" data-value="rush">
+                            <span>3-5 Business Days</span>
+                            <span class="description">Rush (+30%)</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="rushType" name="rushType" value="standard" required>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-grid">
+                    <button type="submit" class="button button-primary">Calculate</button>
+                    <button type="button" class="button button-secondary" id="addToCartBtn">Add to Cart</button>
+                    <button type="button" class="button button-tertiary" id="clearBtn">Clear</button>
                 </div>
             </form>
-            
-            <div id="results" class="results-container" style="display: none;">
-                <h3>Price Estimate</h3>
-                <div class="price-display" id="totalPrice">$0.00</div>
-                
-                <div class="price-breakdown">
-                    <h4>Cost Breakdown:</h4>
-                    <div class="breakdown-item">
-                        <span>Printing Setup Fee:</span>
-                        <span id="printingSetupCost">$0.00</span>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h3>Pricing Details</h3>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <span class="result-label">Quantity:</span>
+                        <span class="result-value" id="resultQuantity">-</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Production Cost:</span>
-                        <span id="productionCost">$0.00</span>
+                    <div class="result-item">
+                        <span class="result-label">Bag Type:</span>
+                        <span class="result-value" id="resultBagType">-</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Material Cost:</span>
-                        <span id="materialCost">$0.00</span>
+                    <div class="result-item">
+                        <span class="result-label">Size:</span>
+                        <span class="result-value" id="resultSize">-</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">$0.00</span>
+                    <div class="result-item">
+                        <span class="result-label">Decoration:</span>
+                        <span class="result-value" id="resultDecoration">-</span>
                     </div>
-                    <div class="breakdown-item" id="rushMultiplierItem" style="display: none;">
-                        <span>Rush Multiplier:</span>
-                        <span id="rushMultiplier">1.0x</span>
+                    <div class="result-item">
+                        <span class="result-label">Production:</span>
+                        <span class="result-value" id="resultProduction">-</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Price per Unit:</span>
-                        <span id="unitPrice">$0.00</span>
+                    <div class="result-item total">
+                        <span class="result-label">Total Price:</span>
+                        <span class="result-value" id="resultTotal">$0.00</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Sheets Required:</span>
-                        <span id="sheetsRequired">0</span>
+                    <div class="result-item">
+                        <span class="result-label">Unit Price:</span>
+                        <span class="result-value" id="resultUnitPrice">$0.00</span>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-    
     
     <nav>
         <div class="nav-container">
@@ -201,7 +213,7 @@
                 </svg>
                 Large Format
             </a>
-            <a href="promo.html" class="nav-item">
+            <a href="promo.html" class="nav-item active">
                 <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
                     <g>
                         <!-- Gift/promo box with ribbon -->
@@ -243,13 +255,10 @@
         </div>
     </nav>
     
-    
     <script src="../js/sw-register.js"></script>
     <script src="../js/version.js"></script>
-    <script src="../js/app.js"></script>
     <script src="../js/cart.js"></script>
-    <script src="../js/paperStocks.js"></script>
-    <script src="../js/pricingConfig.js"></script>
-    <script src="../js/calculator.js"></script>
+    <script src="../js/promoConfig.js"></script>
+    <script src="../js/promoCalculator.js"></script>
 </body>
 </html>

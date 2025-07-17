@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Calculate pricing for HP Indigo brochures">
+    <meta name="description" content="Calculate pricing for custom promotional apparel">
     <meta name="theme-color" content="#0096D6">
     
-    <title>Brochures - HP Indigo Calculator</title>
+    <title>Custom Apparel - Promo Calculator</title>
     
     <link rel="manifest" href="../manifest.json">
     <link rel="stylesheet" href="../css/styles.css">
@@ -18,165 +18,179 @@
 <body>
     <main>
         <div class="calculator-container">
-            <h2>Brochures</h2>
-            <p class="page-description">Brochures give you the space to tell your story in style, with premium papers, unique folds and vibrant colors that bring your brand to life.</p>
+            <h2>Custom Apparel</h2>
+            <p class="page-description">High-quality custom apparel sourced from premium suppliers. Perfect for team uniforms, corporate events, promotional giveaways, and branded merchandise.</p>
             
-            <form id="brochureForm">
-                <!-- Flat Size Section -->
+            <form id="apparelForm">
+                <!-- Type Section -->
                 <div class="selection-section">
                     <div class="selection-header">
-                        <h3>Flat Size (Before Fold)</h3>
+                        <h3>Garment Type</h3>
                         <a href="#" class="help-link">What's this?</a>
                     </div>
-                    <div class="selection-grid size-grid">
-                        <div class="selection-card selected" data-value="8.5x11">
-                            <span>8.5" x 11"</span>
-                            <span class="popular-badge">Recommended</span>
+                    <div class="selection-grid">
+                        <div class="selection-card selected" data-value="gildan-6400">
+                            <span>T-shirts</span>
+                            <span class="description">100% Cotton, Soft Style - Gildan 6400</span>
                         </div>
-                        <div class="selection-card" data-value="11x17">
-                            <span>11" x 17"</span>
+                        <div class="selection-card" data-value="atc-f2700">
+                            <span>Quarter Zip</span>
+                            <span class="description">50/50, Fleece Blend - ATC F2700</span>
+                        </div>
+                        <div class="selection-card" data-value="gildan-sf000">
+                            <span>Crewneck</span>
+                            <span class="description">80/20, Soft Style Blend - Gildan SF000</span>
+                        </div>
+                        <div class="selection-card" data-value="gildan-1801">
+                            <span>Crewneck</span>
+                            <span class="description">50/50, Heavy Blend - Gildan 1801</span>
+                        </div>
+                        <div class="selection-card" data-value="gildan-sf500">
+                            <span>Hoodie</span>
+                            <span class="description">100% Cotton, Soft Style - Gildan SF500</span>
+                        </div>
+                        <div class="selection-card" data-value="gildan-1850">
+                            <span>Hoodie</span>
+                            <span class="description">50/50, Heavy Blend - Gildan 1850</span>
                         </div>
                     </div>
-                    <input type="hidden" id="size" name="size" value="8.5x11" required>
+                    <input type="hidden" id="garmentType" name="garmentType" value="gildan-6400" required>
                 </div>
 
-                <!-- Folding Style Section -->
+                <!-- Decoration Section -->
                 <div class="selection-section">
                     <div class="selection-header">
-                        <h3>Folding Style</h3>
+                        <h3>Decoration</h3>
                         <a href="#" class="help-link">What's this?</a>
                     </div>
-                    <div class="selection-grid fold-grid">
-                        <div class="selection-card selected" data-value="trifold">
-                            <span>Tri-Fold</span>
-                            <span class="popular-badge">Recommended</span>
-                        </div>
-                        <div class="selection-card" data-value="bifold">
-                            <span>Bi-Fold</span>
+                    <div class="selection-grid single-option">
+                        <div class="selection-card selected" data-value="dtf">
+                            <span>DTF (Direct-to-Film)</span>
+                            <span class="description">Full Color Printing</span>
                         </div>
                     </div>
-                    <input type="hidden" id="foldType" name="foldType" value="trifold" required>
+                    <input type="hidden" id="decorationType" name="decorationType" value="dtf" required>
                 </div>
 
-                <!-- Stock Section -->
+                <!-- Size Breakdown Section -->
                 <div class="selection-section">
                     <div class="selection-header">
-                        <h3>Stock</h3>
+                        <h3>Size Breakdown</h3>
                         <a href="#" class="help-link">What's this?</a>
                     </div>
-                    <div class="selection-grid stock-grid">
-                        <div class="selection-card selected" data-value="LYNO416FSC">
-                            <span>80# Text Uncoated</span>
-                            <span class="popular-badge">Recommended</span>
-                        </div>
-                        <div class="selection-card" data-value="PACDIS42FSC">
-                            <span>80# Text Silk</span>
-                        </div>
-                        <div class="selection-card" data-value="LYNOC76FSC">
-                            <span>80# Cover Uncoated</span>
-                        </div>
-                        <div class="selection-card" data-value="PACDISC7613FSC">
-                            <span>80# Cover Silk</span>
+                    
+                    <div class="size-tier">
+                        <h4>Standard Sizes (Same Price)</h4>
+                        <div class="size-inputs-grid">
+                            <div class="size-input">
+                                <label>XS</label>
+                                <input type="number" name="sizeXS" min="0" max="500" value="0" class="size-quantity">
+                            </div>
+                            <div class="size-input">
+                                <label>S</label>
+                                <input type="number" name="sizeS" min="0" max="500" value="0" class="size-quantity">
+                            </div>
+                            <div class="size-input">
+                                <label>M</label>
+                                <input type="number" name="sizeM" min="0" max="500" value="0" class="size-quantity">
+                            </div>
+                            <div class="size-input">
+                                <label>L</label>
+                                <input type="number" name="sizeL" min="0" max="500" value="0" class="size-quantity">
+                            </div>
+                            <div class="size-input">
+                                <label>XL</label>
+                                <input type="number" name="sizeXL" min="0" max="500" value="0" class="size-quantity">
+                            </div>
                         </div>
                     </div>
-                    <input type="hidden" id="paperType" name="paperType" value="LYNO416FSC" required>
+                    
+                    <div class="size-tier">
+                        <h4>Extended Sizes (Higher Price)</h4>
+                        <div class="size-inputs-grid">
+                            <div class="size-input">
+                                <label>2XL</label>
+                                <input type="number" name="size2XL" min="0" max="500" value="0" class="size-quantity">
+                            </div>
+                            <div class="size-input">
+                                <label>3XL</label>
+                                <input type="number" name="size3XL" min="0" max="500" value="0" class="size-quantity">
+                            </div>
+                            <div class="size-input">
+                                <label>4XL</label>
+                                <input type="number" name="size4XL" min="0" max="500" value="0" class="size-quantity">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="total-quantity">
+                        Total: <span id="totalQuantity">0</span> pieces
+                        <div class="quantity-note">Minimum: 10 pieces total</div>
+                    </div>
                 </div>
 
-                <!-- Turnaround Time Section -->
+                <!-- Hidden input for total quantity -->
+                <input type="hidden" id="totalQuantityInput" name="totalQuantity" value="0" required>
+
+                <!-- Rush Options Section -->
                 <div class="selection-section">
                     <div class="selection-header">
-                        <h3>Turnaround Time</h3>
+                        <h3>Production Time</h3>
                         <a href="#" class="help-link">What's this?</a>
                     </div>
-                    <div class="selection-grid turnaround-grid">
+                    <div class="selection-grid">
                         <div class="selection-card selected" data-value="standard">
-                            <span>Standard</span>
-                            <small>3-5 business days</small>
+                            <span>10-14 Business Days</span>
+                            <span class="description">Standard</span>
                         </div>
-                        <div class="selection-card" data-value="2-day">
-                            <span>2-Day Rush</span>
-                            <small>+25%</small>
-                        </div>
-                        <div class="selection-card" data-value="next-day">
-                            <span>Next-Day Rush</span>
-                            <small>+50%</small>
-                        </div>
-                        <div class="selection-card" data-value="same-day">
-                            <span>Same-Day Rush</span>
-                            <small>+100%</small>
+                        <div class="selection-card" data-value="rush">
+                            <span>5-7 Business Days</span>
+                            <span class="description">Rush (+35%)</span>
                         </div>
                     </div>
                     <input type="hidden" id="rushType" name="rushType" value="standard" required>
-                    <small class="rush-note">*Rush orders subject to current capacity</small>
                 </div>
 
-                <!-- Quantity Section (Moved to Bottom) -->
-                <div class="selection-section">
-                    <div class="selection-header">
-                        <h3>Quantity</h3>
-                    </div>
-                    <div class="form-group">
-                        <input type="number" id="quantity" name="quantity" 
-                               min="25" max="2500" value="25" 
-                               inputmode="numeric" pattern="[0-9]*" 
-                               placeholder="Enter quantity" required>
-                    </div>
-                </div>
-                
-                <div class="selection-grid button-grid">
-                    <button type="submit" class="button-card button-primary">Calculate Price</button>
-                    <button type="button" class="button-card button-secondary" id="addToCartBtn" style="display: none;">Add to Cart</button>
-                    <button type="reset" class="button-card button-tertiary">Clear</button>
+                <!-- Action Buttons -->
+                <div class="button-grid">
+                    <button type="submit" class="button button-primary">Calculate</button>
+                    <button type="button" class="button button-secondary" id="addToCartBtn">Add to Cart</button>
+                    <button type="button" class="button button-tertiary" id="clearBtn">Clear</button>
                 </div>
             </form>
-            
-            <div id="results" class="results-container" style="display: none;">
-                <h3>Price Estimate</h3>
-                <div class="price-display" id="totalPrice">$0.00</div>
-                
-                <div class="price-breakdown">
-                    <h4>Cost Breakdown:</h4>
-                    <div class="breakdown-item">
-                        <span>Printing Setup Fee:</span>
-                        <span id="printingSetupCost">$0.00</span>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h3>Pricing Details</h3>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <span class="result-label">Quantity:</span>
+                        <span class="result-value" id="resultQuantity">-</span>
                     </div>
-                    <div class="breakdown-item" id="finishingSetupItem" style="display: none;">
-                        <span>Finishing Setup Fee:</span>
-                        <span id="finishingSetupCost">$0.00</span>
+                    <div class="result-item">
+                        <span class="result-label">Garment:</span>
+                        <span class="result-value" id="resultGarment">-</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Production Cost:</span>
-                        <span id="productionCost">$0.00</span>
+                    <div class="result-item">
+                        <span class="result-label">Decoration:</span>
+                        <span class="result-value" id="resultDecoration">-</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Material Cost:</span>
-                        <span id="materialCost">$0.00</span>
+                    <div class="result-item">
+                        <span class="result-label">Production:</span>
+                        <span class="result-value" id="resultProduction">-</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Finishing Cost:</span>
-                        <span id="finishingCost">$0.00</span>
+                    <div class="result-item total">
+                        <span class="result-label">Total Price:</span>
+                        <span class="result-value" id="resultTotal">$0.00</span>
                     </div>
-                    <div class="breakdown-item">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">$0.00</span>
-                    </div>
-                    <div class="breakdown-item" id="rushMultiplierItem" style="display: none;">
-                        <span>Rush Multiplier:</span>
-                        <span id="rushMultiplier">1.0x</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Price per Unit:</span>
-                        <span id="unitPrice">$0.00</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Sheets Required:</span>
-                        <span id="sheetsRequired">0</span>
+                    <div class="result-item">
+                        <span class="result-label">Unit Price:</span>
+                        <span class="result-value" id="resultUnitPrice">$0.00</span>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-    
     
     <nav>
         <div class="nav-container">
@@ -221,7 +235,7 @@
                 </svg>
                 Large Format
             </a>
-            <a href="promo.html" class="nav-item">
+            <a href="promo.html" class="nav-item active">
                 <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
                     <g>
                         <!-- Gift/promo box with ribbon -->
@@ -263,13 +277,10 @@
         </div>
     </nav>
     
-    
     <script src="../js/sw-register.js"></script>
     <script src="../js/version.js"></script>
-    <script src="../js/app.js"></script>
     <script src="../js/cart.js"></script>
-    <script src="../js/paperStocks.js"></script>
-    <script src="../js/pricingConfig.js"></script>
-    <script src="../js/calculator.js"></script>
+    <script src="../js/promoConfig.js"></script>
+    <script src="../js/promoCalculator.js"></script>
 </body>
 </html>

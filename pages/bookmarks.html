@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Calculate pricing for HP Indigo flyers">
+    <meta name="description" content="Calculate pricing for HP Indigo bookmarks">
     <meta name="theme-color" content="#0096D6">
     
-    <title>Flyers - HP Indigo Calculator</title>
+    <title>Bookmarks - HP Indigo Calculator</title>
     
     <link rel="manifest" href="../manifest.json">
     <link rel="stylesheet" href="../css/styles.css">
@@ -18,10 +18,10 @@
 <body>
     <main>
         <div class="calculator-container">
-            <h2>Flyers</h2>
-            <p class="page-description">Get your message out with high-impact flyers. Perfect for events, promotions, and announcements with vibrant colors and professional quality that gets noticed.</p>
+            <h2>Bookmarks</h2>
+            <p class="page-description">Professional bookmarks on premium cover stock perfect for libraries, educational institutions, events, and marketing campaigns. High-quality printing that makes a lasting impression.</p>
             
-            <form id="flyerForm">
+            <form id="bookmarkForm">
                 <!-- Size Section -->
                 <div class="selection-section">
                     <div class="selection-header">
@@ -29,21 +29,18 @@
                         <a href="#" class="help-link">What's this?</a>
                     </div>
                     <div class="selection-grid size-grid">
-                        <div class="selection-card" data-value="5.5x8.5">
-                            <span>5.5" x 8.5"</span>
+                        <div class="selection-card" data-value="2x6">
+                            <span>2" x 6"</span>
                         </div>
-                        <div class="selection-card selected" data-value="8.5x11">
-                            <span>8.5" x 11"</span>
+                        <div class="selection-card selected" data-value="2x7">
+                            <span>2" x 7"</span>
                             <span class="popular-badge">Recommended</span>
                         </div>
-                        <div class="selection-card" data-value="8.5x14">
-                            <span>8.5" x 14"</span>
-                        </div>
-                        <div class="selection-card" data-value="11x17">
-                            <span>11" x 17"</span>
+                        <div class="selection-card" data-value="2x8">
+                            <span>2" x 8"</span>
                         </div>
                     </div>
-                    <input type="hidden" id="size" name="size" value="8.5x11" required>
+                    <input type="hidden" id="size" name="size" value="2x7" required>
                 </div>
 
                 <!-- Paper Section -->
@@ -53,21 +50,15 @@
                         <a href="#" class="help-link">What's this?</a>
                     </div>
                     <div class="selection-grid paper-grid">
-                        <div class="selection-card selected" data-value="LYNO416FSC">
-                            <span>80# Text Uncoated</span>
+                        <div class="selection-card selected" data-value="COUDCCDIC123513FSC">
+                            <span>130# Cover Uncoated</span>
                             <span class="popular-badge">Recommended</span>
                         </div>
-                        <div class="selection-card" data-value="PACDIS42FSC">
-                            <span>80# Text Silk</span>
-                        </div>
-                        <div class="selection-card" data-value="LYNOC76FSC">
-                            <span>80# Cover Uncoated</span>
-                        </div>
-                        <div class="selection-card" data-value="PACDISC7613FSC">
-                            <span>80# Cover Silk</span>
+                        <div class="selection-card" data-value="PACDISC12413FSC">
+                            <span>130# Cover Silk</span>
                         </div>
                     </div>
-                    <input type="hidden" id="paperType" name="paperType" value="LYNO416FSC" required>
+                    <input type="hidden" id="paperType" name="paperType" value="COUDCCDIC123513FSC" required>
                 </div>
 
                 <!-- Turnaround Time Section -->
@@ -105,7 +96,7 @@
                     </div>
                     <div class="form-group">
                         <input type="number" id="quantity" name="quantity" 
-                               min="25" max="2500" value="25" 
+                               min="100" max="2500" value="100" 
                                inputmode="numeric" pattern="[0-9]*" 
                                placeholder="Enter quantity" required>
                     </div>
