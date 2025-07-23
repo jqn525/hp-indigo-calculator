@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - HP Indigo Pricing Calculator</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/svg+xml" href="../icons/icon-192.svg">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Admin Panel</h1>
+                <div id="userMenu" class="user-menu">
+                    <button id="signInBtn" class="sign-in-btn">Sign In</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Admin Access Warning -->
+        <div id="accessWarning" class="alert alert-warning" style="display: none;">
+            <h3>🔒 Admin Access Required</h3>
+            <p>This page requires administrator privileges. Please sign in with an admin account.</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="alert alert-info">
+            <h3>⏳ Loading Admin Panel...</h3>
+            <p>Checking permissions and loading data...</p>
+        </div>
+
+        <!-- Admin Panel Content -->
+        <div id="adminContent" style="display: none;">
+            
+            <!-- Database Migration Section -->
+            <div class="selection-card">
+                <h2>🗄️ Database Migration</h2>
+                <p>Populate the database with current static pricing data.</p>
+                
+                <div class="button-grid">
+                    <button id="runMigrationBtn" class="calculate-btn">Run Migration</button>
+                    <button id="checkDataBtn" class="calculate-btn secondary">Check Data</button>
+                    <button id="resetDbBtn" class="calculate-btn danger">Reset Database</button>
+                </div>
+                
+                <div id="migrationResults" class="results-section" style="display: none;">
+                    <h3>Migration Results</h3>
+                    <pre id="migrationOutput"></pre>
+                </div>
+            </div>
+
+            <!-- Paper Stocks Management -->
+            <div class="selection-card">
+                <h2>📄 Paper Stocks</h2>
+                <p>Manage paper types and pricing.</p>
+                
+                <div class="button-grid">
+                    <button id="loadPaperStocksBtn" class="calculate-btn">Load Paper Stocks</button>
+                    <button id="refreshCacheBtn" class="calculate-btn secondary">Refresh Cache</button>
+                </div>
+                
+                <div id="paperStocksTable" style="display: none;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Display Name</th>
+                                <th>Type</th>
+                                <th>Weight</th>
+                                <th>Cost/Sheet</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paperStocksBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pricing Configuration -->
+            <div class="selection-card">
+                <h2>⚙️ Pricing Configuration</h2>
+                <p>View and edit pricing formulas and settings.</p>
+                
+                <div class="button-grid">
+                    <button id="loadPricingConfigBtn" class="calculate-btn">Load Configuration</button>
+                    <button id="savePricingConfigBtn" class="calculate-btn" style="display: none;">Save Changes</button>
+                </div>
+                
+                <div id="pricingConfigEditor" style="display: none;">
+                    <textarea id="configTextarea" rows="20" style="width: 100%; font-family: monospace; margin: 10px 0;"></textarea>
+                    <p class="help-text">⚠️ Be careful when editing. Invalid JSON will break the pricing system.</p>
+                </div>
+            </div>
+
+            <!-- System Information -->
+            <div class="selection-card">
+                <h2>📊 System Information</h2>
+                <div id="systemInfo">
+                    <p><strong>Database Status:</strong> <span id="dbStatus">Checking...</span></p>
+                    <p><strong>Cache Status:</strong> <span id="cacheStatus">Checking...</span></p>
+                    <p><strong>Last Migration:</strong> <span id="lastMigration">Unknown</span></p>
+                    <p><strong>Active Sessions:</strong> <span id="activeSessions">Checking...</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <a href="../index.html" class="nav-tab">
+                <span class="nav-icon">📱</span>
+                <span class="nav-text">Home</span>
+            </a>
+            <a href="../pages/cart.html" class="nav-tab">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-text">Cart</span>
+                <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
+            </a>
+            <a href="../pages/admin.html" class="nav-tab active">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Admin</span>
+            </a>
+        </nav>
+
+        <!-- Version Info -->
+        <div id="versionInfo" class="version-info"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/paperStocks.js"></script>
+    <script src="../js/pricingConfig.js"></script>
+    <script src="../js/promoConfig.js"></script>
+    <script src="../js/migrate-data.js"></script>
+    <script src="../js/version.js"></script>
+    <script src="../js/admin.js"></script>
+    <script src="../js/sw-register.js"></script>
+
+    <style>
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .admin-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .admin-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .alert {
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .calculate-btn.secondary {
+            background: #6c757d;
+        }
+
+        .calculate-btn.danger {
+            background: #dc3545;
+        }
+
+        .calculate-btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        .calculate-btn.danger:hover {
+            background: #c82333;
+        }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        #migrationOutput {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</body>
+</html>

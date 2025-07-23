@@ -2,10 +2,10 @@
 // Updated automatically when changes are made
 
 const APP_VERSION = {
-  cacheVersion: 'v30.3',
-  timestamp: 'July 18, 2025 - 00:45:00',
-  buildDate: '2025-07-18',
-  lastUpdate: 'Updated apparel with 6 specific garment types, DTF-only decoration, 2-column layout'
+  cacheVersion: 'v33',
+  timestamp: 'July 20, 2025 - 12:30 AM',
+  buildDate: '2025-07-20',
+  lastUpdate: 'Bootstrap navbar implementation: Converted bottom navigation to Bootstrap navbar component'
 };
 
 // Display version info in the page

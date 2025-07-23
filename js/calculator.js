@@ -1,26 +1,87 @@
+// Global pricing data cache
+let pricingData = {
+  paperStocks: null,
+  pricingConfigs: null,
+  isLoaded: false,
+  isFromDatabase: false
+};
+
+// Initialize pricing data from database with fallback to static data
+async function initializePricingData() {
+  if (pricingData.isLoaded) {
+    return pricingData;
+  }
+
+  try {
+    // Try to get data from database
+    if (window.dbManager) {
+      const dbData = await window.dbManager.getPricingData();
+      
+      if (dbData.paperStocks && dbData.pricingConfigs) {
+        pricingData.paperStocks = dbData.paperStocks;
+        pricingData.pricingConfigs = dbData.pricingConfigs;
+        pricingData.isFromDatabase = dbData.isFromDatabase;
+        pricingData.isLoaded = true;
+        
+        console.log('✅ Pricing data loaded from database');
+        return pricingData;
+      }
+    }
+  } catch (error) {
+    console.warn('Database pricing data failed, falling back to static:', error);
+  }
+
+  // Fallback to static data
+  if (typeof paperStocks !== 'undefined' && typeof pricingConfig !== 'undefined') {
+    pricingData.paperStocks = paperStocks;
+    pricingData.pricingConfigs = {
+      formula: pricingConfig.formula,
+      product_constraints: pricingConfig.productConstraints,
+      imposition_data: pricingConfig.impositionData,
+      finishing_costs: pricingConfig.finishingCosts,
+      rush_multipliers: pricingConfig.rushMultipliers
+    };
+    pricingData.isFromDatabase = false;
+    pricingData.isLoaded = true;
+    
+    console.log('📄 Using static pricing data');
+    return pricingData;
+  }
+
+  console.error('❌ No pricing data available');
+  return null;
+}
+
 // Validate quantity constraints for a product
-function validateQuantity(quantity, productType) {
-  const constraints = pricingConfig.productConstraints[productType];
-  if (!constraints) return { valid: true };
+function validateQuantity(quantity, productType, constraints) {
+  if (!constraints || !constraints[productType]) return { valid: true };
   
-  if (quantity < constraints.minQuantity) {
+  const productConstraints = constraints[productType];
+  
+  if (quantity < productConstraints.minQuantity) {
     return { 
       valid: false, 
-      message: `Minimum quantity is ${constraints.minQuantity}` 
+      message: `Minimum quantity is ${productConstraints.minQuantity}` 
     };
   }
   
-  if (quantity > constraints.maxQuantity) {
+  if (quantity > productConstraints.maxQuantity) {
     return { 
       valid: false, 
-      message: `Maximum quantity is ${constraints.maxQuantity}` 
+      message: `Maximum quantity is ${productConstraints.maxQuantity}` 
     };
   }
   
   return { valid: true };
 }
 
-function calculateBrochurePrice(formData) {
+async function calculateBrochurePrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
   const quantity = parseInt(formData.get('quantity'));
   const size = formData.get('size');
   const paperCode = formData.get('paperType');
@@ -28,7 +89,7 @@ function calculateBrochurePrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'brochures');
+  const validation = validateQuantity(quantity, 'brochures', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return {
       error: validation.message
@@ -36,7 +97,7 @@ function calculateBrochurePrice(formData) {
   }
   
   // Get configuration values
-  const config = pricingConfig.formula;
+  const config = data.pricingConfigs.formula;
   const S = config.setupFee;               // $30.00 (printing setup)
   const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
   const k = config.baseProductionRate;     // $1.50
@@ -44,13 +105,13 @@ function calculateBrochurePrice(formData) {
   const clicks = config.clicksCost;        // $0.10
   
   // Get paper and imposition data
-  const selectedPaper = paperStocks[paperCode];
+  const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
   
   const paperCost = selectedPaper.costPerSheet;
-  const imposition = pricingConfig.impositionData.brochures[size];
+  const imposition = data.pricingConfigs.imposition_data.brochures[size];
   if (!imposition) {
     return { error: 'Invalid size selection' };
   }
@@ -59,13 +120,13 @@ function calculateBrochurePrice(formData) {
   const v = (paperCost + clicks) * 1.5 / imposition;
   
   // Get finishing cost per unit
-  const f = pricingConfig.finishingCosts.folding[foldType] || 0;
+  const f = data.pricingConfigs.finishing_costs.folding[foldType] || 0;
   
   // Determine if finishing is required
   const needsFinishing = foldType && foldType !== 'none' && f > 0;
   
   // Get rush multiplier
-  const rushMultiplier = pricingConfig.rushMultipliers[rushType]?.multiplier || 1.0;
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
   
   // Calculate cost components
   const printingSetupCost = S;
@@ -109,14 +170,20 @@ function calculateBrochurePrice(formData) {
   };
 }
 
-function calculatePostcardPrice(formData) {
+async function calculatePostcardPrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
   const quantity = parseInt(formData.get('quantity'));
   const size = formData.get('size');
   const paperCode = formData.get('paperType');
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'postcards');
+  const validation = validateQuantity(quantity, 'postcards', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return {
       error: validation.message
@@ -124,7 +191,7 @@ function calculatePostcardPrice(formData) {
   }
   
   // Get configuration values
-  const config = pricingConfig.formula;
+  const config = data.pricingConfigs.formula;
   const S = config.setupFee;               // $30.00 (printing setup)
   const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
   const k = config.baseProductionRate;     // $1.50
@@ -132,13 +199,13 @@ function calculatePostcardPrice(formData) {
   const clicks = config.clicksCost;        // $0.10
   
   // Get paper and imposition data
-  const selectedPaper = paperStocks[paperCode];
+  const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
   
   const paperCost = selectedPaper.costPerSheet;
-  const imposition = pricingConfig.impositionData.postcards[size];
+  const imposition = data.pricingConfigs.imposition_data.postcards[size];
   if (!imposition) {
     return { error: 'Invalid size selection' };
   }
@@ -151,7 +218,7 @@ function calculatePostcardPrice(formData) {
   const needsFinishing = false;
   
   // Get rush multiplier
-  const rushMultiplier = pricingConfig.rushMultipliers[rushType]?.multiplier || 1.0;
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
   
   // Calculate cost components
   const printingSetupCost = S;
@@ -197,20 +264,27 @@ function calculatePostcardPrice(formData) {
 
 // Handle brochure form
 const brochureForm = document.getElementById('brochureForm');
-const brochureResults = document.getElementById('results');
+const brochureResults = document.getElementById('resultsSection');
 
 if (brochureForm) {
-  brochureForm.addEventListener('submit', (e) => {
+  brochureForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = new FormData(brochureForm);
-    const pricing = calculateBrochurePrice(formData);
+    // Show loading state
+    const submitBtn = brochureForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Calculating...';
+    submitBtn.disabled = true;
     
-    // Handle errors
-    if (pricing.error) {
-      alert(pricing.error);
-      return;
-    }
+    try {
+      const formData = new FormData(brochureForm);
+      const pricing = await calculateBrochurePrice(formData);
+      
+      // Handle errors
+      if (pricing.error) {
+        alert(pricing.error);
+        return;
+      }
     
     // Update the display
     document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
@@ -244,18 +318,26 @@ if (brochureForm) {
       rushMultiplierItem.style.display = 'none';
     }
     
-    brochureResults.style.display = 'block';
-    brochureResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    // Show Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'inline-block';
-      addToCartBtn.onclick = () => {
-        if (window.cartManager) {
-          window.cartManager.addCurrentConfiguration('brochures', formData, pricing);
-        }
-      };
+      brochureResults.style.display = 'block';
+      brochureResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      // Show Add to Cart button
+      const addToCartBtn = document.getElementById('addToCartBtn');
+      if (addToCartBtn) {
+        addToCartBtn.style.display = 'inline-block';
+        addToCartBtn.onclick = () => {
+          if (window.cartManager) {
+            window.cartManager.addCurrentConfiguration('brochures', formData, pricing);
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Calculation error:', error);
+      alert('Error calculating price. Please try again.');
+    } finally {
+      // Restore button state
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
     }
   });
   
@@ -272,20 +354,27 @@ if (brochureForm) {
 
 // Handle postcard form
 const postcardForm = document.getElementById('postcardForm');
-const postcardResults = document.getElementById('results');
+const postcardResults = document.getElementById('resultsSection');
 
 if (postcardForm) {
-  postcardForm.addEventListener('submit', (e) => {
+  postcardForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = new FormData(postcardForm);
-    const pricing = calculatePostcardPrice(formData);
+    // Show loading state
+    const submitBtn = postcardForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Calculating...';
+    submitBtn.disabled = true;
     
-    // Handle errors
-    if (pricing.error) {
-      alert(pricing.error);
-      return;
-    }
+    try {
+      const formData = new FormData(postcardForm);
+      const pricing = await calculatePostcardPrice(formData);
+      
+      // Handle errors
+      if (pricing.error) {
+        alert(pricing.error);
+        return;
+      }
     
     // Update the display
     document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
@@ -308,17 +397,25 @@ if (postcardForm) {
     }
     
     postcardResults.style.display = 'block';
-    postcardResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    // Show Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'inline-block';
-      addToCartBtn.onclick = () => {
-        if (window.cartManager) {
-          window.cartManager.addCurrentConfiguration('postcards', formData, pricing);
-        }
-      };
+      postcardResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      // Show Add to Cart button
+      const addToCartBtn = document.getElementById('addToCartBtn');
+      if (addToCartBtn) {
+        addToCartBtn.style.display = 'inline-block';
+        addToCartBtn.onclick = () => {
+          if (window.cartManager) {
+            window.cartManager.addCurrentConfiguration('postcards', formData, pricing);
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Calculation error:', error);
+      alert('Error calculating price. Please try again.');
+    } finally {
+      // Restore button state
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
     }
   });
   
@@ -420,7 +517,7 @@ function calculateFlyerPrice(formData) {
 
 // Handle flyer form
 const flyerForm = document.getElementById('flyerForm');
-const flyerResults = document.getElementById('results');
+const flyerResults = document.getElementById('resultsSection');
 
 if (flyerForm) {
   flyerForm.addEventListener('submit', (e) => {
@@ -568,7 +665,7 @@ function calculateBookmarkPrice(formData) {
 
 // Handle bookmark form
 const bookmarkForm = document.getElementById('bookmarkForm');
-const bookmarkResults = document.getElementById('results');
+const bookmarkResults = document.getElementById('resultsSection');
 
 if (bookmarkForm) {
   bookmarkForm.addEventListener('submit', (e) => {

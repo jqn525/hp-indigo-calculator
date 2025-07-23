@@ -12,7 +12,7 @@ const promoConfig = {
       'screen-print': 50.00,
       'embroidery': 75.00,
       'heat-transfer': 35.00,
-      'dtf': 40.00,
+      'dtf': 60.00,
       'full-color': 25.00,
       'spot-color': 35.00,
       'super-matte': 25.00,
@@ -25,7 +25,19 @@ const promoConfig = {
     rushMultipliers: {
       'standard': 1.0,
       'rush': 1.25,  // 25% increase for magnets/stickers
-      'express': 1.35 // 35% increase for apparel/bags
+      'express': 1.50 // 50% increase for apparel
+    },
+    
+    // Centralized decoration pricing (used by both apparel and tote bags)
+    decorationPricing: {
+      'dtf': {
+        setupFee: 60.00,
+        printingCost: 10.00  // per piece
+      },
+      'screen-print': {
+        setupFee: 50.00,
+        printingCost: 8.00   // per piece (placeholder - disabled for now)
+      }
     }
   },
 
@@ -85,49 +97,51 @@ const promoConfig = {
       maxQuantity: 5000,
       stepQuantity: 1,
       
-      // Standard sizes (XS-XL) - same price
+      // Standard sizes (XS-XL) - garment cost with 25% markup
       baseCosts: {
         'gildan-6400': {
-          'dtf': 10.00
+          'dtf': 5.25
         },
         'atc-f2700': {
-          'dtf': 22.00
+          'dtf': 29.99
         },
         'gildan-sf000': {
-          'dtf': 18.00
+          'dtf': 19.99
         },
         'gildan-1801': {
-          'dtf': 20.00
+          'dtf': 15.03
         },
         'gildan-sf500': {
-          'dtf': 24.00
+          'dtf': 24.38
         },
         'gildan-1850': {
-          'dtf': 26.00
+          'dtf': 21.96
         }
       },
       
-      // Extended sizes (2XL-4XL) - higher price (will be updated with real pricing)
+      // Extended sizes (2XL-4XL) - garment cost with 25% markup
       extendedSizeCosts: {
         'gildan-6400': {
-          'dtf': 13.00
+          'dtf': 9.56
         },
         'atc-f2700': {
-          'dtf': 25.00
+          'dtf': 33.74
         },
         'gildan-sf000': {
-          'dtf': 21.00
+          'dtf': 27.49
         },
         'gildan-1801': {
-          'dtf': 23.00
+          'dtf': 21.46
         },
         'gildan-sf500': {
-          'dtf': 27.00
+          'dtf': 34.38
         },
         'gildan-1850': {
-          'dtf': 29.00
+          'dtf': 30.20
         }
       },
+      
+      // Apparel uses the centralized decoration pricing from pricing.decorationPricing
       
       volumeBreaks: [
         { min: 10, max: 23, discount: 0.0 },
@@ -139,88 +153,23 @@ const promoConfig = {
     },
 
     'tote-bags': {
-      name: 'Custom Tote Bags',
-      minQuantity: 25,
+      name: 'Canvas Tote Bags',
+      minQuantity: 10,
       maxQuantity: 5000,
-      stepQuantity: 25,
+      stepQuantity: 5,
       
-      baseCosts: {
-        'canvas-tote': {
-          'small': {
-            'screen-print': 4.50,
-            'heat-transfer': 6.00,
-            'embroidery': 8.50
-          },
-          'medium': {
-            'screen-print': 5.50,
-            'heat-transfer': 7.00,
-            'embroidery': 9.50
-          },
-          'large': {
-            'screen-print': 6.50,
-            'heat-transfer': 8.00,
-            'embroidery': 10.50
-          }
-        },
-        'poly-tote': {
-          'small': {
-            'screen-print': 2.50,
-            'heat-transfer': 4.00,
-            'embroidery': 6.50
-          },
-          'medium': {
-            'screen-print': 3.00,
-            'heat-transfer': 4.50,
-            'embroidery': 7.00
-          },
-          'large': {
-            'screen-print': 3.50,
-            'heat-transfer': 5.00,
-            'embroidery': 7.50
-          }
-        },
-        'jute-tote': {
-          'small': {
-            'screen-print': 3.50,
-            'heat-transfer': 5.00,
-            'embroidery': 7.50
-          },
-          'medium': {
-            'screen-print': 4.50,
-            'heat-transfer': 6.00,
-            'embroidery': 8.50
-          },
-          'large': {
-            'screen-print': 5.50,
-            'heat-transfer': 7.00,
-            'embroidery': 9.50
-          }
-        },
-        'drawstring': {
-          'small': {
-            'screen-print': 1.50,
-            'heat-transfer': 3.00,
-            'embroidery': 5.50
-          },
-          'medium': {
-            'screen-print': 2.00,
-            'heat-transfer': 3.50,
-            'embroidery': 6.00
-          },
-          'large': {
-            'screen-print': 2.50,
-            'heat-transfer': 4.00,
-            'embroidery': 6.50
-          }
-        }
+      // Fixed pricing structure
+      bagCost: 5.00,  // Bag cost already includes markup
+      
+      // Print size multipliers (applied to base decoration cost)
+      printSizeMultipliers: {
+        '10x10': 1.0,   // Standard size, no multiplier
+        '12x12': 1.25   // 25% increase for larger size
       },
       
+      // No volume discounts for simplified pricing
       volumeBreaks: [
-        { min: 25, max: 49, discount: 0.0 },
-        { min: 50, max: 99, discount: 0.05 },
-        { min: 100, max: 249, discount: 0.10 },
-        { min: 250, max: 499, discount: 0.15 },
-        { min: 500, max: 5000, discount: 0.20 }
+        { min: 10, max: 5000, discount: 0.0 }
       ]
     }
   },
@@ -261,7 +210,11 @@ const promoConfig = {
         break;
         
       case 'tote-bags':
-        cost = product.baseCosts[specifications.bagType]?.[specifications.size]?.[specifications.decorationType] || 0;
+        // For tote bags, return the bag cost + decoration printing cost (adjusted for size)
+        const decorationData = this.pricing.decorationPricing[specifications.decorationType];
+        const sizeMultiplier = product.printSizeMultipliers[specifications.size] || 1.0;
+        const decorationCost = decorationData ? decorationData.printingCost * sizeMultiplier : 0;
+        cost = product.bagCost + decorationCost;
         break;
     }
     

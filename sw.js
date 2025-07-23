@@ -1,4 +1,4 @@
-const CACHE_NAME = 'indigo-calc-v30.3';
+const CACHE_NAME = 'indigo-calc-v35';
 
 // Determine if we're running on localhost or production
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -18,6 +18,11 @@ const urlsToCache = [
   `${basePath}/js/promoConfig.js`,
   `${basePath}/js/promoCalculator.js`,
   `${basePath}/js/version.js`,
+  `${basePath}/js/supabase.js`,
+  `${basePath}/js/auth.js`,
+  `${basePath}/js/db.js`,
+  `${basePath}/js/migrate-data.js`,
+  `${basePath}/js/admin.js`,
   `${basePath}/pages/brochures.html`,
   `${basePath}/pages/postcards.html`,
   `${basePath}/pages/flyers.html`,
@@ -29,6 +34,9 @@ const urlsToCache = [
   `${basePath}/pages/stickers.html`,
   `${basePath}/pages/apparel.html`,
   `${basePath}/pages/tote-bags.html`,
+  `${basePath}/pages/signin.html`,
+  `${basePath}/pages/quotes.html`,
+  `${basePath}/pages/admin.html`,
   `${basePath}/manifest.json`
 ];
 

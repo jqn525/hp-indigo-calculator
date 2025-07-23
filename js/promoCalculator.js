@@ -1,13 +1,69 @@
 // Promotional Products Pricing Calculator
 // Handles pricing calculations for outsourced promotional items
 
+// Global promo pricing data cache
+let promoPricingData = {
+  promoConfig: null,
+  isLoaded: false,
+  isFromDatabase: false
+};
+
+// Initialize promo pricing data from database with fallback to static data
+async function initializePromoPricingData() {
+  if (promoPricingData.isLoaded) {
+    return promoPricingData;
+  }
+
+  try {
+    // Try to get data from database
+    if (window.dbManager) {
+      const pricingConfigs = await window.dbManager.getPricingConfigs();
+      
+      if (pricingConfigs && pricingConfigs.promo_pricing && pricingConfigs.promo_products) {
+        promoPricingData.promoConfig = {
+          pricing: pricingConfigs.promo_pricing,
+          products: pricingConfigs.promo_products,
+          getVolumeDiscount: promoConfig?.getVolumeDiscount || function() { return 0; },
+          getBaseCost: promoConfig?.getBaseCost || function() { return 0; }
+        };
+        promoPricingData.isFromDatabase = true;
+        promoPricingData.isLoaded = true;
+        
+        console.log('✅ Promo pricing data loaded from database');
+        return promoPricingData;
+      }
+    }
+  } catch (error) {
+    console.warn('Database promo pricing data failed, falling back to static:', error);
+  }
+
+  // Fallback to static data
+  if (typeof promoConfig !== 'undefined') {
+    promoPricingData.promoConfig = promoConfig;
+    promoPricingData.isFromDatabase = false;
+    promoPricingData.isLoaded = true;
+    
+    console.log('📄 Using static promo pricing data');
+    return promoPricingData;
+  }
+
+  console.error('❌ No promo pricing data available');
+  return null;
+}
+
 // General promo product calculation function
-function calculatePromoPrice(productType, formData) {
+async function calculatePromoPrice(productType, formData) {
+  // Initialize promo pricing data
+  const data = await initializePromoPricingData();
+  if (!data) {
+    return { error: 'Promo pricing data not available' };
+  }
+
   const quantity = parseInt(formData.get('quantity'));
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity
-  const product = promoConfig.products[productType];
+  const product = data.data.promoConfig.products[productType];
   if (!product) {
     return { error: 'Product type not found' };
   }
@@ -54,13 +110,13 @@ function calculatePromoPrice(productType, formData) {
   }
   
   // Get base cost per unit
-  const baseCost = promoConfig.getBaseCost(productType, specifications);
+  const baseCost = data.data.promoConfig.getBaseCost(productType, specifications);
   if (baseCost === 0) {
     return { error: 'Invalid product configuration' };
   }
   
   // Calculate volume discount
-  const volumeDiscount = promoConfig.getVolumeDiscount(productType, quantity);
+  const volumeDiscount = data.promoConfig.getVolumeDiscount(productType, quantity);
   
   // Apply volume discount to base cost
   const discountedUnitCost = baseCost * (1 - volumeDiscount);
@@ -71,19 +127,19 @@ function calculatePromoPrice(productType, formData) {
   // Add setup fee based on decoration type
   let setupFee = 0;
   const decorationType = specifications.decorationType || specifications.type;
-  if (decorationType && promoConfig.pricing.setupFees[decorationType]) {
-    setupFee = promoConfig.pricing.setupFees[decorationType];
+  if (decorationType && data.promoConfig.pricing.setupFees[decorationType]) {
+    setupFee = data.promoConfig.pricing.setupFees[decorationType];
   }
   
   // Calculate cost before markup
   const costBeforeMarkup = subtotal + setupFee;
   
   // Apply markup
-  const markup = promoConfig.pricing.markupPercentage;
+  const markup = data.promoConfig.pricing.markupPercentage;
   const priceAfterMarkup = costBeforeMarkup * (1 + markup);
   
   // Apply rush multiplier
-  const rushMultiplier = promoConfig.pricing.rushMultipliers[rushType] || 1.0;
+  const rushMultiplier = data.promoConfig.pricing.rushMultipliers[rushType] || 1.0;
   const finalPrice = priceAfterMarkup * rushMultiplier;
   
   // Calculate unit price
@@ -108,13 +164,19 @@ function calculatePromoPrice(productType, formData) {
 }
 
 // Individual product calculator functions
-function calculateMagnetPrice(formData) {
+async function calculateMagnetPrice(formData) {
+  // Initialize promo pricing data
+  const data = await initializePromoPricingData();
+  if (!data) {
+    return { error: 'Promo pricing data not available' };
+  }
+
   const quantity = parseInt(formData.get('quantity'));
   const size = formData.get('size');
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate inputs
-  const product = promoConfig.products.magnets;
+  const product = data.promoConfig.products.magnets;
   if (quantity < product.minQuantity || quantity > product.maxQuantity) {
     return { 
       error: `Quantity must be between ${product.minQuantity} and ${product.maxQuantity}` 
@@ -165,7 +227,7 @@ function calculateMagnetPrice(formData) {
   const priceAfterMarkup = supplierCost * (1 + product.markupPercentage);
   
   // Apply rush multiplier
-  const rushMultiplier = promoConfig.pricing.rushMultipliers[rushType] || 1.0;
+  const rushMultiplier = data.promoConfig.pricing.rushMultipliers[rushType] || 1.0;
   const finalPrice = priceAfterMarkup * rushMultiplier;
   
   // Calculate unit price
@@ -187,14 +249,20 @@ function calculateMagnetPrice(formData) {
   };
 }
 
-function calculateStickerPrice(formData) {
+async function calculateStickerPrice(formData) {
+  // Initialize promo pricing data
+  const data = await initializePromoPricingData();
+  if (!data) {
+    return { error: 'Promo pricing data not available' };
+  }
+
   const quantity = parseInt(formData.get('quantity'));
   const size = formData.get('size');
   const stickerType = formData.get('stickerType');
   const rushType = formData.get('rushType') || 'standard';
   
   // Get product configuration
-  const product = promoConfig.products.stickers;
+  const product = data.promoConfig.products.stickers;
   
   // Validate quantity constraints
   if (quantity < product.minQuantity || quantity > product.maxQuantity) {
@@ -248,7 +316,7 @@ function calculateStickerPrice(formData) {
   const priceAfterMarkup = supplierCost * (1 + product.markupPercentage);
   
   // Apply rush multiplier
-  const rushMultiplier = promoConfig.pricing.rushMultipliers[rushType] || 1.0;
+  const rushMultiplier = data.promoConfig.pricing.rushMultipliers[rushType] || 1.0;
   const finalPrice = priceAfterMarkup * rushMultiplier;
   
   // Calculate unit price
@@ -270,7 +338,13 @@ function calculateStickerPrice(formData) {
   };
 }
 
-function calculateApparelPrice(formData) {
+async function calculateApparelPrice(formData) {
+  // Initialize promo pricing data
+  const data = await initializePromoPricingData();
+  if (!data) {
+    return { error: 'Promo pricing data not available' };
+  }
+
   const garmentType = formData.get('garmentType');
   const decorationType = formData.get('decorationType');
   const rushType = formData.get('rushType') || 'standard';
@@ -297,7 +371,7 @@ function calculateApparelPrice(formData) {
   const totalQuantity = standardTotal + extendedTotal;
   
   // Get product configuration
-  const product = promoConfig.products.apparel;
+  const product = data.promoConfig.products.apparel;
   
   // Validate minimum quantity
   if (totalQuantity < product.minQuantity) {
@@ -306,35 +380,52 @@ function calculateApparelPrice(formData) {
     };
   }
   
-  // Get base costs
-  const standardCost = product.baseCosts[garmentType]?.[decorationType] || 0;
-  const extendedCost = product.extendedSizeCosts[garmentType]?.[decorationType] || 0;
+  // Get base costs (garment only)
+  const standardGarmentCost = product.baseCosts[garmentType]?.[decorationType] || 0;
+  const extendedGarmentCost = product.extendedSizeCosts[garmentType]?.[decorationType] || 0;
   
-  if (standardCost === 0 && extendedCost === 0) {
+  // Get printing cost from centralized decoration pricing
+  const decorationData = data.promoConfig.pricing.decorationPricing[decorationType];
+  const printingCost = decorationData ? decorationData.printingCost : 0;
+  
+  if (standardGarmentCost === 0 && extendedGarmentCost === 0) {
     return {
       error: `Invalid garment type or decoration: ${garmentType} with ${decorationType}`
     };
   }
   
-  // Calculate setup fee
-  const setupFee = promoConfig.pricing.setupFees[decorationType] || 0;
+  // Calculate total cost per piece (garment + printing)
+  const standardTotalCost = standardGarmentCost + printingCost;
+  const extendedTotalCost = extendedGarmentCost + printingCost;
+  
+  // Calculate setup fee from centralized decoration pricing
+  const setupFee = decorationData ? decorationData.setupFee : 0;
+  
+  // Calculate cost breakdowns
+  const standardGarmentSubtotal = standardTotal * standardGarmentCost;
+  const extendedGarmentSubtotal = extendedTotal * extendedGarmentCost;
+  const garmentSubtotal = standardGarmentSubtotal + extendedGarmentSubtotal;
+  
+  const printingSubtotal = totalQuantity * printingCost;
+  
+  // Calculate raw subtotal (just the sum of all costs)
+  const rawSubtotal = setupFee + garmentSubtotal + printingSubtotal;
   
   // Calculate subtotal before volume discount
-  const standardSubtotal = standardTotal * standardCost;
-  const extendedSubtotal = extendedTotal * extendedCost;
+  const standardSubtotal = standardTotal * standardTotalCost;
+  const extendedSubtotal = extendedTotal * extendedTotalCost;
   const subtotal = standardSubtotal + extendedSubtotal + setupFee;
   
   // Apply volume discount based on total quantity
-  const volumeDiscount = promoConfig.getVolumeDiscount('apparel', totalQuantity);
+  const volumeDiscount = data.promoConfig.getVolumeDiscount('apparel', totalQuantity);
   const discountAmount = subtotal * volumeDiscount;
   const afterDiscount = subtotal - discountAmount;
   
-  // Apply markup
-  const markup = promoConfig.pricing.markupPercentage;
-  const priceAfterMarkup = afterDiscount * (1 + markup);
+  // Skip markup for apparel (prices already include markup)
+  const priceAfterMarkup = afterDiscount;
   
-  // Apply rush multiplier
-  const rushMultiplier = promoConfig.pricing.rushMultipliers[rushType] || 1.0;
+  // Apply rush multiplier (use 'express' for apparel)
+  const rushMultiplier = rushType === 'rush' ? data.promoConfig.pricing.rushMultipliers.express : data.promoConfig.pricing.rushMultipliers.standard;
   const finalPrice = priceAfterMarkup * rushMultiplier;
   
   // Calculate unit price
@@ -350,13 +441,21 @@ function calculateApparelPrice(formData) {
       decorationType: decorationType
     },
     setupFee: setupFee,
-    standardCost: standardCost,
-    extendedCost: extendedCost,
+    standardGarmentCost: standardGarmentCost,
+    extendedGarmentCost: extendedGarmentCost,
+    printingCost: printingCost,
+    standardTotalCost: standardTotalCost,
+    extendedTotalCost: extendedTotalCost,
+    garmentSubtotal: garmentSubtotal,
+    printingSubtotal: printingSubtotal,
+    rawSubtotal: rawSubtotal,
     subtotal: subtotal,
     volumeDiscount: volumeDiscount,
+    volumeDiscountPercent: (volumeDiscount * 100),
     discountAmount: discountAmount,
     afterDiscount: afterDiscount,
-    markup: markup,
+    beforeRushSubtotal: priceAfterMarkup,
+    markup: 0,
     priceAfterMarkup: priceAfterMarkup,
     rushMultiplier: rushMultiplier,
     totalPrice: finalPrice,
@@ -365,8 +464,82 @@ function calculateApparelPrice(formData) {
   };
 }
 
-function calculateToteBagPrice(formData) {
-  return calculatePromoPrice('tote-bags', formData);
+async function calculateToteBagPrice(formData) {
+  // Initialize promo pricing data
+  const data = await initializePromoPricingData();
+  if (!data) {
+    return { error: 'Promo pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const decorationType = formData.get('decorationType');
+  const rushType = formData.get('rushType') || 'standard';
+  
+  // Get product configuration
+  const product = data.promoConfig.products['tote-bags'];
+  
+  // Validate quantity
+  if (quantity < product.minQuantity || quantity > product.maxQuantity) {
+    return { 
+      error: `Quantity must be between ${product.minQuantity} and ${product.maxQuantity}` 
+    };
+  }
+  
+  // Validate step quantity
+  if ((quantity - product.minQuantity) % product.stepQuantity !== 0) {
+    return { 
+      error: `Quantity must be in increments of ${product.stepQuantity} pieces starting from ${product.minQuantity}` 
+    };
+  }
+  
+  // Get decoration pricing
+  const decorationData = data.promoConfig.pricing.decorationPricing[decorationType];
+  if (!decorationData) {
+    return { error: `Invalid decoration type: ${decorationType}. Available types: ${Object.keys(data.promoConfig.pricing.decorationPricing).join(', ')}` };
+  }
+  
+  // Calculate costs
+  const bagCost = product.bagCost;
+  const sizeMultiplier = product.printSizeMultipliers[size];
+  if (sizeMultiplier === undefined) {
+    return { error: `Invalid size: ${size}. Available sizes: ${Object.keys(product.printSizeMultipliers).join(', ')}` };
+  }
+  const printingCostPerPiece = decorationData.printingCost * sizeMultiplier;
+  const unitCost = bagCost + printingCostPerPiece;
+  
+  // Calculate subtotal
+  const subtotal = unitCost * quantity;
+  
+  // Add setup fee
+  const setupFee = decorationData.setupFee;
+  const totalBeforeRush = subtotal + setupFee;
+  
+  // Apply rush multiplier
+  const rushMultiplier = data.promoConfig.pricing.rushMultipliers[rushType] || 1.0;
+  const finalPrice = totalBeforeRush * rushMultiplier;
+  
+  // Calculate unit price
+  const unitPrice = finalPrice / quantity;
+  
+  return {
+    quantity: quantity,
+    specifications: {
+      bagType: formData.get('bagType'),
+      size: size,
+      decorationType: decorationType
+    },
+    bagCost: bagCost,
+    printingCost: printingCostPerPiece,
+    unitCost: unitCost,
+    subtotal: subtotal,
+    setupFee: setupFee,
+    totalBeforeRush: totalBeforeRush,
+    rushMultiplier: rushMultiplier,
+    totalPrice: finalPrice,
+    unitPrice: unitPrice,
+    rushType: rushType
+  };
 }
 
 // Helper function to format size breakdown for display
@@ -410,6 +583,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const selectionCards = document.querySelectorAll('.selection-card');
   selectionCards.forEach(card => {
     card.addEventListener('click', function() {
+      // Check if card is disabled
+      if (this.classList.contains('disabled')) {
+        return; // Do nothing for disabled cards
+      }
+      
       const section = this.closest('.selection-section');
       const hiddenInput = section.querySelector('input[type="hidden"]');
       
@@ -572,15 +750,6 @@ function displayPromoResults(result, formId) {
   const resultsSection = document.getElementById('resultsSection');
   if (!resultsSection) return;
   
-  // Update result values
-  document.getElementById('resultQuantity').textContent = result.quantity.toLocaleString();
-  document.getElementById('resultTotal').textContent = '$' + result.totalPrice.toFixed(2);
-  document.getElementById('resultUnitPrice').textContent = '$' + result.unitPrice.toFixed(2);
-  
-  // Update production time
-  const productionText = result.rushType === 'standard' ? 'Standard' : 'Rush';
-  document.getElementById('resultProduction').textContent = productionText;
-  
   // Update product-specific fields based on form type
   switch (formId) {
     case 'magnetForm':
@@ -594,12 +763,42 @@ function displayPromoResults(result, formId) {
       break;
       
     case 'apparelForm':
-      document.getElementById('resultGarment').textContent = getGarmentDescription(result.specifications.garmentType);
-      document.getElementById('resultDecoration').textContent = 'DTF (Direct-to-Film)';
+      // Update cost breakdown details
+      document.getElementById('setupFee').textContent = `$${result.setupFee.toFixed(2)}`;
+      document.getElementById('garmentCost').textContent = `$${result.garmentSubtotal.toFixed(2)}`;
+      document.getElementById('printingCost').textContent = `$${result.printingSubtotal.toFixed(2)}`;
+      
+      // Display raw subtotal (sum of all costs)
+      document.getElementById('subtotal').textContent = `$${result.rawSubtotal.toFixed(2)}`;
+      
+      document.getElementById('unitPrice').textContent = `$${result.unitPrice.toFixed(2)}`;
+      document.getElementById('totalPrice').textContent = `$${result.totalPrice.toFixed(2)}`;
+      
+      // Update descriptive fields
+      document.getElementById('garmentDescription').textContent = getGarmentDescription(result.specifications.garmentType);
+      document.getElementById('productionTime').textContent = result.rushType === 'standard' ? 'Standard (10-14 days)' : 'Rush (5-7 days)';
       
       // Update quantity display to show size breakdown
       const sizeBreakdownText = formatSizeBreakdown(result.sizeBreakdown);
-      document.getElementById('resultQuantity').innerHTML = `${result.quantity.toLocaleString()}<br><small>${sizeBreakdownText}</small>`;
+      document.getElementById('quantityBreakdown').innerHTML = `${result.quantity.toLocaleString()}<br><small>${sizeBreakdownText}</small>`;
+      
+      // Show/hide volume discount
+      const volumeDiscountItem = document.getElementById('volumeDiscountItem');
+      if (result.volumeDiscount > 0) {
+        document.getElementById('volumeDiscountAmount').textContent = `-$${result.discountAmount.toFixed(2)} (${result.volumeDiscountPercent.toFixed(0)}% off)`;
+        volumeDiscountItem.style.display = 'flex';
+      } else {
+        volumeDiscountItem.style.display = 'none';
+      }
+      
+      // Show/hide rush multiplier
+      const rushMultiplierItem = document.getElementById('rushMultiplierItem');
+      if (result.rushMultiplier > 1.0) {
+        document.getElementById('rushMultiplier').textContent = `${result.rushMultiplier.toFixed(1)}x`;
+        rushMultiplierItem.style.display = 'flex';
+      } else {
+        rushMultiplierItem.style.display = 'none';
+      }
       break;
       
     case 'toteBagForm':
@@ -638,8 +837,8 @@ function createPromoCartItem(result, formId) {
       break;
       
     case 'toteBagForm':
-      productType = 'Custom Tote Bags';
-      description = `${result.specifications.bagType} ${result.specifications.size} - ${result.specifications.decorationType}`;
+      productType = 'Canvas Tote Bags';
+      description = `${result.specifications.bagType.replace('-', ' ')} ${result.specifications.size} - ${result.specifications.decorationType.replace('-', ' ')}`;
       break;
   }
   

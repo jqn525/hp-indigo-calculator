@@ -9,6 +9,7 @@
     <title>Custom Apparel - Promo Calculator</title>
     
     <link rel="manifest" href="../manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/styles.css">
     
     <meta name="mobile-web-app-capable" content="yes">
@@ -23,10 +24,10 @@
             
             <form id="apparelForm">
                 <!-- Type Section -->
-                <div class="selection-section">
-                    <div class="selection-header">
+                <div class="selection-section mb-4">
+                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
                         <h3>Garment Type</h3>
-                        <a href="#" class="help-link">What's this?</a>
+                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
                     </div>
                     <div class="selection-grid">
                         <div class="selection-card selected" data-value="gildan-6400">
@@ -58,25 +59,29 @@
                 </div>
 
                 <!-- Decoration Section -->
-                <div class="selection-section">
-                    <div class="selection-header">
+                <div class="selection-section mb-4">
+                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
                         <h3>Decoration</h3>
-                        <a href="#" class="help-link">What's this?</a>
+                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
                     </div>
-                    <div class="selection-grid single-option">
+                    <div class="selection-grid">
                         <div class="selection-card selected" data-value="dtf">
                             <span>DTF (Direct-to-Film)</span>
                             <span class="description">Full Color Printing</span>
+                        </div>
+                        <div class="selection-card disabled" data-value="screen-print">
+                            <span>Screen Print</span>
+                            <span class="description">1-2 Colors</span>
                         </div>
                     </div>
                     <input type="hidden" id="decorationType" name="decorationType" value="dtf" required>
                 </div>
 
                 <!-- Size Breakdown Section -->
-                <div class="selection-section">
-                    <div class="selection-header">
+                <div class="selection-section mb-4">
+                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
                         <h3>Size Breakdown</h3>
-                        <a href="#" class="help-link">What's this?</a>
+                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
                     </div>
                     
                     <div class="size-tier">
@@ -84,23 +89,23 @@
                         <div class="size-inputs-grid">
                             <div class="size-input">
                                 <label>XS</label>
-                                <input type="number" name="sizeXS" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="sizeXS" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                             <div class="size-input">
                                 <label>S</label>
-                                <input type="number" name="sizeS" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="sizeS" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                             <div class="size-input">
                                 <label>M</label>
-                                <input type="number" name="sizeM" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="sizeM" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                             <div class="size-input">
                                 <label>L</label>
-                                <input type="number" name="sizeL" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="sizeL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                             <div class="size-input">
                                 <label>XL</label>
-                                <input type="number" name="sizeXL" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="sizeXL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                         </div>
                     </div>
@@ -110,15 +115,15 @@
                         <div class="size-inputs-grid">
                             <div class="size-input">
                                 <label>2XL</label>
-                                <input type="number" name="size2XL" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="size2XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                             <div class="size-input">
                                 <label>3XL</label>
-                                <input type="number" name="size3XL" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="size3XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                             <div class="size-input">
                                 <label>4XL</label>
-                                <input type="number" name="size4XL" min="0" max="500" value="0" class="size-quantity">
+                                <input type="number" name="size4XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
                             </div>
                         </div>
                     </div>
@@ -133,10 +138,10 @@
                 <input type="hidden" id="totalQuantityInput" name="totalQuantity" value="0" required>
 
                 <!-- Rush Options Section -->
-                <div class="selection-section">
-                    <div class="selection-header">
+                <div class="selection-section mb-4">
+                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
                         <h3>Production Time</h3>
-                        <a href="#" class="help-link">What's this?</a>
+                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
                     </div>
                     <div class="selection-grid">
                         <div class="selection-card selected" data-value="standard">
@@ -153,127 +158,158 @@
 
                 <!-- Action Buttons -->
                 <div class="button-grid">
-                    <button type="submit" class="button button-primary">Calculate</button>
-                    <button type="button" class="button button-secondary" id="addToCartBtn">Add to Cart</button>
-                    <button type="button" class="button button-tertiary" id="clearBtn">Clear</button>
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                    <button type="button" class="btn btn-secondary" id="addToCartBtn">Add to Cart</button>
+                    <button type="button" class="btn btn-light" id="clearBtn">Clear</button>
                 </div>
             </form>
 
             <!-- Results Section -->
             <div class="results-section" id="resultsSection" style="display: none;">
-                <h3>Pricing Details</h3>
-                <div class="results-grid">
-                    <div class="result-item">
-                        <span class="result-label">Quantity:</span>
-                        <span class="result-value" id="resultQuantity">-</span>
+                <h3>Price Estimate</h3>
+                <div class="price-display">
+                    <span id="totalPrice">$0.00</span>
+                </div>
+                
+                <div class="price-breakdown">
+                    <h4>Cost Breakdown:</h4>
+                    <div class="breakdown-item">
+                        <span>DTF Setup Fee:</span>
+                        <span id="setupFee">$0.00</span>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Garment:</span>
-                        <span class="result-value" id="resultGarment">-</span>
+                    <div class="breakdown-item">
+                        <span>Garment Cost:</span>
+                        <span id="garmentCost">$0.00</span>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Decoration:</span>
-                        <span class="result-value" id="resultDecoration">-</span>
+                    <div class="breakdown-item">
+                        <span>Printing Cost:</span>
+                        <span id="printingCost">$0.00</span>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Production:</span>
-                        <span class="result-value" id="resultProduction">-</span>
+                    <div class="breakdown-item" id="volumeDiscountItem" style="display: none;">
+                        <span>Volume Discount:</span>
+                        <span id="volumeDiscountAmount">$0.00</span>
                     </div>
-                    <div class="result-item total">
-                        <span class="result-label">Total Price:</span>
-                        <span class="result-value" id="resultTotal">$0.00</span>
+                    <div class="breakdown-item">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">$0.00</span>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Unit Price:</span>
-                        <span class="result-value" id="resultUnitPrice">$0.00</span>
+                    <div class="breakdown-item" id="rushMultiplierItem" style="display: none;">
+                        <span>Rush Multiplier:</span>
+                        <span id="rushMultiplier">1.0x</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Price per Unit:</span>
+                        <span id="unitPrice">$0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Quantity:</span>
+                        <span id="quantityBreakdown">0</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Garment:</span>
+                        <span id="garmentDescription">-</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Production:</span>
+                        <span id="productionTime">-</span>
                     </div>
                 </div>
             </div>
         </div>
     </main>
     
-    <nav>
-        <div class="nav-container">
-            <a href="../index.html" class="nav-item">
-                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                    <g>
-                        <!-- Desktop printer body -->
-                        <rect x="12" y="24" width="40" height="20" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
-                        <!-- Paper trays -->
-                        <rect x="8" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
-                        <rect x="44" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
-                        <!-- Control panel -->
-                        <rect x="20" y="18" width="24" height="6" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="1" rx="1"/>
-                        <!-- Status lights -->
-                        <circle cx="24" cy="21" r="1" fill="currentColor"/>
-                        <circle cx="28" cy="21" r="1" fill="currentColor"/>
-                        <circle cx="32" cy="21" r="1" fill="currentColor"/>
-                        <!-- Paper output -->
-                        <rect x="24" y="44" width="16" height="12" fill="currentColor" opacity="0.15" stroke="currentColor" stroke-width="1.5" rx="1"/>
-                        <!-- Paper sheet coming out -->
-                        <rect x="26" y="46" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2,1" rx="0.5"/>
-                    </g>
-                </svg>
-                Small Format
-            </a>
-            <a href="large-format.html" class="nav-item">
-                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                    <g>
-                        <!-- Large format printer/plotter icon -->
-                        <rect x="8" y="16" width="48" height="32" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
-                        <rect x="12" y="20" width="40" height="24" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1" rx="1"/>
-                        <!-- Paper coming out -->
-                        <path d="M 20 44 Q 22 46 24 44 L 40 44 Q 42 46 44 44" stroke="currentColor" stroke-width="2" fill="none"/>
-                        <!-- Control panel -->
-                        <rect x="54" y="22" width="6" height="12" fill="currentColor" opacity="0.3" rx="1"/>
-                        <circle cx="57" cy="26" r="1" fill="currentColor"/>
-                        <circle cx="57" cy="30" r="1" fill="currentColor"/>
-                        <!-- Stand legs -->
-                        <line x1="16" y1="48" x2="16" y2="54" stroke="currentColor" stroke-width="2"/>
-                        <line x1="48" y1="48" x2="48" y2="54" stroke="currentColor" stroke-width="2"/>
-                    </g>
-                </svg>
-                Large Format
-            </a>
-            <a href="promo.html" class="nav-item active">
-                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                    <g>
-                        <!-- Gift/promo box with ribbon -->
-                        <rect x="16" y="24" width="32" height="24" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
-                        <!-- Ribbon vertical -->
-                        <rect x="30" y="20" width="4" height="32" fill="currentColor" opacity="0.3"/>
-                        <!-- Ribbon horizontal -->
-                        <rect x="12" y="34" width="40" height="4" fill="currentColor" opacity="0.3"/>
-                        <!-- Bow/knot -->
-                        <ellipse cx="32" cy="28" rx="6" ry="4" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1"/>
-                        <path d="M 26 28 Q 32 24 38 28 Q 32 32 26 28" fill="currentColor" opacity="0.3"/>
-                        <!-- Stars/sparkles around -->
-                        <path d="M 12 18 L 14 20 L 12 22 L 10 20 Z" fill="currentColor" opacity="0.4"/>
-                        <path d="M 52 18 L 54 20 L 52 22 L 50 20 Z" fill="currentColor" opacity="0.4"/>
-                        <path d="M 12 50 L 14 52 L 12 54 L 10 52 Z" fill="currentColor" opacity="0.4"/>
-                        <path d="M 52 50 L 54 52 L 52 54 L 50 52 Z" fill="currentColor" opacity="0.4"/>
-                    </g>
-                </svg>
-                Promo
-            </a>
-            <a href="cart.html" class="nav-item" id="cartNavItem">
-                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                    <g>
-                        <!-- Shopping cart body -->
-                        <path d="M12 16 L16 16 L20 44 L52 44 L56 24 L24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        <!-- Cart handle -->
-                        <path d="M20 44 L20 48 Q20 52 24 52 L48 52 Q52 52 52 48 L52 44" stroke="currentColor" stroke-width="2" fill="none"/>
-                        <!-- Cart wheels -->
-                        <circle cx="28" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-                        <circle cx="44" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-                        <!-- Cart items (papers) -->
-                        <rect x="28" y="28" width="16" height="12" fill="currentColor" opacity="0.2" rx="1"/>
-                        <rect x="30" y="30" width="12" height="8" fill="currentColor" opacity="0.3" rx="0.5"/>
-                    </g>
-                </svg>
-                <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-                Cart
-            </a>
+    <nav class="navbar navbar-light bg-white fixed-bottom border-top navbar-bottom">
+        <div class="container-fluid px-2">
+            <ul class="navbar-nav nav-justified w-100 flex-row m-0">
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link text-center">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <!-- Desktop printer body -->
+                                <rect x="12" y="24" width="40" height="20" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
+                                <!-- Paper trays -->
+                                <rect x="8" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
+                                <rect x="44" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
+                                <!-- Control panel -->
+                                <rect x="20" y="18" width="24" height="6" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="1" rx="1"/>
+                                <!-- Status lights -->
+                                <circle cx="24" cy="21" r="1" fill="currentColor"/>
+                                <circle cx="28" cy="21" r="1" fill="currentColor"/>
+                                <circle cx="32" cy="21" r="1" fill="currentColor"/>
+                                <!-- Paper output -->
+                                <rect x="24" y="44" width="16" height="12" fill="currentColor" opacity="0.15" stroke="currentColor" stroke-width="1.5" rx="1"/>
+                                <!-- Paper sheet coming out -->
+                                <rect x="26" y="46" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2,1" rx="0.5"/>
+                            </g>
+                        </svg>
+                        <span class="nav-text">Small Format</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="large-format.html" class="nav-link text-center">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <!-- Large format printer/plotter icon -->
+                                <rect x="8" y="16" width="48" height="32" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
+                                <rect x="12" y="20" width="40" height="24" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1" rx="1"/>
+                                <!-- Paper coming out -->
+                                <path d="M 20 44 Q 22 46 24 44 L 40 44 Q 42 46 44 44" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <!-- Control panel -->
+                                <rect x="54" y="22" width="6" height="12" fill="currentColor" opacity="0.3" rx="1"/>
+                                <circle cx="57" cy="26" r="1" fill="currentColor"/>
+                                <circle cx="57" cy="30" r="1" fill="currentColor"/>
+                                <!-- Stand legs -->
+                                <line x1="16" y1="48" x2="16" y2="54" stroke="currentColor" stroke-width="2"/>
+                                <line x1="48" y1="48" x2="48" y2="54" stroke="currentColor" stroke-width="2"/>
+                            </g>
+                        </svg>
+                        <span class="nav-text">Large Format</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="promo.html" class="nav-link active text-center">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <!-- Gift/promo box with ribbon -->
+                                <rect x="16" y="24" width="32" height="24" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
+                                <!-- Ribbon vertical -->
+                                <rect x="30" y="20" width="4" height="32" fill="currentColor" opacity="0.3"/>
+                                <!-- Ribbon horizontal -->
+                                <rect x="12" y="34" width="40" height="4" fill="currentColor" opacity="0.3"/>
+                                <!-- Bow/knot -->
+                                <ellipse cx="32" cy="28" rx="6" ry="4" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1"/>
+                                <path d="M 26 28 Q 32 24 38 28 Q 32 32 26 28" fill="currentColor" opacity="0.3"/>
+                                <!-- Stars/sparkles around -->
+                                <path d="M 12 18 L 14 20 L 12 22 L 10 20 Z" fill="currentColor" opacity="0.4"/>
+                                <path d="M 52 18 L 54 20 L 52 22 L 50 20 Z" fill="currentColor" opacity="0.4"/>
+                                <path d="M 12 50 L 14 52 L 12 54 L 10 52 Z" fill="currentColor" opacity="0.4"/>
+                                <path d="M 52 50 L 54 52 L 52 54 L 50 52 Z" fill="currentColor" opacity="0.4"/>
+                            </g>
+                        </svg>
+                        <span class="nav-text">Promo</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cart.html" class="nav-link text-center position-relative" id="cartNavItem">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <!-- Shopping cart body -->
+                                <path d="M12 16 L16 16 L20 44 L52 44 L56 24 L24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- Cart handle -->
+                                <path d="M20 44 L20 48 Q20 52 24 52 L48 52 Q52 52 52 48 L52 44" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <!-- Cart wheels -->
+                                <circle cx="28" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <circle cx="44" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <!-- Cart items (papers) -->
+                                <rect x="28" y="28" width="16" height="12" fill="currentColor" opacity="0.2" rx="1"/>
+                                <rect x="30" y="30" width="12" height="8" fill="currentColor" opacity="0.3" rx="0.5"/>
+                            </g>
+                        </svg>
+                        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                        <span class="nav-text">Cart</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </nav>
     
@@ -282,5 +318,6 @@
     <script src="../js/cart.js"></script>
     <script src="../js/promoConfig.js"></script>
     <script src="../js/promoCalculator.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

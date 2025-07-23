@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View your saved HP Indigo quotes">
+    <meta name="theme-color" content="#0096D6">
+    
+    <title>My Quotes - HP Indigo Calculator</title>
+    
+    <link rel="manifest" href="../manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/styles.css">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+</head>
+<body>
+    <main>
+        <div class="quotes-container">
+            <!-- Auth Required Message -->
+            <div id="authRequired" class="text-center" style="display: none;">
+                <h2>Sign In Required</h2>
+                <p>You need to sign in to view your saved quotes.</p>
+                <a href="signin.html?return=quotes.html" class="btn btn-primary">Sign In</a>
+            </div>
+
+            <!-- Quotes Content -->
+            <div id="quotesContent" style="display: none;">
+                <div class="quotes-header">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>My Quotes</h2>
+                        <a href="cart.html" class="btn btn-outline-primary">Back to Cart</a>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="quotesLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading your quotes...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="quotesEmpty" class="text-center py-4" style="display: none;">
+                    <h3>No Quotes Yet</h3>
+                    <p>You haven't saved any quotes. Add items to your cart and save them as quotes.</p>
+                    <a href="../index.html" class="btn btn-primary">Start Calculating</a>
+                </div>
+
+                <!-- Quotes List -->
+                <div id="quotesList" class="quotes-list" style="display: none;">
+                    <!-- Quotes will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Quote Detail Modal -->
+    <div class="modal fade" id="quoteDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quoteDetailTitle">Quote Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="quoteDetailBody">
+                    <!-- Quote details will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="exportQuoteDetail">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-light bg-white fixed-bottom border-top navbar-bottom">
+        <div class="container-fluid px-2">
+            <ul class="navbar-nav nav-justified w-100 flex-row m-0">
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link text-center">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <rect x="12" y="24" width="40" height="20" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
+                                <rect x="8" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
+                                <rect x="44" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
+                                <rect x="20" y="18" width="24" height="6" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="1" rx="1"/>
+                                <circle cx="24" cy="21" r="1" fill="currentColor"/>
+                                <circle cx="28" cy="21" r="1" fill="currentColor"/>
+                                <circle cx="32" cy="21" r="1" fill="currentColor"/>
+                                <rect x="24" y="44" width="16" height="12" fill="currentColor" opacity="0.15" stroke="currentColor" stroke-width="1.5" rx="1"/>
+                                <rect x="26" y="46" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2,1" rx="0.5"/>
+                            </g>
+                        </svg>
+                        <span class="nav-text">Small Format</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="large-format.html" class="nav-link text-center">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <rect x="8" y="16" width="48" height="32" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
+                                <rect x="12" y="20" width="40" height="24" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1" rx="1"/>
+                                <path d="M 20 44 Q 22 46 24 44 L 40 44 Q 42 46 44 44" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <rect x="54" y="22" width="6" height="12" fill="currentColor" opacity="0.3" rx="1"/>
+                                <circle cx="57" cy="26" r="1" fill="currentColor"/>
+                                <circle cx="57" cy="30" r="1" fill="currentColor"/>
+                                <line x1="16" y1="48" x2="16" y2="54" stroke="currentColor" stroke-width="2"/>
+                                <line x1="48" y1="48" x2="48" y2="54" stroke="currentColor" stroke-width="2"/>
+                            </g>
+                        </svg>
+                        <span class="nav-text">Large Format</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="promo.html" class="nav-link text-center">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <rect x="16" y="24" width="32" height="24" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
+                                <rect x="30" y="20" width="4" height="32" fill="currentColor" opacity="0.3"/>
+                                <rect x="12" y="34" width="40" height="4" fill="currentColor" opacity="0.3"/>
+                                <ellipse cx="32" cy="28" rx="6" ry="4" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1"/>
+                                <path d="M 26 28 Q 32 24 38 28 Q 32 32 26 28" fill="currentColor" opacity="0.3"/>
+                                <path d="M 12 18 L 14 20 L 12 22 L 10 20 Z" fill="currentColor" opacity="0.4"/>
+                                <path d="M 52 18 L 54 20 L 52 22 L 50 20 Z" fill="currentColor" opacity="0.4"/>
+                                <path d="M 12 50 L 14 52 L 12 54 L 10 52 Z" fill="currentColor" opacity="0.4"/>
+                                <path d="M 52 50 L 54 52 L 52 54 L 50 52 Z" fill="currentColor" opacity="0.4"/>
+                            </g>
+                        </svg>
+                        <span class="nav-text">Promo</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cart.html" class="nav-link text-center position-relative" id="cartNavItem">
+                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
+                            <g>
+                                <path d="M12 16 L16 16 L20 44 L52 44 L56 24 L24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M20 44 L20 48 Q20 52 24 52 L48 52 Q52 52 52 48 L52 44" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <circle cx="28" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <circle cx="44" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <rect x="28" y="28" width="16" height="12" fill="currentColor" opacity="0.2" rx="1"/>
+                                <rect x="30" y="30" width="12" height="8" fill="currentColor" opacity="0.3" rx="0.5"/>
+                            </g>
+                        </svg>
+                        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                        <span class="nav-text">Cart</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- Custom JS -->
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/version.js"></script>
+    
+    <!-- Page-specific functionality -->
+    <script>
+        let currentQuotes = [];
+        
+        async function initQuotesPage() {
+            // Wait for auth to initialize
+            if (window.authManager) {
+                await authManager.init();
+                
+                if (!authManager.isAuthenticated()) {
+                    document.getElementById('authRequired').style.display = 'block';
+                    return;
+                }
+                
+                document.getElementById('quotesContent').style.display = 'block';
+                await loadQuotes();
+            } else {
+                document.getElementById('authRequired').style.display = 'block';
+            }
+        }
+        
+        async function loadQuotes() {
+            if (!window.dbManager || !window.dbManager.isAvailable()) {
+                showError('Unable to load quotes. Please check your connection.');
+                return;
+            }
+            
+            try {
+                document.getElementById('quotesLoading').style.display = 'block';
+                document.getElementById('quotesEmpty').style.display = 'none';
+                document.getElementById('quotesList').style.display = 'none';
+                
+                const quotes = await window.dbManager.getUserQuotes();
+                currentQuotes = quotes;
+                
+                document.getElementById('quotesLoading').style.display = 'none';
+                
+                if (quotes.length === 0) {
+                    document.getElementById('quotesEmpty').style.display = 'block';
+                } else {
+                    document.getElementById('quotesList').style.display = 'block';
+                    renderQuotes(quotes);
+                }
+            } catch (error) {
+                document.getElementById('quotesLoading').style.display = 'none';
+                showError('Failed to load quotes: ' + error.message);
+            }
+        }
+        
+        function renderQuotes(quotes) {
+            const container = document.getElementById('quotesList');
+            
+            container.innerHTML = quotes.map(quote => `
+                <div class="quote-card" data-quote-id="${quote.id}">
+                    <div class="quote-header">
+                        <div class="quote-info">
+                            <h4>Quote ${quote.quote_number}</h4>
+                            <div class="quote-customer">${quote.customer_name || 'No customer name'}</div>
+                            <div class="quote-date">${new Date(quote.created_at).toLocaleDateString()}</div>
+                        </div>
+                        <div class="quote-total">$${parseFloat(quote.total).toFixed(2)}</div>
+                    </div>
+                    <div class="quote-status">
+                        <span class="badge bg-${getStatusColor(quote.status)}">${quote.status.toUpperCase()}</span>
+                        ${quote.customer_company ? `<span class="quote-company">${quote.customer_company}</span>` : ''}
+                    </div>
+                    <div class="quote-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewQuote('${quote.id}')">View Details</button>
+                        <button class="btn btn-sm btn-primary" onclick="exportQuote('${quote.id}')">Export</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getStatusColor(status) {
+            const colors = {
+                'draft': 'secondary',
+                'sent': 'primary',
+                'accepted': 'success',
+                'rejected': 'danger',
+                'expired': 'warning'
+            };
+            return colors[status] || 'secondary';
+        }
+        
+        async function viewQuote(quoteId) {
+            try {
+                const quote = await window.dbManager.getQuote(quoteId);
+                if (!quote) {
+                    showError('Quote not found');
+                    return;
+                }
+                
+                // Populate modal
+                document.getElementById('quoteDetailTitle').textContent = `Quote ${quote.quote_number}`;
+                
+                const modalBody = document.getElementById('quoteDetailBody');
+                modalBody.innerHTML = `
+                    <div class="quote-detail-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Customer Information</h6>
+                                <p><strong>Name:</strong> ${quote.customer_name || 'Not specified'}</p>
+                                <p><strong>Email:</strong> ${quote.customer_email || 'Not specified'}</p>
+                                <p><strong>Phone:</strong> ${quote.customer_phone || 'Not specified'}</p>
+                                <p><strong>Company:</strong> ${quote.customer_company || 'Not specified'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Quote Information</h6>
+                                <p><strong>Quote #:</strong> ${quote.quote_number}</p>
+                                <p><strong>Date:</strong> ${new Date(quote.created_at).toLocaleDateString()}</p>
+                                <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(quote.status)}">${quote.status.toUpperCase()}</span></p>
+                                <p><strong>Valid Until:</strong> ${new Date(quote.valid_until).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        ${quote.notes ? `<div class="mt-3"><h6>Notes</h6><p>${quote.notes}</p></div>` : ''}
+                    </div>
+                    
+                    <div class="quote-items mt-4">
+                        <h6>Items</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Configuration</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${quote.items.map(item => `
+                                        <tr>
+                                            <td>${item.product_type}</td>
+                                            <td>${formatConfiguration(item.configuration)}</td>
+                                            <td>${item.quantity}</td>
+                                            <td>$${parseFloat(item.unit_price).toFixed(3)}</td>
+                                            <td>$${parseFloat(item.total_price).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4">Subtotal:</th>
+                                        <th>$${parseFloat(quote.subtotal).toFixed(2)}</th>
+                                    </tr>
+                                    ${quote.tax_amount > 0 ? `
+                                        <tr>
+                                            <th colspan="4">Tax (${(quote.tax_rate * 100).toFixed(1)}%):</th>
+                                            <th>$${parseFloat(quote.tax_amount).toFixed(2)}</th>
+                                        </tr>
+                                    ` : ''}
+                                    <tr>
+                                        <th colspan="4">Total:</th>
+                                        <th>$${parseFloat(quote.total).toFixed(2)}</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                
+                // Store current quote for export
+                window.currentQuoteDetail = quote;
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('quoteDetailModal'));
+                modal.show();
+            } catch (error) {
+                showError('Failed to load quote details: ' + error.message);
+            }
+        }
+        
+        function formatConfiguration(config) {
+            const parts = [];
+            if (config.size) parts.push(config.size);
+            if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+                parts.push(window.paperStocks[config.paperType].displayName);
+            }
+            if (config.foldType && config.foldType !== 'none') {
+                parts.push(config.foldType);
+            }
+            if (config.rushType && config.rushType !== 'standard') {
+                parts.push(config.rushType + ' rush');
+            }
+            return parts.join(', ') || 'Standard';
+        }
+        
+        function exportQuote(quoteId) {
+            const quote = currentQuotes.find(q => q.id === quoteId);
+            if (!quote) return;
+            
+            // Generate export text
+            let exportText = `HP INDIGO PRICING QUOTE\n`;
+            exportText += `========================\n\n`;
+            exportText += `Quote Number: ${quote.quote_number}\n`;
+            exportText += `Date: ${new Date(quote.created_at).toLocaleDateString()}\n`;
+            exportText += `Valid Until: ${new Date(quote.valid_until).toLocaleDateString()}\n\n`;
+            
+            if (quote.customer_name) {
+                exportText += `CUSTOMER INFORMATION\n`;
+                exportText += `Name: ${quote.customer_name}\n`;
+                if (quote.customer_company) exportText += `Company: ${quote.customer_company}\n`;
+                if (quote.customer_email) exportText += `Email: ${quote.customer_email}\n`;
+                if (quote.customer_phone) exportText += `Phone: ${quote.customer_phone}\n`;
+                exportText += `\n`;
+            }
+            
+            exportText += `QUOTE TOTAL: $${parseFloat(quote.total).toFixed(2)}\n\n`;
+            
+            if (quote.notes) {
+                exportText += `Notes: ${quote.notes}\n\n`;
+            }
+            
+            exportText += `---\n`;
+            exportText += `This quote is for estimation purposes only.\n`;
+            exportText += `Final pricing may vary based on file specifications and production requirements.\n`;
+            
+            // Download file
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quote-${quote.quote_number}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function showError(message) {
+            alert(message); // Simple error handling
+        }
+        
+        // Event handlers
+        document.getElementById('exportQuoteDetail')?.addEventListener('click', () => {
+            if (window.currentQuoteDetail) {
+                exportQuote(window.currentQuoteDetail.id);
+            }
+        });
+        
+        // Initialize page
+        initQuotesPage();
+    </script>
+    
+    <style>
+        .quotes-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .quote-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .quote-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .quote-info h4 {
+            margin: 0;
+            color: #0096D6;
+        }
+        
+        .quote-customer {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .quote-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .quote-total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0096D6;
+        }
+        
+        .quote-status {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .quote-company {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .quote-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .quote-detail-header {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .quote-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .quote-status {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .quote-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</body>
+</html>

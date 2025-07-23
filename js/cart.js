@@ -1,12 +1,28 @@
-// Cart Management System
+// Cart Management System with Supabase Integration
 class CartManager {
   constructor() {
     this.storageKey = 'hp-indigo-cart';
-    this.items = this.loadFromStorage();
+    this.items = [];
+    this.useCloud = false;
+    this.initialized = false;
     this.init();
   }
 
-  init() {
+  async init() {
+    // Load from localStorage first
+    this.items = this.loadFromStorage();
+    
+    // Try to sync with cloud if available
+    if (window.dbManager) {
+      await window.dbManager.init();
+      this.useCloud = window.dbManager.isAvailable();
+      
+      if (this.useCloud) {
+        await this.syncWithCloud();
+      }
+    }
+    
+    this.initialized = true;
     this.updateCartBadge();
     this.renderCartItems();
     this.bindEvents();
@@ -25,8 +41,67 @@ class CartManager {
   saveToStorage() {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.items));
+      
+      // Also save to cloud if available
+      if (this.useCloud && window.dbManager) {
+        this.saveToCloud();
+      }
     } catch (error) {
       console.warn('Failed to save cart to storage:', error);
+    }
+  }
+
+  // Sync with cloud storage
+  async syncWithCloud() {
+    if (!window.dbManager || !window.dbManager.isAvailable()) return;
+    
+    try {
+      const cloudCart = await window.dbManager.getCart();
+      if (cloudCart && cloudCart.items && cloudCart.items.length > 0) {
+        // Merge cloud items with local items
+        const localItemIds = new Set(this.items.map(item => item.id));
+        const newItems = cloudCart.items.filter(item => !localItemIds.has(item.id));
+        
+        if (newItems.length > 0) {
+          this.items = [...this.items, ...newItems];
+          this.saveToStorage(); // Save merged cart locally
+        }
+      }
+      
+      // Save current state to cloud
+      await this.saveToCloud();
+    } catch (error) {
+      console.warn('Failed to sync cart with cloud:', error);
+    }
+  }
+
+  // Save cart to cloud
+  async saveToCloud() {
+    if (!window.dbManager || !window.dbManager.isAvailable()) return;
+    
+    try {
+      await window.dbManager.updateCartItems(this.items);
+    } catch (error) {
+      console.warn('Failed to save cart to cloud:', error);
+    }
+  }
+
+  // Migrate local cart to cloud (called on login)
+  async migrateLocalCartToCloud() {
+    if (!window.authManager || !window.authManager.isAuthenticated()) return;
+    if (!window.dbManager || !window.dbManager.isAvailable()) return;
+    
+    try {
+      const sessionId = window.authManager.getSessionId();
+      const userId = window.authManager.getUser().id;
+      
+      // Migrate cart ownership in database
+      await window.dbManager.migrateCart(sessionId, userId);
+      
+      // Re-sync with cloud
+      await this.syncWithCloud();
+    } catch (error) {
+      console.warn('Failed to migrate cart to user account:', error);
     }
   }
 
