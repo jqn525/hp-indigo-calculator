@@ -25,21 +25,9 @@
 <body>
     <main>
         <div class="calculator-container">
-            <!-- Auth Header -->
+            <!-- Authentication removed - app works without sign-in -->
             <div class="auth-header">
-                <button id="authButton" class="btn btn-outline-primary btn-sm" onclick="window.location.href='pages/signin.html'">
-                    Sign In
-                </button>
-                <div id="userMenu" class="dropdown" style="display: none;">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <span id="userEmail"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="pages/quotes.html">My Quotes</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item sign-out-btn" href="#">Sign Out</a></li>
-                    </ul>
-                </div>
+                <a href="pages/quotes.html" class="btn btn-outline-primary btn-sm">My Quotes</a>
             </div>
             
             <h2>Welcome to HP Indigo Pricing Calculator</h2>

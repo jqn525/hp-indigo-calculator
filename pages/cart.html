@@ -164,15 +164,8 @@
                 // It will prompt for login if not authenticated
             }
             
-            // Save Quote Handler
+            // Save Quote Handler (no authentication required)
             document.getElementById('saveQuoteBtn')?.addEventListener('click', async () => {
-                if (!window.authManager?.isAuthenticated()) {
-                    if (confirm('You need to sign in to save quotes. Would you like to sign in now?')) {
-                        window.location.href = 'signin.html?return=' + encodeURIComponent(window.location.pathname);
-                    }
-                    return;
-                }
-                
                 if (!window.dbManager?.isAvailable()) {
                     alert('Unable to save quote. Please check your connection.');
                     return;
