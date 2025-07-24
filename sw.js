@@ -1,4 +1,4 @@
-const CACHE_NAME = 'indigo-calc-v35';
+const CACHE_NAME = 'indigo-calc-v36';
 
 // Determine if we're running on localhost or production
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';

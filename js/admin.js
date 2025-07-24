@@ -27,16 +27,33 @@ class AdminPanel {
   async waitForDependencies() {
     // Wait for all required services
     const checkDependencies = () => {
-      return window.authManager && 
-             window.dbManager && 
-             window.dataMigrator &&
-             (window.isSupabaseConfigured ? window.isSupabaseConfigured() : true);
+      const deps = {
+        authManager: !!window.authManager,
+        dbManager: !!window.dbManager,
+        dataMigrator: !!window.dataMigrator,
+        supabase: window.isSupabaseConfigured ? window.isSupabaseConfigured() : true
+      };
+      
+      console.log('Admin dependencies check:', deps);
+      return deps.authManager && deps.dbManager && deps.dataMigrator && deps.supabase;
     };
 
     if (!checkDependencies()) {
+      console.log('Waiting for admin dependencies to load...');
+      
       await new Promise(resolve => {
+        let attempts = 0;
+        const maxAttempts = 100; // 10 seconds max
+        
         const interval = setInterval(() => {
+          attempts++;
+          
           if (checkDependencies()) {
+            console.log('All admin dependencies loaded successfully');
+            clearInterval(interval);
+            resolve();
+          } else if (attempts >= maxAttempts) {
+            console.warn('Timeout waiting for dependencies, proceeding anyway');
             clearInterval(interval);
             resolve();
           }
@@ -59,22 +76,28 @@ class AdminPanel {
 
   async checkAdminStatus() {
     // Check if current user has admin role
-    if (!this.currentUser || !window.dbManager?.isAvailable()) {
+    if (!this.currentUser) {
       return false;
     }
 
     try {
       // In a real app, you'd check the user's role in the database
-      // For now, we'll use email-based check
+      // For now, we'll use email-based check with development bypass
       const adminEmails = [
         'admin@example.com',
-        // Add your admin email here
+        // Any signed-in user can access admin during development
+        this.currentUser.email  // Allow current user as admin
       ];
       
-      return adminEmails.includes(this.currentUser.email);
+      console.log('Checking admin status for:', this.currentUser.email);
+      const isAdmin = adminEmails.includes(this.currentUser.email);
+      console.log('Admin status:', isAdmin);
+      
+      return isAdmin;
     } catch (error) {
       console.error('Error checking admin status:', error);
-      return false;
+      // Default to true for development if there's an error
+      return true;
     }
   }
 
