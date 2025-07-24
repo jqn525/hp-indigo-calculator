@@ -15,6 +15,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+    
+    <!-- Authentication Guard - Protects entire application -->
+    <script src="../js/auth-guard.js"></script>
 </head>
 <body>
     <main>
@@ -164,7 +167,7 @@
                 // It will prompt for login if not authenticated
             }
             
-            // Save Quote Handler (no authentication required)
+            // Save Quote Handler (user authenticated by auth guard)
             document.getElementById('saveQuoteBtn')?.addEventListener('click', async () => {
                 if (!window.dbManager?.isAvailable()) {
                     alert('Unable to save quote. Please check your connection.');

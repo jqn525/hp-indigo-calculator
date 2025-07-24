@@ -15,6 +15,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+    
+    <!-- Authentication Guard - Protects entire application -->
+    <script src="../js/auth-guard.js"></script>
 </head>
 <body>
     <main>
@@ -168,7 +171,7 @@
         let currentQuotes = [];
         
         async function initQuotesPage() {
-            console.log('Initializing quotes page (no authentication required)...');
+            console.log('Initializing quotes page (user authenticated by auth guard)...');
             
             // Wait for database manager to be available
             let attempts = 0;
@@ -187,7 +190,7 @@
             }
             
             try {
-                console.log('Database manager available, loading quotes...');
+                console.log('Database manager available, loading quotes for user:', window.currentUser?.email);
                 document.getElementById('quotesContent').style.display = 'block';
                 await loadQuotes();
                 
@@ -246,9 +249,12 @@
                     </div>
                     <div class="quote-status">
                         <span class="badge bg-${getStatusColor(quote.status)}">${quote.status.toUpperCase()}</span>
+                        ${getExpirationBadge(quote.valid_until)}
                     </div>
                     <div class="quote-actions">
                         <button class="btn btn-sm btn-outline-primary" onclick="viewQuote('${quote.id}')">View Details</button>
+                        <button class="btn btn-sm btn-info" onclick="recalculateQuote('${quote.id}')">Recalculate</button>
+                        <button class="btn btn-sm btn-success" onclick="reopenQuoteInCart('${quote.id}')">Reopen Cart</button>
                         <button class="btn btn-sm btn-primary" onclick="exportQuote('${quote.id}')">Export</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteQuote('${quote.id}')">Delete</button>
                     </div>
@@ -265,6 +271,24 @@
                 'expired': 'warning'
             };
             return colors[status] || 'secondary';
+        }
+        
+        function getExpirationBadge(validUntil) {
+            if (!validUntil) return '';
+            
+            const now = new Date();
+            const expiry = new Date(validUntil);
+            const daysUntilExpiry = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntilExpiry < 0) {
+                return '<span class="badge bg-danger ms-2">EXPIRED</span>';
+            } else if (daysUntilExpiry <= 7) {
+                return `<span class="badge bg-warning text-dark ms-2">Expires in ${daysUntilExpiry} day${daysUntilExpiry !== 1 ? 's' : ''}</span>`;
+            } else if (daysUntilExpiry <= 14) {
+                return `<span class="badge bg-info ms-2">Expires in ${daysUntilExpiry} days</span>`;
+            }
+            
+            return ''; // Don't show badge for quotes with more than 14 days
         }
         
         async function viewQuote(quoteId) {
@@ -449,6 +473,334 @@
             } catch (error) {
                 console.error('Error deleting quote:', error);
                 showError('Error deleting quote: ' + error.message);
+            }
+        }
+        
+        async function recalculateQuote(quoteId) {
+            try {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Recalculating...';
+                button.disabled = true;
+                
+                // Ensure calculator scripts are loaded
+                await loadCalculatorScripts();
+                
+                const recalculatedQuote = await window.dbManager.recalculateQuote(quoteId);
+                
+                if (!recalculatedQuote) {
+                    throw new Error('Failed to recalculate quote');
+                }
+                
+                // Show recalculation results in modal
+                showRecalculationModal(recalculatedQuote);
+                
+            } catch (error) {
+                console.error('Recalculation error:', error);
+                showError('Failed to recalculate quote: ' + error.message);
+            } finally {
+                // Reset button
+                const button = event.target;
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function loadCalculatorScripts() {
+            // Check if calculator functions are already loaded
+            if (window.calculateBrochurePrice && window.calculatePromoPrice) {
+                return;
+            }
+            
+            // Load calculator scripts if not already loaded
+            const scripts = [
+                '../js/calculator.js',
+                '../js/promoCalculator.js',
+                '../js/pricingConfig.js',
+                '../js/paperStocks.js',
+                '../js/promoConfig.js'
+            ];
+            
+            for (const scriptSrc of scripts) {
+                if (!document.querySelector(`script[src="${scriptSrc}"]`)) {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = scriptSrc;
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+            }
+        }
+        
+        function showRecalculationModal(recalculatedQuote) {
+            const hasChanges = recalculatedQuote.has_price_changes;
+            const totalDiff = recalculatedQuote.total_price_difference;
+            const changePercent = recalculatedQuote.total_change_percent;
+            
+            const modalHtml = `
+                <div class="modal fade" id="recalculationModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Quote Recalculation - ${recalculatedQuote.quote_number}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert ${hasChanges ? (totalDiff > 0 ? 'alert-warning' : 'alert-success') : 'alert-info'}" role="alert">
+                                    ${hasChanges ? 
+                                        `<strong>Price Changes Detected!</strong><br>
+                                         Total change: <strong>${totalDiff >= 0 ? '+' : ''}$${totalDiff.toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(1)}%)</strong>` :
+                                        '<strong>No Price Changes</strong><br>All prices remain the same as when originally quoted.'
+                                    }
+                                </div>
+                                
+                                <h6>Price Comparison</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Item</th>
+                                                <th>Original Price</th>
+                                                <th>Current Price</th>
+                                                <th>Change</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${recalculatedQuote.items.map(item => `
+                                                <tr ${item.price_changed ? 'class="table-warning"' : ''}>
+                                                    <td>
+                                                        <strong>${item.product_type}</strong><br>
+                                                        <small class="text-muted">${formatConfiguration(item.configuration)}</small>
+                                                        ${item.recalculation_error ? `<br><small class="text-danger">${item.recalculation_error}</small>` : ''}
+                                                    </td>
+                                                    <td>$${parseFloat(item.total_price).toFixed(2)}</td>
+                                                    <td>$${parseFloat(item.current_total_price).toFixed(2)}</td>
+                                                    <td>
+                                                        ${item.price_changed ? 
+                                                            `<span class="text-${item.price_difference > 0 ? 'danger' : 'success'}">
+                                                                ${item.price_difference >= 0 ? '+' : ''}$${item.price_difference.toFixed(2)}
+                                                                (${item.price_change_percent >= 0 ? '+' : ''}${item.price_change_percent.toFixed(1)}%)
+                                                            </span>` : 
+                                                            '<span class="text-muted">No change</span>'
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                        <tfoot class="table-secondary">
+                                            <tr>
+                                                <th>Total</th>
+                                                <th>$${parseFloat(recalculatedQuote.original_total).toFixed(2)}</th>
+                                                <th>$${parseFloat(recalculatedQuote.current_total).toFixed(2)}</th>
+                                                <th>
+                                                    <span class="text-${totalDiff > 0 ? 'danger' : totalDiff < 0 ? 'success' : 'muted'}">
+                                                        ${totalDiff !== 0 ? 
+                                                            `${totalDiff >= 0 ? '+' : ''}$${totalDiff.toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(1)}%)` : 
+                                                            'No change'
+                                                        }
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                
+                                <small class="text-muted">
+                                    <em>Recalculated on ${new Date(recalculatedQuote.recalculation_date).toLocaleString()}</em>
+                                </small>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                ${hasChanges ? '<button type="button" class="btn btn-primary" onclick="createUpdatedQuote()">Create New Quote with Updated Pricing</button>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal
+            const existingModal = document.getElementById('recalculationModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Store recalculated quote data for potential new quote creation
+            window.currentRecalculatedQuote = recalculatedQuote;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('recalculationModal'));
+            modal.show();
+            
+            // Clean up modal on hide
+            document.getElementById('recalculationModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
+                delete window.currentRecalculatedQuote;
+            });
+        }
+        
+        function createUpdatedQuote() {
+            // TODO: Implement creating a new quote with updated pricing
+            // This would involve creating a new quote with current prices
+            alert('Create updated quote functionality coming soon!');
+        }
+        
+        async function reopenQuoteInCart(quoteId) {
+            try {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Loading...';
+                button.disabled = true;
+                
+                // Get the quote with all items
+                const quote = await window.dbManager.getQuote(quoteId);
+                
+                if (!quote || !quote.items || quote.items.length === 0) {
+                    throw new Error('Quote not found or has no items');
+                }
+                
+                // Check if cart already has items
+                const currentCartItems = window.cartManager ? window.cartManager.getItems() : [];
+                const hasExistingItems = currentCartItems.length > 0;
+                
+                if (hasExistingItems) {
+                    // Show confirmation modal for merge vs replace
+                    showCartMergeModal(quote, currentCartItems.length);
+                } else {
+                    // Direct load if cart is empty
+                    await loadQuoteIntoCart(quote);
+                }
+                
+            } catch (error) {
+                console.error('Error reopening quote in cart:', error);
+                showError('Failed to reopen quote: ' + error.message);
+            } finally {
+                // Reset button
+                const button = event.target;
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        function showCartMergeModal(quote, existingItemCount) {
+            const modalHtml = `
+                <div class="modal fade" id="cartMergeModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Quote to Cart</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>You currently have <strong>${existingItemCount}</strong> item${existingItemCount !== 1 ? 's' : ''} in your cart.</p>
+                                <p>Quote <strong>${quote.quote_number}</strong> contains <strong>${quote.items.length}</strong> item${quote.items.length !== 1 ? 's' : ''}.</p>
+                                <p>How would you like to proceed?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-warning" onclick="loadQuoteIntoCart(window.currentQuoteToLoad, true)">Replace Cart</button>
+                                <button type="button" class="btn btn-success" onclick="loadQuoteIntoCart(window.currentQuoteToLoad, false)">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal
+            const existingModal = document.getElementById('cartMergeModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Store quote data for the action buttons
+            window.currentQuoteToLoad = quote;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('cartMergeModal'));
+            modal.show();
+            
+            // Clean up on hide
+            document.getElementById('cartMergeModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
+                delete window.currentQuoteToLoad;
+            });
+        }
+        
+        async function loadQuoteIntoCart(quote, replaceCart = false) {
+            try {
+                // Close any open modals
+                const modal = document.getElementById('cartMergeModal');
+                if (modal) {
+                    bootstrap.Modal.getInstance(modal)?.hide();
+                }
+                
+                // Ensure cart manager is available
+                if (!window.cartManager) {
+                    throw new Error('Cart system not available. Please refresh the page.');
+                }
+                
+                // Convert quote items to cart items format
+                const cartItems = quote.items.map(item => ({
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                    productType: item.product_type,
+                    timestamp: new Date().toISOString(),
+                    configuration: {
+                        ...item.configuration,
+                        // Ensure quantity is set properly
+                        quantity: item.quantity.toString()
+                    },
+                    pricing: {
+                        unitPrice: parseFloat(item.unit_price),
+                        totalPrice: parseFloat(item.total_price),
+                        totalCost: parseFloat(item.total_price), // Fallback for different naming
+                        // Add any additional pricing breakdown if available
+                        originalQuoteId: quote.id,
+                        originalQuoteNumber: quote.quote_number
+                    }
+                }));
+                
+                // Load items into cart
+                if (replaceCart) {
+                    window.cartManager.clearCart();
+                }
+                
+                // Add items to cart using the extended method we'll create
+                await window.cartManager.loadQuoteItems(cartItems);
+                
+                // Show success message
+                const action = replaceCart ? 'replaced' : 'added to';
+                const successMessage = `Successfully ${action} cart with ${cartItems.length} item${cartItems.length !== 1 ? 's' : ''} from Quote ${quote.quote_number}`;
+                
+                // Create and show success alert
+                const alertHtml = `
+                    <div class="alert alert-success alert-dismissible fade show position-fixed" 
+                         style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                        <strong>Success!</strong> ${successMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', alertHtml);
+                
+                // Auto-remove alert after 5 seconds
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert-success');
+                    if (alert) alert.remove();
+                }, 5000);
+                
+                // Redirect to cart page after short delay
+                setTimeout(() => {
+                    window.location.href = 'cart.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error loading quote into cart:', error);
+                showError('Failed to load quote into cart: ' + error.message);
             }
         }
         

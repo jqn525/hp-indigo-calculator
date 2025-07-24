@@ -147,6 +147,47 @@ class CartManager {
     return [...this.items];
   }
 
+  // Load multiple items from a quote into the cart
+  async loadQuoteItems(quoteItems) {
+    if (!Array.isArray(quoteItems) || quoteItems.length === 0) {
+      throw new Error('No items provided to load');
+    }
+
+    try {
+      // Add each item to the cart
+      for (const item of quoteItems) {
+        // Validate item structure
+        if (!item.productType || !item.configuration || !item.pricing) {
+          console.warn('Skipping invalid item:', item);
+          continue;
+        }
+
+        // Ensure the item has a unique ID
+        const cartItem = {
+          id: item.id || Date.now().toString(36) + Math.random().toString(36).substr(2),
+          productType: item.productType,
+          timestamp: item.timestamp || new Date().toISOString(),
+          configuration: { ...item.configuration },
+          pricing: { ...item.pricing }
+        };
+
+        this.items.push(cartItem);
+      }
+
+      // Save to storage and update UI
+      this.saveToStorage();
+      this.updateCartBadge();
+      this.renderCartItems();
+
+      console.log(`Loaded ${quoteItems.length} items into cart from quote`);
+      return true;
+
+    } catch (error) {
+      console.error('Error loading quote items into cart:', error);
+      throw error;
+    }
+  }
+
   getItemCount() {
     return this.items.length;
   }
@@ -216,6 +257,13 @@ class CartManager {
     const date = new Date(item.timestamp);
     const timeString = date.toLocaleString();
     
+    // Check if this item was loaded from a quote
+    const isFromQuote = pricing.originalQuoteNumber;
+    const quoteIndicator = isFromQuote ? 
+      `<div class="quote-source-badge">
+        <span class="badge bg-info">From Quote ${pricing.originalQuoteNumber}</span>
+      </div>` : '';
+
     return `
       <div class="cart-item" data-item-id="${item.id}">
         <div class="cart-item-header">
@@ -223,6 +271,7 @@ class CartManager {
             <h3>${productDisplayName}</h3>
             <div class="cart-item-summary">${summary}</div>
             <div class="cart-item-price">Total: $${pricing.totalPrice || pricing.totalCost}</div>
+            ${quoteIndicator}
           </div>
           <button class="remove-item-btn" onclick="cartManager.removeItem('${item.id}')">
             Remove

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login to SFU Document Solutions Pricing Calculator">
+    <meta name="theme-color" content="#0096D6">
+    
+    <title>Login - SFU Document Solutions</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SFU Docs">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>SFU Document Solutions</h1>
+                <p>Pricing Calculator</p>
+            </div>
+            
+            <div class="login-form-container">
+                <form id="loginForm" class="login-form">
+                    <div class="alert alert-danger" id="loginError" style="display: none;" role="alert">
+                        <span id="loginErrorMessage"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" required 
+                               placeholder="your.email@sfu.ca" autocomplete="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required 
+                               placeholder="Enter your password" autocomplete="current-password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                Keep me signed in
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100" id="loginButton">
+                        <span id="loginButtonText">Sign In</span>
+                        <div class="spinner-border spinner-border-sm ms-2" id="loginSpinner" style="display: none;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </form>
+                
+                <div class="login-footer">
+                    <p class="text-muted text-center">
+                        Need help? Contact IT Support
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- Supabase and Auth -->
+    <script src="js/supabase.js"></script>
+    <script src="js/version.js"></script>
+    
+    <!-- Login Logic -->
+    <script>
+        class SimpleAuth {
+            constructor() {
+                this.initializeLogin();
+            }
+            
+            async initializeLogin() {
+                // Check if already logged in
+                if (this.isAuthenticated()) {
+                    this.redirectToApp();
+                    return;
+                }
+                
+                // Wait for Supabase to be ready
+                await this.waitForSupabase();
+                
+                // Bind form events
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+                
+                // Auto-focus email field
+                document.getElementById('email').focus();
+            }
+            
+            async waitForSupabase() {
+                let attempts = 0;
+                const maxAttempts = 50;
+                
+                while (!window.supabaseClient && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (!window.supabaseClient) {
+                    this.showError('Unable to connect to authentication service. Please refresh the page.');
+                }
+            }
+            
+            async handleLogin() {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const rememberMe = document.getElementById('rememberMe').checked;
+                
+                if (!email || !password) {
+                    this.showError('Please enter both email and password.');
+                    return;
+                }
+                
+                this.setLoading(true);
+                this.hideError();
+                
+                try {
+                    // Attempt Supabase authentication
+                    if (window.supabaseClient) {
+                        const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                            email: email,
+                            password: password
+                        });
+                        
+                        if (error) {
+                            throw new Error(error.message);
+                        }
+                        
+                        if (data.user) {
+                            // Store authentication token
+                            const authData = {
+                                token: data.session.access_token,
+                                user: {
+                                    id: data.user.id,
+                                    email: data.user.email,
+                                    name: data.user.user_metadata?.name || data.user.email
+                                },
+                                expires: new Date(data.session.expires_at * 1000).toISOString(),
+                                remember: rememberMe
+                            };
+                            
+                            // Store in localStorage (or sessionStorage if not remembering)
+                            const storage = rememberMe ? localStorage : sessionStorage;
+                            storage.setItem('sfu_auth', JSON.stringify(authData));
+                            
+                            console.log('✅ Login successful:', data.user.email);
+                            this.redirectToApp();
+                            return;
+                        }
+                    }
+                    
+                    // Fallback: Simple demo authentication for development
+                    if (email.includes('@sfu.ca') && password.length >= 6) {
+                        const authData = {
+                            token: 'demo_token_' + Date.now(),
+                            user: {
+                                id: 'demo_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
+                                email: email,
+                                name: email.split('@')[0]
+                            },
+                            expires: new Date(Date.now() + (rememberMe ? 30 : 1) * 24 * 60 * 60 * 1000).toISOString(),
+                            remember: rememberMe
+                        };
+                        
+                        const storage = rememberMe ? localStorage : sessionStorage;
+                        storage.setItem('sfu_auth', JSON.stringify(authData));
+                        
+                        console.log('✅ Demo login successful:', email);
+                        this.redirectToApp();
+                        return;
+                    }
+                    
+                    throw new Error('Invalid email or password. Please use your SFU email address.');
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.showError(error.message || 'Login failed. Please try again.');
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+            
+            isAuthenticated() {
+                const authData = this.getAuthData();
+                if (!authData) return false;
+                
+                // Check if token is expired
+                const expires = new Date(authData.expires);
+                if (expires <= new Date()) {
+                    this.clearAuth();
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            getAuthData() {
+                const fromLocal = localStorage.getItem('sfu_auth');
+                const fromSession = sessionStorage.getItem('sfu_auth');
+                
+                if (fromLocal) {
+                    try {
+                        return JSON.parse(fromLocal);
+                    } catch (e) {
+                        localStorage.removeItem('sfu_auth');
+                    }
+                }
+                
+                if (fromSession) {
+                    try {
+                        return JSON.parse(fromSession);
+                    } catch (e) {
+                        sessionStorage.removeItem('sfu_auth');
+                    }
+                }
+                
+                return null;
+            }
+            
+            clearAuth() {
+                localStorage.removeItem('sfu_auth');
+                sessionStorage.removeItem('sfu_auth');
+            }
+            
+            redirectToApp() {
+                // Get return URL from query params, or default to index
+                const urlParams = new URLSearchParams(window.location.search);
+                const returnUrl = urlParams.get('return') || 'index.html';
+                
+                // Show success message briefly
+                this.showSuccess('Login successful! Redirecting...');
+                
+                setTimeout(() => {
+                    window.location.href = returnUrl;
+                }, 1000);
+            }
+            
+            setLoading(loading) {
+                const button = document.getElementById('loginButton');
+                const buttonText = document.getElementById('loginButtonText');
+                const spinner = document.getElementById('loginSpinner');
+                
+                if (loading) {
+                    button.disabled = true;
+                    buttonText.textContent = 'Signing In...';
+                    spinner.style.display = 'inline-block';
+                } else {
+                    button.disabled = false;
+                    buttonText.textContent = 'Sign In';
+                    spinner.style.display = 'none';
+                }
+            }
+            
+            showError(message) {
+                const errorDiv = document.getElementById('loginError');
+                const errorMessage = document.getElementById('loginErrorMessage');
+                
+                errorMessage.textContent = message;
+                errorDiv.style.display = 'block';
+                
+                // Auto-hide after 10 seconds
+                setTimeout(() => {
+                    this.hideError();
+                }, 10000);
+            }
+            
+            hideError() {
+                document.getElementById('loginError').style.display = 'none';
+            }
+            
+            showSuccess(message) {
+                // Create temporary success alert
+                const alertHtml = `
+                    <div class="alert alert-success" role="alert">
+                        ${message}
+                    </div>
+                `;
+                
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.outerHTML = alertHtml + errorDiv.outerHTML;
+            }
+        }
+        
+        // Initialize login system
+        document.addEventListener('DOMContentLoaded', () => {
+            window.simpleAuth = new SimpleAuth();
+        });
+    </script>
+</body>
+</html>
