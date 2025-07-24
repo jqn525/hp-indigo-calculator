@@ -255,25 +255,23 @@ class DatabaseManager {
     return quoteResult;
   }
 
-  // Get session quotes (no authentication required)
+  // Get all quotes (no authentication or session filtering)
   async getUserQuotes(limit = 50, offset = 0) {
     if (!this.isAvailable()) return [];
     
-    // Use session ID instead of user ID
-    const sessionId = window.authManager?.getSessionId() || 'session_default';
-    
+    // Return all quotes - no filtering by user or session
     const { data, error } = await this.client
       .from('quotes')
       .select('*')
-      .or(`session_id.eq.${sessionId},customer_email.eq.session_${sessionId}`)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
     
     if (error) {
-      console.error('Error fetching session quotes:', error);
+      console.error('Error fetching quotes:', error);
       return [];
     }
     
+    console.log(`Loaded ${data?.length || 0} quotes from database`);
     return data || [];
   }
 
