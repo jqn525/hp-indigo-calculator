@@ -71,13 +71,14 @@ class DatabaseManager {
     
     if (error) {
       console.error('Error fetching cart:', error);
-      return null;
+      // Try to create cart as fallback
+      return this.createCart();
     }
     
     return data;
   }
 
-  // Create new cart
+  // Create or get existing cart
   async createCart() {
     if (!this.isAvailable()) return null;
     
@@ -90,14 +91,18 @@ class DatabaseManager {
       items: []
     };
     
+    // Use upsert to handle existing carts gracefully
     const { data, error } = await this.client
       .from('carts')
-      .insert(cartData)
+      .upsert(cartData, { 
+        onConflict: userId ? 'user_id' : 'session_id',
+        ignoreDuplicates: false 
+      })
       .select()
       .single();
     
     if (error) {
-      console.error('Error creating cart:', error);
+      console.error('Error creating/updating cart:', error);
       return null;
     }
     
