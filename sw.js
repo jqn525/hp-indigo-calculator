@@ -1,4 +1,4 @@
-const CACHE_NAME = 'indigo-calc-v50';
+const CACHE_NAME = 'indigo-calc-v51';
 
 // Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';

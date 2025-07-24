@@ -574,7 +574,7 @@ footer {
 
 /* Selection Cards */
 .selection-card {
-  background-color: #939598;
+  background-color: var(--bg-white);
   border: 2px solid #e0e0e0;
   border-radius: var(--border-radius);
   padding: 1.25rem 1rem;
@@ -597,7 +597,15 @@ footer {
 
 .selection-card.selected {
   border-color: #A6192E;
-  background-color: rgba(204, 6, 51, 0.1);
+  background-color: #939598;
+}
+
+.selection-card.selected span {
+  color: white;
+}
+
+.selection-card.selected small {
+  color: white;
 }
 
 .selection-card.disabled {
@@ -619,14 +627,14 @@ footer {
 
 .selection-card span {
   font-weight: 600;
-  color: white;
+  color: var(--text-dark);
   font-size: 1rem;
   line-height: 1.2;
 }
 
 .selection-card small {
   font-size: 0.85rem;
-  color: white;
+  color: var(--text-light);
   margin-top: 0.25rem;
   font-weight: 400;
 }
