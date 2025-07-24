@@ -168,18 +168,51 @@
         let currentQuotes = [];
         
         async function initQuotesPage() {
-            // Wait for auth to initialize
-            if (window.authManager) {
-                await authManager.init();
+            console.log('Initializing quotes page...');
+            
+            // Wait for auth manager to be available
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max
+            
+            while (!window.authManager && attempts < maxAttempts) {
+                console.log('Waiting for auth manager...', attempts);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.authManager) {
+                console.error('Auth manager not available after timeout');
+                document.getElementById('authRequired').style.display = 'block';
+                return;
+            }
+            
+            try {
+                // Wait for auth to initialize
+                await window.authManager.init();
+                console.log('Auth manager initialized');
                 
-                if (!authManager.isAuthenticated()) {
+                // Check authentication state
+                const isAuthenticated = window.authManager.isAuthenticated();
+                const user = window.authManager.getUser();
+                
+                console.log('Auth check:', {
+                    isAuthenticated,
+                    user: user?.email,
+                    userObject: !!user
+                });
+                
+                if (!isAuthenticated) {
+                    console.log('User not authenticated, showing sign in required');
                     document.getElementById('authRequired').style.display = 'block';
                     return;
                 }
                 
+                console.log('User authenticated, loading quotes...');
                 document.getElementById('quotesContent').style.display = 'block';
                 await loadQuotes();
-            } else {
+                
+            } catch (error) {
+                console.error('Error during quotes page initialization:', error);
                 document.getElementById('authRequired').style.display = 'block';
             }
         }
