@@ -1,10 +1,15 @@
-const CACHE_NAME = 'indigo-calc-v36';
+const CACHE_NAME = 'indigo-calc-v37';
 
-// Determine if we're running on localhost or production
+// Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+const isVercel = self.location.hostname.includes('vercel.app') || self.location.hostname === 'docsol.ca';
 
 // Set appropriate base path
-const basePath = isLocalhost ? '' : '/hp-indigo-calculator';
+let basePath = '';
+if (!isLocalhost && !isVercel) {
+  // GitHub Pages or other hosting
+  basePath = '/hp-indigo-calculator';
+}
 
 const urlsToCache = [
   `${basePath}/`,

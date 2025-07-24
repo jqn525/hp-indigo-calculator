@@ -5,10 +5,15 @@ if ('serviceWorker' in navigator) {
     if (window.location.hostname === 'localhost') {
       // For local development, always use absolute path from root
       swPath = '/sw.js';
+    } else if (window.location.hostname.includes('vercel.app') || window.location.hostname === 'docsol.ca') {
+      // For Vercel deployment (both vercel.app and custom domains)
+      swPath = '/sw.js';
     } else {
-      // For GitHub Pages
+      // For GitHub Pages or other hosting
       swPath = '/hp-indigo-calculator/sw.js';
     }
+    
+    console.log('Registering service worker at:', swPath);
     
     navigator.serviceWorker.register(swPath)
       .then((registration) => {

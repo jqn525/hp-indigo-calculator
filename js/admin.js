@@ -64,13 +64,16 @@ class AdminPanel {
 
   async setupAuth() {
     if (window.authManager) {
+      // Wait for auth manager to initialize
+      await window.authManager.init();
       this.currentUser = window.authManager.getUser();
       this.isAdmin = await this.checkAdminStatus();
     }
 
     console.log('Admin panel auth status:', {
       user: this.currentUser?.email,
-      isAdmin: this.isAdmin
+      isAdmin: this.isAdmin,
+      authManagerAvailable: !!window.authManager
     });
   }
 
@@ -115,8 +118,8 @@ class AdminPanel {
     document.getElementById('loadPricingConfigBtn')?.addEventListener('click', () => this.loadPricingConfig());
     document.getElementById('savePricingConfigBtn')?.addEventListener('click', () => this.savePricingConfig());
 
-    // Auth state changes
-    if (window.authManager) {
+    // Auth state changes - check if function exists first
+    if (window.authManager && typeof window.authManager.onAuthStateChange === 'function') {
       window.authManager.onAuthStateChange((user) => {
         this.currentUser = user;
         this.checkAdminStatus().then(isAdmin => {
@@ -124,6 +127,19 @@ class AdminPanel {
           this.updateUI();
         });
       });
+    } else {
+      console.log('Auth state change listener not available, will check periodically');
+      // Fallback: check auth state periodically
+      setInterval(() => {
+        const currentUser = window.authManager?.getUser();
+        if (currentUser !== this.currentUser) {
+          this.currentUser = currentUser;
+          this.checkAdminStatus().then(isAdmin => {
+            this.isAdmin = isAdmin;
+            this.updateUI();
+          });
+        }
+      }, 1000);
     }
   }
 

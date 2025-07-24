@@ -140,6 +140,37 @@
     <script src="../js/version.js"></script>
     <script src="../js/admin.js"></script>
     <script src="../js/sw-register.js"></script>
+    
+    <!-- Emergency Migration Script -->
+    <script>
+        // Emergency migration function that can be called from console
+        window.emergencyMigration = async function() {
+            console.log('🚨 Running emergency migration...');
+            
+            try {
+                // Wait a bit for all dependencies to load
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                if (!window.dataMigrator) {
+                    console.error('❌ DataMigrator not available');
+                    return;
+                }
+                
+                await window.dataMigrator.runMigration();
+                console.log('✅ Emergency migration completed!');
+                
+            } catch (error) {
+                console.error('❌ Emergency migration failed:', error);
+            }
+        };
+        
+        // Auto-trigger if URL has migrate parameter
+        if (window.location.search.includes('emergency=true')) {
+            window.addEventListener('load', () => {
+                setTimeout(() => window.emergencyMigration(), 3000);
+            });
+        }
+    </script>
 
     <style>
         .admin-table {
