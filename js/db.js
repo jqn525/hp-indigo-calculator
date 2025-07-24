@@ -206,7 +206,8 @@ class DatabaseManager {
       customer_name: quoteData.customer_name,
       customer_email: quoteData.customer_email || `session_${sessionId}`, // Fallback email
       customer_phone: quoteData.customer_phone,
-      customer_company: quoteData.customer_company,
+      department: quoteData.department, // SFU Department/Faculty
+      assigned_by: quoteData.assigned_by, // Staff member
       notes: quoteData.notes,
       subtotal: subtotal,
       tax_rate: quoteData.tax_rate || 0,
@@ -273,6 +274,42 @@ class DatabaseManager {
     
     console.log(`Loaded ${data?.length || 0} quotes from database`);
     return data || [];
+  }
+
+  // Delete quote and its items
+  async deleteQuote(quoteId) {
+    if (!this.isAvailable()) return false;
+    
+    try {
+      // Delete quote items first (due to foreign key constraint)
+      const { error: itemsError } = await this.client
+        .from('quote_items')
+        .delete()
+        .eq('quote_id', quoteId);
+      
+      if (itemsError) {
+        console.error('Error deleting quote items:', itemsError);
+        throw itemsError;
+      }
+      
+      // Delete the quote
+      const { error: quoteError } = await this.client
+        .from('quotes')
+        .delete()
+        .eq('id', quoteId);
+      
+      if (quoteError) {
+        console.error('Error deleting quote:', quoteError);
+        throw quoteError;
+      }
+      
+      console.log(`Quote ${quoteId} deleted successfully`);
+      return true;
+      
+    } catch (error) {
+      console.error('Failed to delete quote:', error);
+      return false;
+    }
   }
 
   // Get single quote with items (no authentication required)

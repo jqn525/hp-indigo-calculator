@@ -199,20 +199,24 @@
                                         <input type="text" class="form-control" id="customerName" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Customer Email</label>
+                                        <label class="form-label">Email</label>
                                         <input type="email" class="form-control" id="customerEmail">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Customer Phone</label>
+                                        <label class="form-label">Phone</label>
                                         <input type="tel" class="form-control" id="customerPhone">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Company</label>
-                                        <input type="text" class="form-control" id="customerCompany">
+                                        <label class="form-label">Department/Faculty</label>
+                                        <input type="text" class="form-control" id="customerDepartment" placeholder="e.g. School of Business, Faculty of Applied Sciences">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Assigned By</label>
+                                        <input type="text" class="form-control" id="assignedBy" placeholder="Staff member name" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Notes</label>
-                                        <textarea class="form-control" id="quoteNotes" rows="3"></textarea>
+                                        <textarea class="form-control" id="quoteNotes" rows="3" placeholder="Additional notes or requirements"></textarea>
                                     </div>
                                 </form>
                             </div>
@@ -238,7 +242,8 @@
                     customer_name: document.getElementById('customerName').value,
                     customer_email: document.getElementById('customerEmail').value,
                     customer_phone: document.getElementById('customerPhone').value,
-                    customer_company: document.getElementById('customerCompany').value,
+                    department: document.getElementById('customerDepartment').value,
+                    assigned_by: document.getElementById('assignedBy').value,
                     notes: document.getElementById('quoteNotes').value,
                     items: items.map(item => ({
                         product_type: item.productType,

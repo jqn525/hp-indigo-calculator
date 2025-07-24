@@ -239,16 +239,18 @@
                             <h4>Quote ${quote.quote_number}</h4>
                             <div class="quote-customer">${quote.customer_name || 'No customer name'}</div>
                             <div class="quote-date">${new Date(quote.created_at).toLocaleDateString()}</div>
+                            ${quote.department ? `<div class="quote-department"><strong>Department:</strong> ${quote.department}</div>` : ''}
+                            ${quote.assigned_by ? `<div class="quote-assigned"><strong>Assigned by:</strong> ${quote.assigned_by}</div>` : ''}
                         </div>
                         <div class="quote-total">$${parseFloat(quote.total).toFixed(2)}</div>
                     </div>
                     <div class="quote-status">
                         <span class="badge bg-${getStatusColor(quote.status)}">${quote.status.toUpperCase()}</span>
-                        ${quote.customer_company ? `<span class="quote-company">${quote.customer_company}</span>` : ''}
                     </div>
                     <div class="quote-actions">
                         <button class="btn btn-sm btn-outline-primary" onclick="viewQuote('${quote.id}')">View Details</button>
                         <button class="btn btn-sm btn-primary" onclick="exportQuote('${quote.id}')">Export</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteQuote('${quote.id}')">Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -411,6 +413,45 @@
             URL.revokeObjectURL(url);
         }
         
+        async function deleteQuote(quoteId) {
+            if (!confirm('Are you sure you want to delete this quote? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const success = await window.dbManager.deleteQuote(quoteId);
+                
+                if (success) {
+                    // Remove the quote card from the UI
+                    const quoteCard = document.querySelector(`[data-quote-id="${quoteId}"]`);
+                    if (quoteCard) {
+                        quoteCard.style.transition = 'opacity 0.3s ease';
+                        quoteCard.style.opacity = '0';
+                        setTimeout(() => {
+                            quoteCard.remove();
+                            
+                            // Check if there are any quotes left
+                            const remainingQuotes = document.querySelectorAll('.quote-card');
+                            if (remainingQuotes.length === 0) {
+                                document.getElementById('quotesEmpty').style.display = 'block';
+                                document.getElementById('quotesList').style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                    
+                    // Also remove from currentQuotes array
+                    currentQuotes = currentQuotes.filter(quote => quote.id !== quoteId);
+                    
+                    console.log('Quote deleted successfully');
+                } else {
+                    showError('Failed to delete quote. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error deleting quote:', error);
+                showError('Error deleting quote: ' + error.message);
+            }
+        }
+        
         function showError(message) {
             alert(message); // Simple error handling
         }
@@ -462,6 +503,13 @@
         .quote-date {
             color: #666;
             font-size: 0.9rem;
+        }
+        
+        .quote-department,
+        .quote-assigned {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
         }
         
         .quote-total {
