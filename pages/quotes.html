@@ -198,8 +198,8 @@
         }
         
         async function loadQuotes() {
-            if (!window.dbManager || !window.dbManager.isAvailable()) {
-                showError('Unable to load quotes. Please check your connection.');
+            if (!window.dbManager) {
+                showError('Database manager not available. Please refresh the page.');
                 return;
             }
             
