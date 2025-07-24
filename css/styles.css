@@ -1,3 +1,22 @@
+/* 
+=============================================================================
+SFU DOCUMENT SOLUTIONS - BRAND COLORS
+=============================================================================
+
+Official SFU Brand Colors:
+- SFU Light Red: #CC0633 (PMS 199C, RGB: 204, 6, 51)
+- SFU Dark Red: #A6192E (PMS 187C, RGB: 166, 25, 46)
+
+These colors should be used consistently across:
+- Login page gradients
+- Primary/secondary button colors  
+- Text accent colors
+- Brand elements
+
+Updated: 2025-07-24
+=============================================================================
+*/
+
 /* SFU Custom Fonts */
 @font-face {
   font-family: 'November Condensed';
@@ -17,13 +36,13 @@
 
 /* Bootstrap CSS Variable Overrides */
 :root {
-  /* Override Bootstrap theme colors */
-  --bs-primary: #0096D6;
-  --bs-primary-rgb: 0, 150, 214;
-  --bs-secondary: #00B0A6;
-  --bs-secondary-rgb: 0, 176, 166;
-  --bs-success: #00B0A6;
-  --bs-info: #0096D6;
+  /* Override Bootstrap theme colors with SFU Brand Colors */
+  --bs-primary: #CC0633;
+  --bs-primary-rgb: 204, 6, 51;
+  --bs-secondary: #A6192E;
+  --bs-secondary-rgb: 166, 25, 46;
+  --bs-success: #A6192E;
+  --bs-info: #CC0633;
   --bs-body-color: #333333;
   --bs-body-color-rgb: 51, 51, 51;
   --bs-secondary-color: #666666;
@@ -34,9 +53,9 @@
   --bs-border-radius-sm: 4px;
   --bs-border-radius-lg: 12px;
   
-  /* Custom variables (maintain existing) */
-  --primary-color: #0096D6;
-  --secondary-color: #00B0A6;
+  /* Custom variables updated with SFU Brand Colors */
+  --primary-color: #CC0633;
+  --secondary-color: #A6192E;
   --text-dark: #333333;
   --text-light: #666666;
   --bg-light: #f5f5f5;
@@ -48,37 +67,37 @@
 
 /* Bootstrap Component Overrides */
 .btn-primary {
-  --bs-btn-bg: #0096D6;
-  --bs-btn-border-color: #0096D6;
-  --bs-btn-hover-bg: #0077aa;
-  --bs-btn-hover-border-color: #0077aa;
-  --bs-btn-active-bg: #006699;
-  --bs-btn-active-border-color: #006699;
+  --bs-btn-bg: #CC0633;
+  --bs-btn-border-color: #CC0633;
+  --bs-btn-hover-bg: #A6192E;
+  --bs-btn-hover-border-color: #A6192E;
+  --bs-btn-active-bg: #8B1426;
+  --bs-btn-active-border-color: #8B1426;
 }
 
 .btn-secondary {
-  --bs-btn-bg: #00B0A6;
-  --bs-btn-border-color: #00B0A6;
-  --bs-btn-hover-bg: #008b84;
-  --bs-btn-hover-border-color: #008b84;
-  --bs-btn-active-bg: #007570;
-  --bs-btn-active-border-color: #007570;
+  --bs-btn-bg: #A6192E;
+  --bs-btn-border-color: #A6192E;
+  --bs-btn-hover-bg: #8B1426;
+  --bs-btn-hover-border-color: #8B1426;
+  --bs-btn-active-bg: #70101E;
+  --bs-btn-active-border-color: #70101E;
 }
 
 .text-primary {
-  color: #0096D6 !important;
+  color: #CC0633 !important;
 }
 
 .text-secondary {
-  color: #00B0A6 !important;
+  color: #A6192E !important;
 }
 
 .bg-primary {
-  background-color: #0096D6 !important;
+  background-color: #CC0633 !important;
 }
 
 .bg-secondary {
-  background-color: #00B0A6 !important;
+  background-color: #A6192E !important;
 }
 
 * {
@@ -1216,7 +1235,7 @@ footer {
 
 /* Login Page Styles */
 .login-body {
-  background: linear-gradient(135deg, #0096D6 0%, #00B0A6 100%);
+  background: linear-gradient(135deg, #CC0633 0%, #A6192E 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -1249,7 +1268,7 @@ footer {
 }
 
 .login-header {
-  background: linear-gradient(135deg, #0096D6 0%, #00B0A6 100%);
+  background: linear-gradient(135deg, #CC0633 0%, #A6192E 100%);
   color: white;
   text-align: center;
   padding: 2rem 1.5rem 1.5rem;
@@ -1300,7 +1319,7 @@ footer {
 
 .login-form .form-control:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.2rem rgba(0, 150, 214, 0.15);
+  box-shadow: 0 0 0 0.2rem rgba(204, 6, 51, 0.15);
 }
 
 .login-form .form-check {
@@ -1314,7 +1333,7 @@ footer {
 }
 
 .login-form .btn-primary {
-  background: linear-gradient(135deg, #0096D6 0%, #00B0A6 100%);
+  background: linear-gradient(135deg, #CC0633 0%, #A6192E 100%);
   border: none;
   border-radius: 8px;
   padding: 0.875rem 1.5rem;
@@ -1328,7 +1347,7 @@ footer {
 
 .login-form .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 150, 214, 0.3);
+  box-shadow: 0 8px 25px rgba(204, 6, 51, 0.3);
 }
 
 .login-form .btn-primary:disabled {
