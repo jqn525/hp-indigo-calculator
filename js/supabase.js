@@ -1,16 +1,10 @@
 // Supabase Configuration
 // This file initializes the Supabase client for the HP Indigo Calculator
 
-// Get Supabase credentials from environment variables or fallback to hardcoded values
-// In production (Vercel), these will be injected as environment variables
-// In development, it uses the hardcoded values below
-const SUPABASE_URL = typeof process !== 'undefined' && process.env?.SUPABASE_URL 
-  ? process.env.SUPABASE_URL 
-  : 'https://kmbwfonentsqnjraukid.supabase.co';
-
-const SUPABASE_ANON_KEY = typeof process !== 'undefined' && process.env?.SUPABASE_ANON_KEY 
-  ? process.env.SUPABASE_ANON_KEY 
-  : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttYndmb25lbnRzcW5qcmF1a2lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMjI0MDYsImV4cCI6MjA2ODc5ODQwNn0.sdnHp4wUGMF6JP2_UtnPYu6FLWlUJ3Ub1PybpINuNEo';
+// Supabase credentials - these are public keys safe to include in client-side code
+// Anonymous keys are designed to be public and don't expose sensitive data
+const SUPABASE_URL = 'https://kmbwfonentsqnjraukid.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttYndmb25lbnRzcW5qcmF1a2lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMjI0MDYsImV4cCI6MjA2ODc5ODQwNn0.sdnHp4wUGMF6JP2_UtnPYu6FLWlUJ3Ub1PybpINuNEo';
 
 // Check if we're using placeholder values
 if (SUPABASE_URL === 'YOUR_SUPABASE_PROJECT_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
