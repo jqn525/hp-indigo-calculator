@@ -1,3 +1,20 @@
+/* SFU Custom Fonts */
+@font-face {
+  font-family: 'November Condensed';
+  src: url('../fonts/NovemberCondensedFNI-Heavy.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lava';
+  src: url('../fonts/LavaFNI-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Bootstrap CSS Variable Overrides */
 :root {
   /* Override Bootstrap theme colors */
@@ -71,7 +88,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Lava', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   color: var(--text-dark);
@@ -80,6 +97,42 @@ body {
   display: flex;
   flex-direction: column;
   padding-bottom: 70px; /* Space for bottom navigation */
+}
+
+/* SFU Typography System */
+h1, h2, h3, h4, h5, h6,
+.product-card h3,
+.selection-card h2,
+.selection-card h3,
+.results-section h3,
+.quote-card h4,
+.home-grid h3,
+.nav-text,
+.btn,
+.calculate-btn,
+.product-name,
+.product-title,
+.form-label,
+.modal-title,
+.section-title {
+  font-family: 'November Condensed', 'Arial Narrow', 'Arial', sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Body text uses Lava */
+p, .product-card p, 
+.selection-card p,
+.description,
+.help-text,
+.quote-customer,
+.quote-company,
+.form-text,
+.modal-body,
+.alert,
+input, select, textarea {
+  font-family: 'Lava', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Bootstrap Navbar Overrides for Bottom Navigation */

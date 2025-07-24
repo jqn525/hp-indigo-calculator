@@ -1,4 +1,4 @@
-const CACHE_NAME = 'indigo-calc-v42';
+const CACHE_NAME = 'indigo-calc-v43';
 
 // Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -42,7 +42,9 @@ const urlsToCache = [
   `${basePath}/pages/signin.html`,
   `${basePath}/pages/quotes.html`,
   `${basePath}/pages/admin.html`,
-  `${basePath}/manifest.json`
+  `${basePath}/manifest.json`,
+  `${basePath}/fonts/NovemberCondensedFNI-Heavy.otf`,
+  `${basePath}/fonts/LavaFNI-Regular.otf`
 ];
 
 self.addEventListener('install', (event) => {
