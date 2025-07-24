@@ -168,52 +168,32 @@
         let currentQuotes = [];
         
         async function initQuotesPage() {
-            console.log('Initializing quotes page...');
+            console.log('Initializing quotes page (no authentication required)...');
             
-            // Wait for auth manager to be available
+            // Wait for database manager to be available
             let attempts = 0;
             const maxAttempts = 50; // 5 seconds max
             
-            while (!window.authManager && attempts < maxAttempts) {
-                console.log('Waiting for auth manager...', attempts);
+            while (!window.dbManager && attempts < maxAttempts) {
+                console.log('Waiting for database manager...', attempts);
                 await new Promise(resolve => setTimeout(resolve, 100));
                 attempts++;
             }
             
-            if (!window.authManager) {
-                console.error('Auth manager not available after timeout');
-                document.getElementById('authRequired').style.display = 'block';
+            if (!window.dbManager) {
+                console.error('Database manager not available after timeout');
+                showError('Unable to connect to database. Please refresh the page.');
                 return;
             }
             
             try {
-                // Wait for auth to initialize
-                await window.authManager.init();
-                console.log('Auth manager initialized');
-                
-                // Check authentication state
-                const isAuthenticated = window.authManager.isAuthenticated();
-                const user = window.authManager.getUser();
-                
-                console.log('Auth check:', {
-                    isAuthenticated,
-                    user: user?.email,
-                    userObject: !!user
-                });
-                
-                if (!isAuthenticated) {
-                    console.log('User not authenticated, showing sign in required');
-                    document.getElementById('authRequired').style.display = 'block';
-                    return;
-                }
-                
-                console.log('User authenticated, loading quotes...');
+                console.log('Database manager available, loading quotes...');
                 document.getElementById('quotesContent').style.display = 'block';
                 await loadQuotes();
                 
             } catch (error) {
                 console.error('Error during quotes page initialization:', error);
-                document.getElementById('authRequired').style.display = 'block';
+                showError('Failed to initialize quotes page: ' + error.message);
             }
         }
         
@@ -228,7 +208,12 @@
                 document.getElementById('quotesEmpty').style.display = 'none';
                 document.getElementById('quotesList').style.display = 'none';
                 
-                const quotes = await window.dbManager.getUserQuotes();
+                // Get session-based quotes (no authentication required)
+                const sessionId = window.authManager?.getSessionId() || 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                console.log('Loading quotes for session:', sessionId);
+                
+                // Load quotes from database without user requirement
+                const quotes = await getSessionQuotes(sessionId);
                 currentQuotes = quotes;
                 
                 document.getElementById('quotesLoading').style.display = 'none';
@@ -242,6 +227,32 @@
             } catch (error) {
                 document.getElementById('quotesLoading').style.display = 'none';
                 showError('Failed to load quotes: ' + error.message);
+                console.error('Quote loading error:', error);
+            }
+        }
+        
+        // New function to get quotes by session instead of user
+        async function getSessionQuotes(sessionId) {
+            if (!window.dbManager?.isAvailable()) return [];
+            
+            try {
+                // Direct database query without user authentication
+                const { data, error } = await window.supabaseClient
+                    .from('quotes')
+                    .select('*')
+                    .or(`session_id.eq.${sessionId},customer_email.eq.session_${sessionId}`)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+                
+                if (error) {
+                    console.error('Error fetching session quotes:', error);
+                    return [];
+                }
+                
+                return data || [];
+            } catch (error) {
+                console.error('Session quotes query failed:', error);
+                return [];
             }
         }
         

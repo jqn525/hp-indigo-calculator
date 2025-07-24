@@ -187,14 +187,12 @@ class DatabaseManager {
 
   // === QUOTE OPERATIONS ===
 
-  // Create new quote
+  // Create new quote (no authentication required)
   async createQuote(quoteData) {
     if (!this.isAvailable()) return null;
     
-    const userId = window.authManager?.getUser()?.id;
-    if (!userId) {
-      throw new Error('Must be logged in to save quotes');
-    }
+    // Use session ID instead of user ID
+    const sessionId = window.authManager?.getSessionId() || 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
     // Calculate totals
     const items = quoteData.items || [];
@@ -203,9 +201,10 @@ class DatabaseManager {
     const total = subtotal + taxAmount;
     
     const quote = {
-      user_id: userId,
+      user_id: null, // No user ID required
+      session_id: sessionId, // Use session instead
       customer_name: quoteData.customer_name,
-      customer_email: quoteData.customer_email,
+      customer_email: quoteData.customer_email || `session_${sessionId}`, // Fallback email
       customer_phone: quoteData.customer_phone,
       customer_company: quoteData.customer_company,
       notes: quoteData.notes,
@@ -256,41 +255,37 @@ class DatabaseManager {
     return quoteResult;
   }
 
-  // Get user's quotes
-  async getUserQuotes(limit = 10, offset = 0) {
+  // Get session quotes (no authentication required)
+  async getUserQuotes(limit = 50, offset = 0) {
     if (!this.isAvailable()) return [];
     
-    const userId = window.authManager?.getUser()?.id;
-    if (!userId) return [];
+    // Use session ID instead of user ID
+    const sessionId = window.authManager?.getSessionId() || 'session_default';
     
     const { data, error } = await this.client
       .from('quotes')
       .select('*')
-      .eq('user_id', userId)
+      .or(`session_id.eq.${sessionId},customer_email.eq.session_${sessionId}`)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
     
     if (error) {
-      console.error('Error fetching quotes:', error);
+      console.error('Error fetching session quotes:', error);
       return [];
     }
     
     return data || [];
   }
 
-  // Get single quote with items
+  // Get single quote with items (no authentication required)
   async getQuote(quoteId) {
     if (!this.isAvailable()) return null;
     
-    const userId = window.authManager?.getUser()?.id;
-    if (!userId) return null;
-    
-    // Get quote
+    // Get quote without user restriction
     const { data: quote, error: quoteError } = await this.client
       .from('quotes')
       .select('*')
       .eq('id', quoteId)
-      .eq('user_id', userId)
       .single();
     
     if (quoteError) {
