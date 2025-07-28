@@ -1,66 +1,152 @@
-# HP Indigo Pricing Calculator PWA
+# SFU Document Solutions Pricing Calculator
 
-A Progressive Web App for calculating pricing for HP Indigo digital press products, designed for internal print shop teams using tablets.
+A Progressive Web App for calculating pricing for HP Indigo digital press products, designed for SFU Document Solutions staff using tablets and mobile devices.
 
-## Features
+## ✨ Features
 
-- ✅ **Progressive Web App** - Installable on tablets and phones
-- ✅ **Offline Support** - Works without internet after first visit
-- ✅ **Mobile-First Design** - Optimized for tablet use
-- ✅ **Brochure Calculator** - Complete pricing for various brochure types
-- 🚧 **Postcards** - Coming soon
-- 🚧 **Flyers** - Coming soon
+- 🔐 **Secure Authentication** - Front-door login system with SFU branding
+- ☁️ **Cloud Integration** - Supabase database for quotes and user management
+- 📱 **Progressive Web App** - Installable on tablets and phones
+- 🔄 **Offline Support** - Works without internet after first visit
+- 📋 **Quote Management** - Save, view, and manage customer quotes
+- 🛒 **Cart System** - Batch multiple products for combined quotes
+- 🎨 **SFU Branding** - Official SFU red color scheme and typography
 
-## Setup for GitHub Pages
+## 🧮 Available Calculators
 
-1. Create a new GitHub repository
-2. Push this code to the repository
-3. Go to Settings → Pages
-4. Set source to "Deploy from a branch"
-5. Select "main" branch and "/ (root)" folder
-6. Save and wait for deployment
+- ✅ **Brochures** - Tri-fold and bi-fold options, 25-2500 units
+- ✅ **Postcards** - 4 standard sizes, 100-5000 units  
+- ✅ **Flyers** - 4 standard sizes, 25-2500 units
+- ✅ **Bookmarks** - 3 sizes on premium cover stock, 100-2500 units
+- ✅ **Promotional Products** - Magnets, stickers, apparel, tote bags
+- 🚧 **Large Format** - Coming soon
 
-Your PWA will be available at: `https://[username].github.io/[repository-name]/`
+## 🚀 Live Application
 
-## Local Development
+**Production URL**: [https://docsol.ca](https://docsol.ca)
 
-1. Serve the files using any local web server:
+## 🛠️ Technology Stack
+
+- **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5
+- **Backend**: Supabase (Database, Authentication, Real-time)
+- **Hosting**: Vercel with custom domain
+- **PWA Features**: Service Worker, Web App Manifest
+- **Typography**: SFU custom fonts (November Condensed, Lava)
+- **Authentication**: Front-door security with session management
+
+## 💻 Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/jqn525/hp-indigo-calculator.git
+   cd hp-indigo-calculator
+   ```
+
+2. **Start a local server**
    ```bash
    # Using Python
    python -m http.server 8000
    
    # Using Node.js
-   npx serve
+   npx serve -p 8000
    ```
 
-2. Open http://localhost:8000 in your browser
+3. **Open in browser**
+   ```
+   http://localhost:8000
+   ```
 
-## Icon Setup
+## 🔧 Configuration
 
-Before deploying, create two PNG icons and place them in the `/icons` folder:
-- `icon-192.png` (192x192 pixels)
-- `icon-512.png` (512x512 pixels)
+### Environment Variables
+The application uses hardcoded Supabase credentials for simplicity. For production deployments, consider using environment variables.
 
-## Brochure Calculator Features
+### Service Worker
+- Current cache version: `v52`
+- Increment version in `sw.js` when deploying CSS/JS changes
+- Implements cache-first strategy with network-first for CSS files
 
-- Multiple size options (Letter, Legal, Tabloid, Custom)
-- Various fold types (Tri-fold, Bi-fold, Gate-fold, Z-fold)
-- Paper weight selection (80gsm to 250gsm)
-- Color mode options (Full color, B&W, mixed)
-- Coating/finish options
-- Automatic quantity discounts
-- Real-time price calculation with breakdown
+## 📱 Mobile Features
 
-## Technology Stack
+- **Responsive Design**: Optimized for tablets and mobile devices
+- **Touch-Friendly**: Large buttons and intuitive navigation
+- **Offline Mode**: Full functionality without internet connection
+- **Installation**: Add to home screen as native app
 
-- Vanilla JavaScript (no framework dependencies)
-- CSS Grid & Flexbox for responsive layout
-- Service Worker for offline functionality
-- Web App Manifest for installation
+## 🎨 Brand Guidelines
 
-## Browser Support
+### SFU Colors
+- **Primary Red**: #CC0633 (PMS 199C, RGB: 204, 6, 51)
+- **Secondary Red**: #A6192E (PMS 187C, RGB: 166, 25, 46)
 
-- Chrome/Edge (Recommended)
-- Safari on iOS
-- Firefox
-- Any modern browser with PWA support
+### Typography
+- **Headers**: November Condensed (Heavy)
+- **Body Text**: Lava (Regular)
+
+## 🔐 Authentication System
+
+- **Front-door Security**: Single login protects entire application
+- **Session Management**: Supports "remember me" functionality
+- **Supabase Integration**: Cloud-based user authentication
+- **Demo Mode**: Fallback authentication for development
+
+## 💾 Data Management
+
+### Quote System
+- **Save Quotes**: Customer information with detailed line items
+- **Quote History**: View and manage all saved quotes
+- **Export Functionality**: Generate formatted quote files
+- **Reopen Carts**: Load saved quotes back into cart for modifications
+
+### Cart Features
+- **Multi-Product**: Add multiple configurations to single quote
+- **Real-time Pricing**: Live price updates as options change
+- **Persistent Storage**: Cart survives browser sessions
+
+## 🚀 Deployment
+
+### Vercel Deployment
+1. **Push to GitHub**: All changes trigger automatic deployment
+2. **Custom Domain**: Configured for docsol.ca
+3. **Environment**: Production-ready with HTTPS
+
+### Manual Deployment Steps
+```bash
+# Make changes
+git add -A
+git commit -m "Description of changes"
+git push origin main
+# Vercel automatically deploys
+```
+
+## 📊 Pricing Engine
+
+The calculator uses a sophisticated pricing formula:
+```
+C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r
+```
+
+Where:
+- S = Setup fee ($30)
+- F_setup = Finishing setup fee ($15, if applicable)
+- Q = Quantity
+- e = Efficiency exponent (varies by product)
+- k = Base production rate ($1.50)
+- v = Variable cost per piece (paper + clicks)
+- f = Finishing cost per piece
+- r = Rush multiplier (1.0-2.0x)
+
+## 🛡️ Browser Support
+
+- **Chrome/Edge** (Recommended for best PWA experience)
+- **Safari** on iOS/macOS
+- **Firefox** 
+- Any modern browser with PWA and Service Worker support
+
+## 📞 Support
+
+For technical issues or feature requests, contact SFU Document Solutions IT support.
+
+## 📄 License
+
+Internal use only - SFU Document Solutions pricing calculator.

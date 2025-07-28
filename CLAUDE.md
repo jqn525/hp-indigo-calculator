@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-HP Indigo Pricing Calculator - A Progressive Web App (PWA) for calculating pricing for HP Indigo digital press products. Built as a vanilla JavaScript application with no framework dependencies, designed for internal print shop teams using tablets.
+**SFU Document Solutions Pricing Calculator** - A Progressive Web App (PWA) for calculating pricing for HP Indigo digital press products. Built as a vanilla JavaScript application with no framework dependencies, designed for SFU Document Solutions staff using tablets and mobile devices.
+
+**Live URL**: https://docsol.ca
 
 ### ⭐ **Latest Updates (2025-07-24)**
 - **SFU BRANDING COMPLETE**: Full rebrand to SFU Document Solutions with official colors
@@ -19,11 +21,21 @@ HP Indigo Pricing Calculator - A Progressive Web App (PWA) for calculating prici
 - **BUTTON LAYOUT**: Professional 3-column button grid matching selection card design
 
 ### Current Products Available:
+
+#### Small Format Products:
 - **Brochures** (tri-fold, bi-fold) - 25-2500 units, e=0.75
 - **Postcards** (4x6, 5x7, 5.5x8.5, 6x9) - 100-5000 units, e=0.70
 - **Flyers** (5.5x8.5, 8.5x11, 8.5x14, 11x17) - 25-2500 units, e=0.70
-- **Bookmarks** (2x6, 2x7, 2x8) - 100-2500 units, e=0.65 - *NEW*
-- **Large Format** (placeholder page)
+- **Bookmarks** (2x6, 2x7, 2x8) - 100-2500 units, e=0.65
+
+#### Promotional Products:
+- **Magnets** (2x2, 3x3, 4x4, 5x5) - 25-1000 units, linear interpolation pricing
+- **Stickers** (various sizes) - Quantity-based pricing
+- **Apparel** (t-shirts, hoodies) - Size and color options
+- **Tote Bags** (standard canvas) - Bulk pricing tiers
+
+#### Coming Soon:
+- **Large Format** (banners, posters) - Placeholder page
 
 ## Development Commands
 
@@ -40,13 +52,14 @@ Access at: http://localhost:8000
 
 ### Deployment
 ```bash
-# Push to GitHub
+# Push to GitHub (triggers Vercel deployment)
 git add -A
 git commit -m "Your commit message"
 git push origin main
 ```
 
-GitHub Pages automatically deploys from main branch root folder.
+**Live Site**: https://docsol.ca (Vercel hosting with custom domain)
+**Staging**: Vercel preview deployments for pull requests
 
 ## Architecture
 
@@ -120,22 +133,24 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Selection Cards**: Consistent card-based interface for size, paper, and option selection  
 - **Button Grid**: 3-column button layout (Calculate, Add to Cart, Clear) matching selection cards
 - **Responsive Design**: Optimized for iPhone 14 Pro Max and all mobile devices
-- **Color Scheme**: Primary blue (#0096D6), secondary teal (#00B0A6), consistent throughout
+- **Color Scheme**: SFU Light Red (#CC0633), SFU Dark Red (#A6192E), consistent SFU branding
 
 ### Cache Busting
 To force users to get updated files:
-1. Change `CACHE_NAME` in `sw.js` (e.g., from `indigo-calc-v25` to `indigo-calc-v26`)
+1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v52`)
 2. This triggers service worker update cycle and clears old cache
+3. Always increment version when deploying CSS/JS changes
 
 ### Environment Compatibility
-- Service worker uses environment detection for localhost vs GitHub Pages
+- Service worker uses environment detection for localhost vs Vercel
 - `sw-register.js` handles different service worker paths automatically
 - Manifest references SVG icons (no PNG conversion needed)
 
-## GitHub Pages Specifics
-- `.nojekyll` file prevents Jekyll processing
-- All asset paths must be absolute (`/path/to/file`)
-- Deployed at: https://jqn525.github.io/hp-indigo-calculator/
+## Vercel Deployment Specifics
+- Automatic deployment on push to main branch
+- Custom domain configured: docsol.ca
+- All asset paths are absolute (`/path/to/file`)
+- Production URL: https://docsol.ca
 
 ---
 
