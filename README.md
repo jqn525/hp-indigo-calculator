@@ -14,12 +14,21 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 
 ## 🧮 Available Calculators
 
+### Small Format Products
 - ✅ **Brochures** - Tri-fold and bi-fold options, 25-2500 units
 - ✅ **Postcards** - 4 standard sizes, 100-5000 units  
 - ✅ **Flyers** - 4 standard sizes, 25-2500 units
 - ✅ **Bookmarks** - 3 sizes on premium cover stock, 100-2500 units
-- ✅ **Promotional Products** - Magnets, stickers, apparel, tote bags
-- 🚧 **Large Format** - Coming soon
+- ✅ **Small Format Hub** - Unified product selection and filtering
+
+### Promotional Products
+- ✅ **Magnets** - Linear interpolation pricing, 4 sizes, 25-1000 units
+- ✅ **Stickers** - Various sizes with quantity-based pricing
+- ✅ **Apparel** - T-shirts and hoodies with size/color options
+- ✅ **Tote Bags** - Canvas bags with bulk pricing tiers
+
+### Large Format
+- 🚧 **Banners & Posters** - Coming soon
 
 ## 🚀 Live Application
 
@@ -29,10 +38,12 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 
 - **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5
 - **Backend**: Supabase (Database, Authentication, Real-time)
-- **Hosting**: Vercel with custom domain
-- **PWA Features**: Service Worker, Web App Manifest
+- **Hosting**: Vercel with custom domain (docsol.ca)
+- **PWA Features**: Service Worker (v69), Web App Manifest
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
+- **Database**: Dynamic pricing with smart caching and fallback support
+- **Architecture**: Modular component system with configurators
 
 ## 💻 Local Development
 
@@ -47,8 +58,8 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
    # Using Python
    python -m http.server 8000
    
-   # Using Node.js
-   npx serve -p 8000
+   # Using Node.js (recommended for external drives)
+   npx serve -p 8000 -s .
    ```
 
 3. **Open in browser**
@@ -62,7 +73,7 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 The application uses hardcoded Supabase credentials for simplicity. For production deployments, consider using environment variables.
 
 ### Service Worker
-- Current cache version: `v52`
+- Current cache version: `v69`
 - Increment version in `sw.js` when deploying CSS/JS changes
 - Implements cache-first strategy with network-first for CSS files
 

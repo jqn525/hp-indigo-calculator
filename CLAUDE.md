@@ -23,10 +23,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Current Products Available:
 
 #### Small Format Products:
+- **Small Format Hub** (`/pages/small-format.html`) - Unified product selection with filtering
 - **Brochures** (tri-fold, bi-fold) - 25-2500 units, e=0.75
 - **Postcards** (4x6, 5x7, 5.5x8.5, 6x9) - 100-5000 units, e=0.70
 - **Flyers** (5.5x8.5, 8.5x11, 8.5x14, 11x17) - 25-2500 units, e=0.70
 - **Bookmarks** (2x6, 2x7, 2x8) - 100-2500 units, e=0.65
+
+#### Product Information Pages:
+- **Product Brochures** (`/pages/product-brochures.html`) - Detailed brochure specifications
+- **Product Postcards** (`/pages/product-postcards.html`) - Postcard size and material guide
+- **Product Flyers** (`/pages/product-flyers.html`) - Flyer options and specifications
+- **Product Bookmarks** (`/pages/product-bookmarks.html`) - Bookmark details and uses
 
 #### Promotional Products:
 - **Magnets** (2x2, 3x3, 4x4, 5x5) - 25-1000 units, linear interpolation pricing
@@ -36,6 +43,51 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 #### Coming Soon:
 - **Large Format** (banners, posters) - Placeholder page
+
+### New Product Pages (Latest Architecture)
+
+#### Small Format Hub (`/pages/small-format.html`)
+- **Purpose**: Unified product selection and discovery page
+- **Features**:
+  - Product filtering by quantity, paper type, turnaround time
+  - Grid layout with enhanced product cards
+  - "Get Quote" buttons linking to individual calculators
+  - Integrated search functionality
+  - Responsive design optimized for desktop and mobile
+- **Integration**: Uses `small-format-filters.js` for dynamic filtering
+
+#### Product Information Pages (Enhanced Detail Pages)
+- **Product Brochures** (`/pages/product-brochures.html`)
+  - Detailed tri-fold and bi-fold specifications
+  - Paper stock options and visual examples
+  - Design guidelines and best practices
+  - Direct link to brochure calculator
+  
+- **Product Postcards** (`/pages/product-postcards.html`)
+  - Size comparison charts (4x6, 5x7, 5.5x8.5, 6x9)
+  - Mailing guidelines and postal regulations
+  - Paper finish options with visual samples
+  - Direct link to postcard calculator
+  
+- **Product Flyers** (`/pages/product-flyers.html`)
+  - Size specifications and use cases
+  - Paper weight recommendations
+  - Design template suggestions
+  - Direct link to flyer calculator
+  
+- **Product Bookmarks** (`/pages/product-bookmarks.html`)
+  - Size options (2x6, 2x7, 2x8) with visual comparisons
+  - Premium cover stock details
+  - Finishing options and applications
+  - Direct link to bookmark calculator
+
+#### Page Architecture Features
+- **Consistent Header**: All pages use the same desktop header navigation
+- **Authentication Protected**: All pages protected by `auth-guard.js`
+- **SFU Branding**: Consistent SFU red color scheme and typography
+- **Responsive Design**: Bootstrap 5 grid system with custom CSS
+- **SEO Optimized**: Proper meta descriptions and page titles
+- **PWA Integration**: Manifest.json and theme color support
 
 ## Development Commands
 
@@ -103,8 +155,13 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - Auto-cleanup of old caches on activation
 
 ### File Structure Patterns
-- `/pages/*.html` - Individual calculator pages (brochures, postcards, flyers, bookmarks, large-format, cart)
+- `/pages/*.html` - Individual calculator pages and product pages
+- `/pages/product-*.html` - Detailed product information pages
+- `/pages/small-format.html` - Unified small format product hub
 - `/js/calculator.js` - Product-specific pricing functions
+- `/js/configurator.js` - Product configuration management
+- `/js/header.js` - Header component functionality
+- `/js/small-format-filters.js` - Product filtering and search
 - `/js/cart.js` - Cart management system with localStorage
 - `/js/pricingConfig.js` - Centralized pricing rules and constraints
 - `/js/paperStocks.js` - Paper specifications and costs
@@ -113,6 +170,38 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - Navigation: Bottom-positioned 3-tab structure (Small Format + Large Format + Cart)
 
 ## Key Implementation Details
+
+### New JavaScript Components (Latest)
+
+#### Product Configurator (`js/configurator.js`)
+- **Purpose**: Enhanced UX with real-time pricing updates
+- **Features**: 
+  - Real-time configuration tracking
+  - Debounced pricing calculations
+  - Visual preview updates
+  - Tooltip initialization
+  - Current config: size, fold type, paper type, rush type, quantity
+- **Integration**: Works with all product calculators for improved UX
+
+#### Header Navigation (`js/header.js`)
+- **Purpose**: Desktop header navigation system with dropdowns
+- **Features**:
+  - Mobile menu toggle functionality
+  - Dropdown menu management
+  - Cart badge updates
+  - User menu integration
+  - Search functionality (placeholder for future)
+- **Mobile Support**: Responsive hamburger menu for mobile devices
+
+#### Small Format Filters (`js/small-format-filters.js`)
+- **Purpose**: Product filtering and view controls for small format hub
+- **Features**:
+  - Filter by quantity, paper type, turnaround time
+  - Grid/list view toggle
+  - Product count updates
+  - "No results" state handling
+  - Reset filters functionality
+- **Integration**: Powers the unified small format product selection page
 
 ### Adding New Product Calculators
 1. Add product constraints to `pricingConfig.js` (`productConstraints` object)
@@ -137,7 +226,7 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 
 ### Cache Busting
 To force users to get updated files:
-1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v52`)
+1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v69`)
 2. This triggers service worker update cycle and clears old cache
 3. Always increment version when deploying CSS/JS changes
 
@@ -202,7 +291,7 @@ Successfully migrated from static pricing data to dynamic database-driven pricin
 - `js/supabase.js` - Environment variable support ✅
 - `pages/admin.html` - Admin interface ✅
 - `vercel.json` - Deployment configuration ✅
-- `sw.js` - Updated to v35 with new files ✅
+- `sw.js` - Updated to v69 with all new files ✅
 
 #### Benefits Achieved:
 - **Easy Price Updates**: No code deployments needed for pricing changes
@@ -259,7 +348,7 @@ Successfully integrated Supabase for cloud storage and user management:
 - `pages/quotes.html` - Quote history page ✅
 - `sql/schema.sql` - Complete database schema ✅
 - Updated cart.js for cloud sync ✅
-- Service worker updated to v34 ✅
+- Service worker updated to v69 ✅
 
 #### Current Features:
 1. **Authentication Flow**:
@@ -280,25 +369,117 @@ Successfully integrated Supabase for cloud storage and user management:
 
 ---
 
-## Next Session Plans:
+## Current File Structure (Latest)
 
-### Session 2: Database Migration
-1. Move paper stocks to Supabase
-2. Move pricing configs to database
-3. Create admin interface for price updates
-4. Add caching for performance
+### Core Application Files
+```
+├── index.html                 # Main homepage with PWA features
+├── login.html                 # SFU-branded authentication page
+├── manifest.json              # PWA manifest configuration
+├── sw.js                      # Service worker (v69) with caching
+├── vercel.json               # Vercel deployment configuration
+└── README.md                 # Project documentation
+```
 
-### Session 3: Advanced Features
-1. Quote sharing via unique URLs
-2. Email notifications
-3. Customer management
-4. Analytics dashboard
+### Stylesheets & Assets
+```
+├── css/
+│   └── styles.css            # Complete SFU branding + responsive design
+├── fonts/
+│   ├── LavaFNI-Regular.otf   # SFU body text font
+│   └── NovemberCondensedFNI-Heavy.otf # SFU header font
+└── icons/
+    ├── *.svg                 # Product icons and PWA icons
+    └── README.md             # Icon documentation
+```
 
-### Session 4: Polish
-1. Better error handling
-2. Loading states
-3. Offline queue for syncing
-4. Performance optimization
+### JavaScript Architecture
+```
+├── js/
+│   ├── app.js                # Main application initialization
+│   ├── auth.js               # Supabase authentication system
+│   ├── auth-guard.js         # Page-level authentication protection
+│   ├── calculator.js         # Core pricing calculation engine
+│   ├── cart.js               # Shopping cart with cloud sync
+│   ├── configurator.js       # NEW: Enhanced product configurator
+│   ├── db.js                 # Database operations with caching
+│   ├── header.js             # NEW: Desktop header navigation
+│   ├── migrate-data.js       # Database migration utilities
+│   ├── paperStocks.js        # Paper specifications and costs
+│   ├── pricingConfig.js      # Centralized pricing rules
+│   ├── promoCalculator.js    # Promotional product pricing
+│   ├── promoConfig.js        # Promotional product configurations
+│   ├── small-format-filters.js # NEW: Product filtering system
+│   ├── supabase.js           # Supabase client configuration
+│   └── sw-register.js        # Service worker registration
+```
+
+### Product Pages (Calculators)
+```
+├── pages/
+│   ├── small-format.html     # NEW: Unified small format hub
+│   ├── brochures.html        # Brochure calculator
+│   ├── postcards.html        # Postcard calculator
+│   ├── flyers.html           # Flyer calculator
+│   ├── bookmarks.html        # Bookmark calculator
+│   ├── magnets.html          # Magnet calculator
+│   ├── stickers.html         # Sticker calculator
+│   ├── apparel.html          # Apparel calculator
+│   ├── tote-bags.html        # Tote bag calculator
+│   └── large-format.html     # Large format placeholder
+```
+
+### Product Information Pages (NEW)
+```
+├── pages/
+│   ├── product-brochures.html   # Detailed brochure specifications
+│   ├── product-postcards.html   # Postcard size and material guide
+│   ├── product-flyers.html      # Flyer options and specifications
+│   └── product-bookmarks.html   # Bookmark details and applications
+```
+
+### System & Admin Pages
+```
+├── pages/
+│   ├── admin.html            # Admin panel for pricing management
+│   ├── cart.html             # Shopping cart interface
+│   ├── quotes.html           # Quote history and management
+│   ├── signin.html           # User authentication page
+│   └── promo.html            # Promotional products hub
+```
+
+### Database & Configuration
+```
+├── sql/
+│   ├── schema.sql            # Complete Supabase database schema
+│   ├── disable_auth.sql      # Development authentication bypass
+│   └── fix_rls_policies.sql  # Row-level security fixes
+```
+
+### Documentation Files
+```
+├── CLAUDE.md                 # This file - Claude Code instructions
+├── TASK_CHECKLIST.md         # Comprehensive UI overhaul checklist
+├── UI_OVERHAUL_PLAN.md       # Strategic transformation plan
+├── README_SUPABASE.md        # Supabase integration documentation
+└── NOTES_FOR_NEXT_SESSION.md # Session planning notes
+```
+
+## Next Session Opportunities (Updated)
+
+### Immediate Improvements
+1. **Performance Optimization**: Implement lazy loading for product images
+2. **SEO Enhancement**: Add structured data markup for products
+3. **Analytics Integration**: Google Analytics 4 with enhanced e-commerce tracking
+4. **Advanced Filtering**: Search functionality for small format hub
+5. **Mobile Enhancements**: Progressive Web App installation prompts
+
+### Advanced Features  
+1. **Quote Management**: Advanced quote templates and PDF generation
+2. **Customer Portal**: Enhanced account dashboard with order history
+3. **Integration**: Connect with existing SFU Document Solutions systems
+4. **A/B Testing**: Framework for pricing and UI optimization
+5. **Business Intelligence**: Advanced reporting and analytics dashboard
 
 ---
 
@@ -339,9 +520,9 @@ Successfully integrated Supabase for cloud storage and user management:
 ✅ **350 pieces 3x3**: Supplier $392.20 → Customer $490.25  
 ✅ **35 pieces 4x4**: Supplier $88.60 → Customer $110.75  
 
-#### Current Cache Version: v29
-- Incremented for magnet pricing changes and version system addition
-- Next update should use v30
+#### Current Cache Version: v69
+- Latest version with all new components and pages
+- Increment for any CSS/JS changes
 
 ---
 
@@ -375,7 +556,7 @@ Successfully integrated Supabase for cloud storage and user management:
 - **Improved Text**: "Reset Form" → "Clear"
 
 ### Technical Updates:
-- **Service Worker**: Updated to v25, includes all new files
+- **Service Worker**: Updated to v69, includes all new files
 - **CSS Enhancements**: Button grid system, mobile optimizations
 - **Code Organization**: Modular cart system, consistent patterns
 
@@ -422,7 +603,7 @@ This session focused on implementing the complete SFU Document Solutions brand i
 
 #### Files Modified:
 - `css/styles.css` - Complete brand color overhaul + selection card refinements
-- `sw.js` - Cache version increments (v49 → v52)
+- `sw.js` - Cache version increments (v49 → v69)
 - `CLAUDE.md` - Updated documentation
 
 #### Current Status:
