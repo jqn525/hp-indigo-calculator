@@ -5,7 +5,42 @@ class CartManager {
     this.items = [];
     this.useCloud = false;
     this.initialized = false;
+    
+    // Check for corrupted data and clear if found
+    this.validateAndCleanLocalStorage();
+    
     this.init();
+  }
+
+  validateAndCleanLocalStorage() {
+    const stored = localStorage.getItem(this.storageKey);
+    if (stored) {
+      try {
+        const items = JSON.parse(stored);
+        
+        // Check if data is an array and if any item has missing critical properties
+        if (!Array.isArray(items)) {
+          console.warn('Cart data is not an array, clearing corrupted data');
+          localStorage.removeItem(this.storageKey);
+          return;
+        }
+        
+        const hasCorruptedData = items.some(item => 
+          !item || 
+          !item.productType || 
+          !item.configuration || 
+          !item.pricing
+        );
+        
+        if (hasCorruptedData) {
+          console.warn('Clearing corrupted cart data - found items with missing required properties');
+          localStorage.removeItem(this.storageKey);
+        }
+      } catch (e) {
+        console.warn('Failed to parse cart data, clearing corrupted data:', e);
+        localStorage.removeItem(this.storageKey);
+      }
+    }
   }
 
   async init() {
@@ -106,6 +141,11 @@ class CartManager {
   }
 
   addItem(product) {
+    console.log('Adding product to cart:', product);
+    console.log('Product type:', product.productType);
+    console.log('Pricing:', product.pricing);
+    console.log('Configuration:', product.configuration);
+    
     // Generate unique ID for the cart item
     const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
     
@@ -243,9 +283,9 @@ class CartManager {
   }
 
   renderCartItem(item) {
-    const config = item.configuration;
-    const pricing = item.pricing;
-    const productType = item.productType;
+    const config = item.configuration || {};
+    const pricing = item.pricing || {};
+    const productType = item.productType || 'product';
     
     // Get display name for product type
     const productDisplayName = this.getProductDisplayName(productType);
@@ -256,6 +296,10 @@ class CartManager {
     // Format timestamp
     const date = new Date(item.timestamp);
     const timeString = date.toLocaleString();
+    
+    // Get price with fallback
+    const totalPrice = pricing.totalPrice || pricing.totalCost || 0;
+    const unitPrice = pricing.unitPrice || 0;
     
     // Check if this item was loaded from a quote
     const isFromQuote = pricing.originalQuoteNumber;
@@ -270,7 +314,7 @@ class CartManager {
           <div class="cart-item-info">
             <h3>${productDisplayName}</h3>
             <div class="cart-item-summary">${summary}</div>
-            <div class="cart-item-price">Total: $${pricing.totalPrice || pricing.totalCost}</div>
+            <div class="cart-item-price">Total: $${parseFloat(totalPrice).toFixed(2)}</div>
             ${quoteIndicator}
           </div>
           <button class="remove-item-btn" onclick="cartManager.removeItem('${item.id}')">
@@ -288,29 +332,29 @@ class CartManager {
   generateItemSummary(config, productType) {
     const parts = [];
     
-    // Add quantity
-    if (config.quantity) {
+    // Add quantity with fallback
+    if (config && config.quantity) {
       parts.push(`${config.quantity} units`);
     }
     
     // Add size
-    if (config.size) {
+    if (config && config.size) {
       parts.push(config.size);
     }
     
     // Add paper type (display name if available)
-    if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+    if (config && config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
       parts.push(window.paperStocks[config.paperType].displayName);
     }
     
     // Add fold type for brochures
-    if (config.foldType && config.foldType !== 'none') {
+    if (config && config.foldType && config.foldType !== 'none') {
       const foldDisplay = config.foldType.charAt(0).toUpperCase() + config.foldType.slice(1);
       parts.push(foldDisplay);
     }
     
     // Add rush if not standard
-    if (config.rushType && config.rushType !== 'standard') {
+    if (config && config.rushType && config.rushType !== 'standard') {
       const rushDisplay = config.rushType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
       parts.push(rushDisplay);
     }
@@ -322,34 +366,39 @@ class CartManager {
     const details = [];
     
     // Basic configuration details
-    if (config.quantity) {
+    if (config && config.quantity) {
       details.push({ label: 'Quantity', value: config.quantity });
     }
     
-    if (config.size) {
+    if (config && config.size) {
       details.push({ label: 'Size', value: config.size });
     }
     
-    if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+    if (config && config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
       details.push({ label: 'Paper', value: window.paperStocks[config.paperType].displayName });
     }
     
-    if (config.foldType && config.foldType !== 'none') {
+    if (config && config.foldType && config.foldType !== 'none') {
       const foldDisplay = config.foldType.charAt(0).toUpperCase() + config.foldType.slice(1);
       details.push({ label: 'Fold Type', value: foldDisplay });
     }
     
-    if (config.rushType && config.rushType !== 'standard') {
+    if (config && config.rushType && config.rushType !== 'standard') {
       const rushDisplay = config.rushType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
       details.push({ label: 'Turnaround', value: rushDisplay });
     }
     
-    // Pricing details
-    if (pricing.unitPrice) {
-      details.push({ label: 'Unit Price', value: `$${pricing.unitPrice}` });
+    // Pricing details with fallbacks
+    const unitPrice = pricing.unitPrice || 0;
+    const totalPrice = pricing.totalPrice || pricing.totalCost || 0;
+    
+    if (unitPrice > 0) {
+      details.push({ label: 'Unit Price', value: `$${parseFloat(unitPrice).toFixed(2)}` });
     }
     
-    if (pricing.sheetsRequired) {
+    details.push({ label: 'Total', value: `$${parseFloat(totalPrice).toFixed(2)}` });
+    
+    if (pricing && pricing.sheetsRequired) {
       details.push({ label: 'Sheets Required', value: pricing.sheetsRequired });
     }
     
@@ -367,9 +416,13 @@ class CartManager {
       'postcards': 'Postcard',
       'flyers': 'Flyer',
       'bookmarks': 'Bookmark',
-      'large-format': 'Large Format Print'
+      'large-format': 'Large Format Print',
+      'magnets': 'Custom Magnets',
+      'stickers': 'Custom Stickers',
+      'apparel': 'Custom Apparel',
+      'tote-bags': 'Canvas Tote Bags'
     };
-    return names[productType] || productType;
+    return names[productType] || productType || 'Product';
   }
 
   bindEvents() {
@@ -427,10 +480,13 @@ class CartManager {
     quoteText += `Total Items: ${this.items.length}\n\n`;
 
     this.items.forEach((item, index) => {
+      const totalPrice = item.pricing.totalPrice || item.pricing.totalCost || 0;
+      const unitPrice = item.pricing.unitPrice || 0;
+      
       quoteText += `${index + 1}. ${this.getProductDisplayName(item.productType)}\n`;
       quoteText += `   ${this.generateItemSummary(item.configuration, item.productType)}\n`;
-      quoteText += `   Total: $${item.pricing.totalCost}\n`;
-      quoteText += `   Unit Price: $${item.pricing.unitPrice}\n\n`;
+      quoteText += `   Total: $${parseFloat(totalPrice).toFixed(2)}\n`;
+      quoteText += `   Unit Price: $${parseFloat(unitPrice).toFixed(2)}\n\n`;
     });
 
     quoteText += `TOTAL QUOTE VALUE: $${this.getTotalCost().toFixed(2)}\n`;

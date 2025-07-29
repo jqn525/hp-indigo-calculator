@@ -1,10 +1,13 @@
 // Product Configurator - Enhanced UX with Real-time Pricing
 class ProductConfigurator {
     constructor() {
+        // Detect current product type
+        this.productType = this.detectProductType();
+        
         this.currentConfig = {
             size: '8.5x11',
             foldType: 'bifold',
-            paperType: 'LYNO416FSC',
+            paperType: 'LYNOC95FSC', // Default to 100# Cover Uncoated for postcard compatibility
             rushType: 'standard',
             quantity: 100
         };
@@ -21,13 +24,26 @@ class ProductConfigurator {
         this.init();
     }
 
+    detectProductType() {
+        // Detect product type based on form ID
+        if (document.getElementById('postcardForm')) {
+            return 'postcards';
+        } else if (document.getElementById('flyerForm')) {
+            return 'flyers';
+        } else if (document.getElementById('bookmarkForm')) {
+            return 'bookmarks';
+        } else if (document.getElementById('brochureForm')) {
+            return 'brochures';
+        }
+        return 'brochures'; // Default fallback
+    }
+
     async init() {
         console.log('🚀 Initializing Product Configurator...');
         
         try {
             this.setupEventListeners();
             this.initializeTooltips();
-            this.updateVisualPreview();
             this.updateConfigurationSummary();
             
             // Wait a moment for any async dependencies to load
@@ -50,9 +66,11 @@ class ProductConfigurator {
         const maxAttempts = 10;
         
         while (attempts < maxAttempts) {
-            if (typeof calculateBrochurePrice === 'function' && 
-                (typeof window.pricingConfigs !== 'undefined' || typeof window.dbManager !== 'undefined')) {
-                console.log('✅ Dependencies ready');
+            const hasProductFunction = this.getProductPricingFunction() !== null;
+            const hasPricingData = (typeof window.pricingConfigs !== 'undefined' || typeof window.dbManager !== 'undefined');
+            
+            if (hasProductFunction && hasPricingData) {
+                console.log('✅ Dependencies ready for product type:', this.productType);
                 return;
             }
             
@@ -63,6 +81,22 @@ class ProductConfigurator {
         
         if (attempts >= maxAttempts) {
             console.warn('⚠️ Some dependencies may not be ready, proceeding anyway');
+        }
+    }
+
+    getProductPricingFunction() {
+        // Return the appropriate pricing function for the current product type
+        switch (this.productType) {
+            case 'brochures':
+                return typeof calculateBrochurePrice === 'function' ? calculateBrochurePrice : null;
+            case 'postcards':
+                return typeof calculatePostcardPrice === 'function' ? calculatePostcardPrice : null;
+            case 'flyers':
+                return typeof calculateFlyerPrice === 'function' ? calculateFlyerPrice : null;
+            case 'bookmarks':
+                return typeof calculateBookmarkPrice === 'function' ? calculateBookmarkPrice : null;
+            default:
+                return null;
         }
     }
 
@@ -149,9 +183,6 @@ class ProductConfigurator {
         // Update configuration
         this.currentConfig[this.getConfigKey(option)] = value;
 
-        // Update visual preview
-        this.updateVisualPreview();
-
         // Update configuration summary
         this.updateConfigurationSummary();
 
@@ -213,25 +244,6 @@ class ProductConfigurator {
         }
     }
 
-    updateVisualPreview() {
-        const preview = document.getElementById('brochurePreview');
-        if (!preview) return;
-
-        // Update fold lines based on fold type
-        const triFoldLines = preview.querySelectorAll('.fold-line.tri-fold');
-        const biFoldLines = preview.querySelectorAll('.fold-line.bi-fold');
-
-        if (this.currentConfig.foldType === 'trifold') {
-            triFoldLines.forEach(line => line.style.display = 'block');
-            biFoldLines.forEach(line => line.style.display = 'none');
-        } else {
-            triFoldLines.forEach(line => line.style.display = 'none');
-            biFoldLines.forEach(line => line.style.display = 'block');
-        }
-
-        // Could add more visual updates based on paper type, size, etc.
-        // For now, keeping it simple with fold line changes
-    }
 
     updateConfigurationSummary() {
         const summaryMapping = {
@@ -326,28 +338,33 @@ class ProductConfigurator {
     }
 
     async callPricingCalculator() {
-        // Use the existing brochure calculation function
-        if (typeof calculateBrochurePrice === 'function') {
-            const config = this.currentConfig;
-            
-            console.log('🔧 Calling pricing calculator with config:', config);
-            
-            // Create FormData object as expected by calculateBrochurePrice
-            const formData = new FormData();
-            formData.append('quantity', config.quantity);
-            formData.append('size', config.size);
-            formData.append('foldType', config.foldType);
-            formData.append('paperType', config.paperType);
-            formData.append('rushType', config.rushType);
-            
-            const result = await calculateBrochurePrice(formData);
-            console.log('💰 Raw pricing result:', result);
-            
-            return result;
-        } else {
-            console.error('❌ calculateBrochurePrice function not available');
+        const pricingFunction = this.getProductPricingFunction();
+        
+        if (!pricingFunction) {
+            console.error(`❌ Pricing function not available for product type: ${this.productType}`);
             return null;
         }
+        
+        const config = this.currentConfig;
+        console.log('🔧 Calling pricing calculator with config:', config);
+        console.log('🏷️ Product type:', this.productType);
+        
+        // Create FormData object with appropriate parameters for each product type
+        const formData = new FormData();
+        formData.append('quantity', config.quantity);
+        formData.append('size', config.size);
+        formData.append('paperType', config.paperType);
+        formData.append('rushType', config.rushType);
+        
+        // Only add foldType for brochures
+        if (this.productType === 'brochures') {
+            formData.append('foldType', config.foldType);
+        }
+        
+        const result = await pricingFunction(formData);
+        console.log('💰 Raw pricing result:', result);
+        
+        return result;
     }
 
     updatePricingDisplay(status) {
@@ -424,37 +441,45 @@ class ProductConfigurator {
     }
 
     addToCart() {
-        if (!this.currentPricing.total) {
-            alert('Please wait for pricing calculation to complete.');
+        if (!this.currentPricing) {
+            alert('Please calculate pricing first');
             return;
         }
 
-        // Prepare cart item data
-        const cartItem = {
-            id: Date.now().toString(),
-            type: 'brochures',
-            title: 'Professional Brochures',
-            configuration: {
-                size: this.currentConfig.size,
-                foldType: this.currentConfig.foldType,
-                paperType: this.currentConfig.paperType,
-                rushType: this.currentConfig.rushType,
-                quantity: this.currentConfig.quantity
-            },
-            pricing: {
+        // Use cartManager directly instead of the global addToCart
+        if (window.cartManager) {
+            // Create FormData to match what other calculators use
+            const formData = new FormData();
+            formData.append('quantity', this.currentConfig.quantity);
+            formData.append('size', this.currentConfig.size);
+            formData.append('paperType', this.currentConfig.paperType);
+            formData.append('rushType', this.currentConfig.rushType);
+            
+            // Only add foldType for brochures
+            if (this.productType === 'brochures') {
+                formData.append('foldType', this.currentConfig.foldType);
+            }
+            
+            // Use the proper pricing structure
+            const pricing = {
                 unitPrice: this.currentPricing.unitPrice,
-                totalPrice: this.currentPricing.total,
-                quantity: this.currentConfig.quantity
-            },
-            timestamp: new Date().toISOString()
-        };
-
-        // Use existing cart functionality
-        if (typeof addToCart === 'function') {
-            addToCart(cartItem);
+                totalCost: this.currentPricing.total, // Note: totalCost, not totalPrice
+                totalPrice: this.currentPricing.total, // Include both for compatibility
+                sheetsRequired: this.currentPricing.breakdown.sheetsRequired,
+                printingSetupCost: this.currentPricing.breakdown.setupFee,
+                finishingSetupCost: this.currentPricing.breakdown.finishingSetupFee || 0,
+                productionCost: this.currentPricing.breakdown.productionCost,
+                materialCost: this.currentPricing.breakdown.materialCost,
+                finishingCost: this.currentPricing.breakdown.finishingCost || 0,
+                subtotal: this.currentPricing.breakdown.subtotal,
+                rushMultiplier: this.currentPricing.breakdown.rushMultiplier
+            };
+            
+            // Use the cartManager method that other calculators use
+            window.cartManager.addCurrentConfiguration(this.productType, formData, pricing);
             this.showAddToCartSuccess();
         } else {
-            console.error('Cart functionality not available');
+            console.error('Cart manager not available');
         }
     }
 
@@ -479,8 +504,15 @@ class ProductConfigurator {
 
     requestQuote() {
         // Create quote request data
+        const productNames = {
+            'brochures': 'Brochures',
+            'postcards': 'Postcards', 
+            'flyers': 'Flyers',
+            'bookmarks': 'Bookmarks'
+        };
+        
         const quoteData = {
-            product: 'Brochures',
+            product: productNames[this.productType] || 'Product',
             configuration: this.currentConfig,
             pricing: this.currentPricing,
             timestamp: new Date().toISOString()

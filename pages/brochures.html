@@ -123,59 +123,12 @@
             <div class="configurator-layout">
                 <!-- Product Preview Section -->
                 <div class="product-preview-section">
+                    <div class="preview-header">
+                        <h1>Brochures</h1>
+                        <p class="preview-subtitle">Professional brochures with premium papers, unique folds and vibrant colors that bring your brand to life.</p>
+                    </div>
+                    
                     <div class="preview-container">
-                        <div class="product-visual" id="productVisual">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" id="brochurePreview">
-                                <g>
-                                    <!-- Main brochure shape -->
-                                    <rect x="50" y="50" width="300" height="200" fill="#f8f9fa" stroke="#CC0633" stroke-width="3" rx="8"/>
-                                    
-                                    <!-- Tri-fold lines (hidden by default) -->
-                                    <line x1="150" y1="50" x2="150" y2="250" stroke="#CC0633" stroke-width="2" stroke-dasharray="5,5" opacity="0.7" class="fold-line tri-fold" style="display: none;"/>
-                                    <line x1="250" y1="50" x2="250" y2="250" stroke="#CC0633" stroke-width="2" stroke-dasharray="5,5" opacity="0.7" class="fold-line tri-fold" style="display: none;"/>
-                                    
-                                    <!-- Bi-fold line (default) -->
-                                    <line x1="200" y1="50" x2="200" y2="250" stroke="#CC0633" stroke-width="2" stroke-dasharray="5,5" opacity="0.7" class="fold-line bi-fold"/>
-                                    
-                                    <!-- Panel content -->
-                                    <rect x="70" y="70" width="60" height="160" fill="#CC0633" opacity="0.9" rx="4"/>
-                                    <line x1="80" y1="90" x2="120" y2="90" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                                    <line x1="80" y1="110" x2="115" y2="110" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                                    <line x1="80" y1="130" x2="120" y2="130" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                                    
-                                    <rect x="170" y="70" width="60" height="160" fill="#A6192E" opacity="0.3" rx="4"/>
-                                    <line x1="180" y1="90" x2="220" y2="90" stroke="#CC0633" stroke-width="2" stroke-linecap="round"/>
-                                    <line x1="180" y1="110" x2="215" y2="110" stroke="#666" stroke-width="2" stroke-linecap="round"/>
-                                    <rect x="185" y="130" width="30" height="20" fill="#CC0633" opacity="0.5" rx="2"/>
-                                    
-                                    <rect x="270" y="70" width="60" height="160" fill="#e3f2fd" rx="4"/>
-                                    <circle cx="300" cy="120" r="15" fill="#CC0633" opacity="0.3"/>
-                                    <line x1="280" y1="160" x2="320" y2="160" stroke="#666" stroke-width="2"/>
-                                    <line x1="280" y1="180" x2="315" y2="180" stroke="#666" stroke-width="2"/>
-                                    
-                                    <!-- Shadow -->
-                                    <ellipse cx="200" cy="270" rx="100" ry="15" fill="#CC0633" opacity="0.2"/>
-                                </g>
-                            </svg>
-                        </div>
-                        
-                        <!-- Live Pricing Display -->
-                        <div class="live-pricing">
-                            <div class="price-summary">
-                                <div class="current-price">
-                                    <span class="price-label">Total Price</span>
-                                    <span class="price-value" id="livePrice">$0.00</span>
-                                </div>
-                                <div class="unit-price">
-                                    <span class="unit-label">Per unit:</span>
-                                    <span class="unit-value" id="liveUnitPrice">$0.00</span>
-                                </div>
-                            </div>
-                            <div class="price-status" id="priceStatus">
-                                <span class="status-text">Configure your product to see pricing</span>
-                            </div>
-                        </div>
-                        
                         <!-- Configuration Summary -->
                         <div class="config-summary">
                             <h4>Your Configuration</h4>
@@ -203,6 +156,23 @@
                             </div>
                         </div>
                         
+                        <!-- Live Pricing Display -->
+                        <div class="live-pricing">
+                            <div class="price-summary">
+                                <div class="current-price">
+                                    <span class="price-label">Total Price</span>
+                                    <span class="price-value" id="livePrice">$0.00</span>
+                                </div>
+                                <div class="unit-price">
+                                    <span class="unit-label">Per unit:</span>
+                                    <span class="unit-value" id="liveUnitPrice">$0.00</span>
+                                </div>
+                            </div>
+                            <div class="price-status" id="priceStatus">
+                                <span class="status-text">Configure your product to see pricing</span>
+                            </div>
+                        </div>
+                        
                         <!-- Quick Actions -->
                         <div class="quick-actions">
                             <button type="button" class="btn btn-primary btn-lg" id="addToCartBtn" disabled>
@@ -211,23 +181,12 @@
                                 </svg>
                                 Add to Cart
                             </button>
-                            <button type="button" class="btn btn-outline-primary btn-lg" id="requestQuoteBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                </svg>
-                                Request Quote
-                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Configuration Panel -->
                 <div class="configuration-panel">
-                    <div class="panel-header">
-                        <h1>Configure Your Brochures</h1>
-                        <p class="panel-description">Professional brochures with premium papers, unique folds and vibrant colors that bring your brand to life.</p>
-                    </div>
-                    
                     <form id="brochureForm" class="configurator-form">
                         <!-- Size Configuration -->
                         <div class="config-section">
@@ -310,7 +269,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="option-grid paper-grid">
+                            <div class="option-grid">
                                 <label class="option-card selected" data-option="paper" data-value="LYNO416FSC">
                                     <input type="radio" name="paperType" value="LYNO416FSC" checked hidden>
                                     <div class="option-content">
