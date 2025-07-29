@@ -43,7 +43,6 @@ const urlsToCache = [
   `${basePath}/pages/stickers.html`,
   `${basePath}/pages/apparel.html`,
   `${basePath}/pages/tote-bags.html`,
-  `${basePath}/pages/signin.html`,
   `${basePath}/pages/quotes.html`,
   `${basePath}/pages/admin.html`,
   `${basePath}/pages/product-brochures.html`,
