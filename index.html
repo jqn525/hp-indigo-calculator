@@ -14,7 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     
     <!-- Custom CSS (overrides Bootstrap) -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=62">
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -26,17 +26,200 @@
     <script src="js/auth-guard.js"></script>
 </head>
 <body>
-    <main>
-        <div class="calculator-container">
-            <!-- User authentication info -->
-            <div class="auth-header">
-                <!-- Auth guard will populate this with user info and logout button -->
+    <!-- Desktop Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand/Logo -->
+            <a href="index.html" class="header-brand">
+                <div class="brand-text">SFU Document Solutions</div>
+            </a>
+
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="header-search">
+                    <input type="text" placeholder="Search products..." />
+                    <button type="submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="header-user-menu">
+                    <button class="user-menu-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Account
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="pages/signin.html" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                            </svg>
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="header-cart">
+                    <a href="pages/cart.html" class="cart-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        <span class="cart-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                </button>
             </div>
-            
-            <h2>SFU Document Solutions</h2>
-            
-            <div class="home-grid">
-                <a href="pages/brochures.html" class="product-card">
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item">
+                <a href="pages/small-format.html" class="mobile-nav-link">Small Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="pages/large-format.html" class="mobile-nav-link">Large Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="pages/promo.html" class="mobile-nav-link">Promotional</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#about" class="mobile-nav-link">About</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#contact" class="mobile-nav-link">Contact</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="pages/cart.html" class="mobile-nav-link">Cart</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="pages/signin.html" class="mobile-nav-link">Sign In</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Professional Digital Printing Solutions</h1>
+                    <p class="hero-subtitle">From business cards to large format displays, SFU Document Solutions delivers exceptional quality with fast turnaround times for all your printing needs.</p>
+                    <div class="hero-actions">
+                        <a href="#services" class="btn btn-primary btn-lg">Get Your Quote</a>
+                        <a href="#services" class="btn btn-outline-primary btn-lg">Browse Services</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-visual">
+                        <!-- Placeholder for hero image/graphic -->
+                        <svg viewBox="0 0 400 300" class="hero-graphic">
+                            <rect x="20" y="40" width="360" height="220" fill="#f8f9fa" stroke="#CC0633" stroke-width="2" rx="10"/>
+                            <rect x="40" y="60" width="120" height="80" fill="#CC0633" opacity="0.1" rx="5"/>
+                            <rect x="180" y="60" width="120" height="80" fill="#A6192E" opacity="0.1" rx="5"/>
+                            <rect x="320" y="60" width="40" height="80" fill="#CC0633" opacity="0.2" rx="5"/>
+                            <text x="200" y="200" text-anchor="middle" fill="#CC0633" font-size="18" font-weight="bold">QUALITY PRINTING</text>
+                            <text x="200" y="225" text-anchor="middle" fill="#666" font-size="14">Professional Results</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Overview Section -->
+        <section class="services-section" id="services">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Our Printing Services</h2>
+                    <p>Comprehensive digital printing solutions for businesses, organizations, and individuals</p>
+                </div>
+                
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+                                <g>
+                                    <rect x="8" y="14" width="48" height="36" fill="#e3f2fd" stroke="#CC0633" stroke-width="2" rx="2"/>
+                                    <line x1="32" y1="14" x2="32" y2="50" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                                    <line x1="44" y1="14" x2="44" y2="50" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                                    <path d="M 20 14 L 32 14 L 32 50 L 20 50 Q 14 50 14 44 L 14 20 Q 14 14 20 14" fill="#CC0633" opacity="0.8"/>
+                                    <line x1="18" y1="22" x2="28" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <line x1="18" y1="28" x2="26" y2="28" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h3>Small Format Printing</h3>
+                        <p>Professional brochures, postcards, flyers, and bookmarks with premium paper options and expert finishing.</p>
+                        <a href="pages/small-format.html" class="service-link">Explore Options →</a>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+                                <g>
+                                    <rect x="8" y="16" width="48" height="32" fill="#ffffff" stroke="#CC0633" stroke-width="2" rx="2"/>
+                                    <rect x="12" y="20" width="40" height="24" fill="#CC0633" opacity="0.1" rx="1"/>
+                                    <path d="M 20 44 Q 22 46 24 44 L 40 44 Q 42 46 44 44" stroke="#CC0633" stroke-width="2" fill="none"/>
+                                    <rect x="54" y="22" width="6" height="12" fill="#A6192E" opacity="0.8" rx="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h3>Large Format Printing</h3>
+                        <p>Eye-catching banners, posters, and signage solutions for events, marketing, and business displays.</p>
+                        <a href="pages/large-format.html" class="service-link">Coming Soon →</a>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+                                <g>
+                                    <rect x="16" y="24" width="32" height="24" fill="#ffffff" stroke="#CC0633" stroke-width="2" rx="2"/>
+                                    <rect x="30" y="20" width="4" height="32" fill="#CC0633" opacity="0.6"/>
+                                    <rect x="12" y="34" width="40" height="4" fill="#A6192E" opacity="0.6"/>
+                                    <ellipse cx="32" cy="28" rx="6" ry="4" fill="#CC0633" opacity="0.3" stroke="#CC0633" stroke-width="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h3>Promotional Products</h3>
+                        <p>Custom magnets, stickers, apparel, and branded merchandise to promote your business effectively.</p>
+                        <a href="pages/promo.html" class="service-link">Get Started →</a>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+                                <g>
+                                    <circle cx="32" cy="32" r="20" fill="none" stroke="#CC0633" stroke-width="2"/>
+                                    <path d="M22 32L28 38L42 24" stroke="#A6192E" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <circle cx="32" cy="32" r="12" fill="#CC0633" opacity="0.1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h3>Custom Solutions</h3>
+                        <p>Specialized printing services and design consultation for unique projects and special requirements.</p>
+                        <a href="#contact" class="service-link">Contact Us →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legacy Product Grid (Hidden) -->
+        <div class="home-grid" style="display: none;">
+            <a href="pages/brochures.html" class="product-card">
                     <div class="product-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
                             <g>
@@ -122,6 +305,59 @@
             </div>
         </div>
         
+        <!-- Company Credentials Section -->
+        <section class="credentials-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Why Choose SFU Document Solutions</h2>
+                    <p>Trusted by businesses and organizations for over 15 years</p>
+                </div>
+                
+                <div class="credentials-grid">
+                    <div class="credential-item">
+                        <div class="credential-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <h4>15+ Years Experience</h4>
+                        <p>Professional printing excellence since 2008</p>
+                    </div>
+                    
+                    <div class="credential-item">
+                        <div class="credential-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                        </div>
+                        <h4>HP Indigo Technology</h4>
+                        <p>State-of-the-art digital press equipment</p>
+                    </div>
+                    
+                    <div class="credential-item">
+                        <div class="credential-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
+                        <h4>Fast Turnaround</h4>
+                        <p>Same-day to 5 business days delivery</p>
+                    </div>
+                    
+                    <div class="credential-item">
+                        <div class="credential-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h4>Quality Guarantee</h4>
+                        <p>100% satisfaction guaranteed on all orders</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
         <div class="install-prompt" id="installPrompt">
             <span>Install this app for offline access</span>
             <button class="btn btn-secondary" id="installPromptBtn">Install</button>
@@ -130,110 +366,14 @@
         <button id="installBtn" class="btn btn-primary" style="display: none; position: fixed; top: 1rem; right: 1rem; z-index: 1000;">Install App</button>
     </main>
     
-    
-    <nav class="navbar navbar-light bg-white fixed-bottom border-top navbar-bottom">
-        <div class="container-fluid px-2">
-            <ul class="navbar-nav nav-justified w-100 flex-row m-0">
-                <li class="nav-item">
-                    <a href="index.html" class="nav-link active text-center">
-                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                            <g>
-                                <!-- Desktop printer body -->
-                                <rect x="12" y="24" width="40" height="20" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
-                                <!-- Paper trays -->
-                                <rect x="8" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
-                                <rect x="44" y="20" width="12" height="16" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" rx="1"/>
-                                <!-- Control panel -->
-                                <rect x="20" y="18" width="24" height="6" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="1" rx="1"/>
-                                <!-- Status lights -->
-                                <circle cx="24" cy="21" r="1" fill="currentColor"/>
-                                <circle cx="28" cy="21" r="1" fill="currentColor"/>
-                                <circle cx="32" cy="21" r="1" fill="currentColor"/>
-                                <!-- Paper output -->
-                                <rect x="24" y="44" width="16" height="12" fill="currentColor" opacity="0.15" stroke="currentColor" stroke-width="1.5" rx="1"/>
-                                <!-- Paper sheet coming out -->
-                                <rect x="26" y="46" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2,1" rx="0.5"/>
-                            </g>
-                        </svg>
-                        <span class="nav-text">Small Format</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="pages/large-format.html" class="nav-link text-center">
-                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                            <g>
-                                <!-- Large format printer/plotter icon -->
-                                <rect x="8" y="16" width="48" height="32" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
-                                <rect x="12" y="20" width="40" height="24" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1" rx="1"/>
-                                <!-- Paper coming out -->
-                                <path d="M 20 44 Q 22 46 24 44 L 40 44 Q 42 46 44 44" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <!-- Control panel -->
-                                <rect x="54" y="22" width="6" height="12" fill="currentColor" opacity="0.3" rx="1"/>
-                                <circle cx="57" cy="26" r="1" fill="currentColor"/>
-                                <circle cx="57" cy="30" r="1" fill="currentColor"/>
-                                <!-- Stand legs -->
-                                <line x1="16" y1="48" x2="16" y2="54" stroke="currentColor" stroke-width="2"/>
-                                <line x1="48" y1="48" x2="48" y2="54" stroke="currentColor" stroke-width="2"/>
-                            </g>
-                        </svg>
-                        <span class="nav-text">Large Format</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="pages/promo.html" class="nav-link text-center">
-                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                            <g>
-                                <!-- Gift/promo box with ribbon -->
-                                <rect x="16" y="24" width="32" height="24" fill="currentColor" opacity="0.1" stroke="currentColor" stroke-width="2" rx="2"/>
-                                <!-- Ribbon vertical -->
-                                <rect x="30" y="20" width="4" height="32" fill="currentColor" opacity="0.3"/>
-                                <!-- Ribbon horizontal -->
-                                <rect x="12" y="34" width="40" height="4" fill="currentColor" opacity="0.3"/>
-                                <!-- Bow/knot -->
-                                <ellipse cx="32" cy="28" rx="6" ry="4" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1"/>
-                                <path d="M 26 28 Q 32 24 38 28 Q 32 32 26 28" fill="currentColor" opacity="0.3"/>
-                                <!-- Stars/sparkles around -->
-                                <path d="M 12 18 L 14 20 L 12 22 L 10 20 Z" fill="currentColor" opacity="0.4"/>
-                                <path d="M 52 18 L 54 20 L 52 22 L 50 20 Z" fill="currentColor" opacity="0.4"/>
-                                <path d="M 12 50 L 14 52 L 12 54 L 10 52 Z" fill="currentColor" opacity="0.4"/>
-                                <path d="M 52 50 L 54 52 L 52 54 L 50 52 Z" fill="currentColor" opacity="0.4"/>
-                            </g>
-                        </svg>
-                        <span class="nav-text">Promo</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="pages/cart.html" class="nav-link text-center position-relative" id="cartNavItem">
-                        <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                            <g>
-                                <!-- Shopping cart body -->
-                                <path d="M12 16 L16 16 L20 44 L52 44 L56 24 L24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                                <!-- Cart handle -->
-                                <path d="M20 44 L20 48 Q20 52 24 52 L48 52 Q52 52 52 48 L52 44" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <!-- Cart wheels -->
-                                <circle cx="28" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <circle cx="44" cy="56" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <!-- Cart items (papers) -->
-                                <rect x="28" y="28" width="16" height="12" fill="currentColor" opacity="0.2" rx="1"/>
-                                <rect x="30" y="30" width="12" height="8" fill="currentColor" opacity="0.3" rx="0.5"/>
-                            </g>
-                        </svg>
-                        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-                        <span class="nav-text">Cart</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    
     <!-- Bootstrap JS Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
     <!-- Custom JS -->
     <script src="js/sw-register.js"></script>
-    <script src="js/version.js"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/header.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

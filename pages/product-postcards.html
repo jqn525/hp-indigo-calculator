@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional postcard printing - 4x6, 5x7, 5.5x8.5, 6x9 sizes with premium paper options">
+    <meta name="theme-color" content="#CC0633">
+    
+    <title>Postcards - Professional Printing | SFU Document Solutions</title>
+    
+    <link rel="manifest" href="../manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/styles.css?v=62">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+    
+    <!-- Authentication Guard - Protects entire application -->
+    <script src="../js/auth-guard.js"></script>
+</head>
+<body>
+    <!-- Desktop Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand/Logo -->
+            <a href="../index.html" class="header-brand">
+                <div class="brand-text">SFU Document Solutions</div>
+            </a>
+
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="header-search">
+                    <input type="text" placeholder="Search products..." />
+                    <button type="submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="header-user-menu">
+                    <button class="user-menu-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Account
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="signin.html" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                            </svg>
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="header-cart">
+                    <a href="cart.html" class="cart-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        <span class="cart-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item">
+                <a href="small-format.html" class="mobile-nav-link">Small Format Printing</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="large-format.html" class="mobile-nav-link">Large Format Printing</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="promo.html" class="mobile-nav-link">Promotional Products</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#about" class="mobile-nav-link">About Us</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#contact" class="mobile-nav-link">Contact</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="cart.html" class="mobile-nav-link">Cart</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="signin.html" class="mobile-nav-link">Sign In</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="small-format.html">Small Format Printing</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Postcards</li>
+                </ol>
+            </div>
+        </nav>
+
+        <!-- Product Detail Section -->
+        <section class="product-detail">
+            <div class="container">
+                <div class="product-detail-grid">
+                    <!-- Product Images -->
+                    <div class="product-images">
+                        <div class="main-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+                                <g>
+                                    <!-- Main postcard shape -->
+                                    <rect x="50" y="75" width="300" height="200" fill="#ffffff" stroke="#CC0633" stroke-width="3" rx="6"/>
+                                    
+                                    <!-- Postcard dividing line -->
+                                    <line x1="200" y1="75" x2="200" y2="275" stroke="#CC0633" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+                                    
+                                    <!-- Front side content -->
+                                    <rect x="70" y="95" width="110" height="80" fill="#CC0633" opacity="0.2" rx="4"/>
+                                    <circle cx="125" cy="135" r="15" fill="#CC0633" opacity="0.6"/>
+                                    <path d="M 70 155 L 90 135 L 110 150 L 130 125 L 130 175 L 70 175 Z" fill="#CC0633" opacity="0.4"/>
+                                    
+                                    <line x1="80" y1="195" x2="170" y2="195" stroke="#CC0633" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="80" y1="210" x2="160" y2="210" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+                                    <line x1="80" y1="225" x2="165" y2="225" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+                                    
+                                    <!-- Back side content (address area) -->
+                                    <line x1="220" y1="105" x2="320" y2="105" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+                                    <line x1="220" y1="120" x2="310" y2="120" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+                                    <line x1="220" y1="135" x2="315" y2="135" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+                                    <line x1="220" y1="150" x2="300" y2="150" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+                                    
+                                    <!-- Stamp area -->
+                                    <rect x="270" y="95" width="25" height="20" fill="#A6192E" opacity="0.8" rx="2"/>
+                                    
+                                    <!-- Shadow -->
+                                    <ellipse cx="200" cy="285" rx="120" ry="10" fill="#CC0633" opacity="0.2"/>
+                                </g>
+                            </svg>
+                        </div>
+                        
+                        <div class="image-thumbnails">
+                            <div class="thumbnail active">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 60" width="80" height="60">
+                                    <rect x="10" y="15" width="60" height="40" fill="#ffffff" stroke="#CC0633" stroke-width="1" rx="2"/>
+                                    <line x1="40" y1="15" x2="40" y2="55" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                                </svg>
+                                <span>4×6</span>
+                            </div>
+                            <div class="thumbnail">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 60" width="80" height="60">
+                                    <rect x="8" y="12" width="64" height="45" fill="#ffffff" stroke="#CC0633" stroke-width="1" rx="2"/>
+                                    <line x1="40" y1="12" x2="40" y2="57" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                                </svg>
+                                <span>5×7</span>
+                            </div>
+                            <div class="thumbnail">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 60" width="80" height="60">
+                                    <rect x="6" y="10" width="68" height="50" fill="#ffffff" stroke="#CC0633" stroke-width="1" rx="2"/>
+                                    <line x1="40" y1="10" x2="40" y2="60" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                                </svg>
+                                <span>6×9</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Information -->
+                    <div class="product-info-detailed">
+                        <h1>Professional Postcards</h1>
+                        <p class="product-subtitle">High-quality postcards for direct mail, announcements, and marketing</p>
+                        
+                        <div class="pricing-preview">
+                            <span class="price-label">Starting from</span>
+                            <span class="price-value">$0.32</span>
+                            <span class="price-unit">per piece</span>
+                            <small class="price-note">*Price varies by quantity, size, paper, and turnaround</small>
+                        </div>
+
+                        <div class="product-actions-main">
+                            <a href="postcards.html" class="btn btn-primary btn-lg">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                </svg>
+                                Configure & Get Quote
+                            </a>
+                            <button class="btn btn-outline-primary btn-lg" id="requestSampleBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                Request Sample
+                            </button>
+                        </div>
+
+                        <div class="product-highlights">
+                            <div class="highlight-item">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                <div>
+                                    <strong>Perfect for Direct Mail</strong>
+                                    <span>USPS-compliant sizing for mailing</span>
+                                </div>
+                            </div>
+                            
+                            <div class="highlight-item">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                                </svg>
+                                <div>
+                                    <strong>Quick Turnaround</strong>
+                                    <span>Same-day to 5 business days</span>
+                                </div>
+                            </div>
+                            
+                            <div class="highlight-item">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                <div>
+                                    <strong>Premium Quality</strong>
+                                    <span>HP Indigo digital press printing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Specifications -->
+        <section class="product-specifications">
+            <div class="container">
+                <div class="spec-tabs">
+                    <ul class="nav nav-tabs" id="specTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">
+                                Specifications
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="papers-tab" data-bs-toggle="tab" data-bs-target="#papers" type="button" role="tab">
+                                Paper Options
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pricing-tab" data-bs-toggle="tab" data-bs-target="#pricing" type="button" role="tab">
+                                Pricing Guide
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="templates-tab" data-bs-toggle="tab" data-bs-target="#templates" type="button" role="tab">
+                                Templates
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="specTabContent">
+                        <!-- Specifications Tab -->
+                        <div class="tab-pane fade show active" id="specs" role="tabpanel">
+                            <div class="specs-grid">
+                                <div class="spec-category">
+                                    <h4>Size Options</h4>
+                                    <ul>
+                                        <li><strong>4" × 6"</strong> - Standard postcard size (recommended)</li>
+                                        <li><strong>5" × 7"</strong> - Large format for impact</li>
+                                        <li><strong>5.5" × 8.5"</strong> - Half-letter size</li>
+                                        <li><strong>6" × 9"</strong> - Premium large format</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="spec-category">
+                                    <h4>Printing Options</h4>
+                                    <ul>
+                                        <li><strong>Single-sided</strong> - Front design only</li>
+                                        <li><strong>Double-sided</strong> - Full color both sides</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="spec-category">
+                                    <h4>Quantity Range</h4>
+                                    <ul>
+                                        <li><strong>Minimum:</strong> 100 pieces</li>
+                                        <li><strong>Maximum:</strong> 5,000 pieces</li>
+                                        <li><strong>Optimal:</strong> 250-1000 pieces for best value</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="spec-category">
+                                    <h4>Production Details</h4>
+                                    <ul>
+                                        <li><strong>Efficiency Factor:</strong> 0.70 (good volume discounts)</li>
+                                        <li><strong>Setup Fee:</strong> $30 base (no finishing required)</li>
+                                        <li><strong>Imposition:</strong> Multiple pieces per sheet for efficiency</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Paper Options Tab -->
+                        <div class="tab-pane fade" id="papers" role="tabpanel">
+                            <div class="paper-options">
+                                <div class="paper-category">
+                                    <h4>Text Weight Options</h4>
+                                    <div class="paper-grid">
+                                        <div class="paper-option">
+                                            <strong>80# Text Uncoated</strong>
+                                            <span class="paper-code">LYNO416FSC</span>
+                                            <p>Natural white, smooth finish. Standard for most direct mail applications.</p>
+                                            <span class="recommended-badge">Most Popular</span>
+                                        </div>
+                                        <div class="paper-option">
+                                            <strong>80# Text Silk</strong>
+                                            <span class="paper-code">PACDIS42FSC</span>
+                                            <p>Smooth silk finish with enhanced print quality. Perfect for image-heavy designs.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="paper-category">
+                                    <h4>Cover Weight Options</h4>
+                                    <div class="paper-grid">
+                                        <div class="paper-option">
+                                            <strong>80# Cover Uncoated</strong>
+                                            <span class="paper-code">LYNOC76FSC</span>
+                                            <p>Heavier weight for premium feel. Excellent durability for mailing.</p>
+                                            <span class="recommended-badge">Premium</span>
+                                        </div>
+                                        <div class="paper-option">
+                                            <strong>80# Cover Silk</strong>
+                                            <span class="paper-code">PACDISC7613FSC</span>
+                                            <p>Premium silk finish with superior color reproduction and durability.</p>
+                                        </div>
+                                        <div class="paper-option">
+                                            <strong>100# Cover Gloss</strong>
+                                            <span class="paper-code">PACFXC1013GFSC</span>
+                                            <p>High-gloss finish for vibrant colors and professional appearance.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing Guide Tab -->
+                        <div class="tab-pane fade" id="pricing" role="tabpanel">
+                            <div class="pricing-guide">
+                                <h4>Volume Pricing Examples</h4>
+                                <div class="pricing-table">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Quantity</th>
+                                                <th>4×6 Single-sided</th>
+                                                <th>5×7 Single-sided</th>
+                                                <th>Per Unit Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>100</td>
+                                                <td>$72.50</td>
+                                                <td>$85.25</td>
+                                                <td>$0.73 - $0.85</td>
+                                            </tr>
+                                            <tr>
+                                                <td>250</td>
+                                                <td>$125.75</td>
+                                                <td>$148.50</td>
+                                                <td>$0.50 - $0.59</td>
+                                            </tr>
+                                            <tr class="table-highlight">
+                                                <td>500</td>
+                                                <td>$195.50</td>
+                                                <td>$235.25</td>
+                                                <td>$0.39 - $0.47</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1000</td>
+                                                <td>$315.75</td>
+                                                <td>$385.50</td>
+                                                <td>$0.32 - $0.39</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2500</td>
+                                                <td>$685.25</td>
+                                                <td>$835.75</td>
+                                                <td>$0.27 - $0.33</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="pricing-note">
+                                    <strong>Note:</strong> Prices shown are estimates for 80# Text Uncoated with standard turnaround. 
+                                    Double-sided printing adds approximately 25% to the base price. 
+                                    Use our calculator for exact quotes including premium papers and rush options.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Templates Tab -->
+                        <div class="tab-pane fade" id="templates" role="tabpanel">
+                            <div class="templates-section">
+                                <h4>Design Templates & Guidelines</h4>
+                                <div class="template-grid">
+                                    <div class="template-item">
+                                        <h5>4×6 Postcard Template</h5>
+                                        <p>Standard postcard template with bleed areas and safe zones marked.</p>
+                                        <a href="#" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                                    </div>
+                                    <div class="template-item">
+                                        <h5>5×7 Postcard Template</h5>
+                                        <p>Large format postcard template for maximum impact designs.</p>
+                                        <a href="#" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                                    </div>
+                                    <div class="template-item">
+                                        <h5>6×9 Premium Template</h5>
+                                        <p>Premium large format template for high-end marketing pieces.</p>
+                                        <a href="#" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                                    </div>
+                                    <div class="template-item">
+                                        <h5>Direct Mail Guidelines</h5>
+                                        <p>USPS compliance guide for postcard direct mail campaigns.</p>
+                                        <a href="#" class="btn btn-outline-primary btn-sm">Download PDF</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="design-tips">
+                                    <h5>Design Tips for Postcards</h5>
+                                    <ul>
+                                        <li><strong>Resolution:</strong> Use 300 DPI for all images</li>
+                                        <li><strong>Color Mode:</strong> CMYK color mode for accurate printing</li>
+                                        <li><strong>Bleed:</strong> Include 0.125" bleed on all sides</li>
+                                        <li><strong>Safe Zone:</strong> Keep important content 0.25" from edges</li>
+                                        <li><strong>Address Area:</strong> Reserve right half of back for addressing</li>
+                                        <li><strong>Text Size:</strong> Minimum 8pt for body text, 12pt for addresses</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Products -->
+        <section class="related-products">
+            <div class="container">
+                <h3>Related Products</h3>
+                <div class="related-grid">
+                    <div class="related-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+                            <rect x="8" y="14" width="48" height="36" fill="#ffffff" stroke="#CC0633" stroke-width="2" rx="2"/>
+                            <line x1="32" y1="14" x2="32" y2="50" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                            <line x1="44" y1="14" x2="44" y2="50" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                        </svg>
+                        <h4>Brochures</h4>
+                        <p>Tri-fold and bi-fold brochures for comprehensive marketing</p>
+                        <a href="product-brochures.html" class="btn btn-outline-primary btn-sm">View Details</a>
+                    </div>
+                    
+                    <div class="related-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+                            <path d="M 14 10 L 46 10 Q 50 10 50 14 L 50 44 Q 50 46 48 47 L 46 48" fill="#ffffff" stroke="#CC0633" stroke-width="2"/>
+                            <line x1="20" y1="18" x2="40" y2="18" stroke="#CC0633" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <h4>Flyers</h4>
+                        <p>Single and double-sided flyers for events and promotions</p>
+                        <a href="product-flyers.html" class="btn btn-outline-primary btn-sm">View Details</a>
+                    </div>
+                    
+                    <div class="related-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+                            <rect x="24" y="8" width="16" height="44" fill="#ffffff" stroke="#CC0633" stroke-width="2" rx="2"/>
+                            <path d="M 24 52 L 32 46 L 40 52 L 40 44 L 24 44 Z" fill="#CC0633" opacity="0.9"/>
+                        </svg>
+                        <h4>Bookmarks</h4>
+                        <p>Professional bookmarks on premium cover stock</p>
+                        <a href="product-bookmarks.html" class="btn btn-outline-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <script src="../js/sw-register.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

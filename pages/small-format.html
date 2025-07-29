@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Small format printing services - brochures, postcards, flyers, bookmarks from SFU Document Solutions">
+    <meta name="theme-color" content="#CC0633">
+    
+    <title>Small Format Printing - SFU Document Solutions</title>
+    
+    <link rel="manifest" href="../manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/styles.css?v=62">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+    
+    <!-- Authentication Guard - Protects entire application -->
+    <script src="../js/auth-guard.js"></script>
+</head>
+<body>
+    <!-- Desktop Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand/Logo -->
+            <a href="../index.html" class="header-brand">
+                <div class="brand-text">SFU Document Solutions</div>
+            </a>
+
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="header-search">
+                    <input type="text" placeholder="Search products..." />
+                    <button type="submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="header-user-menu">
+                    <button class="user-menu-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Account
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="signin.html" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                            </svg>
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="header-cart">
+                    <a href="cart.html" class="cart-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        <span class="cart-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item">
+                <a href="small-format.html" class="mobile-nav-link">Small Format Printing</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="large-format.html" class="mobile-nav-link">Large Format Printing</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="promo.html" class="mobile-nav-link">Promotional Products</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#about" class="mobile-nav-link">About</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#contact" class="mobile-nav-link">Contact</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="cart.html" class="mobile-nav-link">Cart</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="signin.html" class="mobile-nav-link">Sign In</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Small Format Printing</li>
+                </ol>
+            </div>
+        </nav>
+
+        <!-- Category Hero Section -->
+        <section class="category-hero">
+            <div class="container">
+                <div class="category-hero-content">
+                    <h1>Small Format Printing</h1>
+                    <p class="category-subtitle">Professional marketing materials that make a lasting impression. From business brochures to promotional flyers, our HP Indigo digital press delivers exceptional quality with vibrant colors and sharp details.</p>
+                    <div class="category-stats">
+                        <div class="stat-item">
+                            <strong>4</strong>
+                            <span>Product Types</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>25-5000</strong>
+                            <span>Quantity Range</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>24hrs</strong>
+                            <span>Fastest Turnaround</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Filter Section -->
+        <section class="product-filters">
+            <div class="container">
+                <div class="filter-header">
+                    <h3>Browse Products</h3>
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="grid">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                            </svg>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label>Quantity Range:</label>
+                        <select class="form-select" id="quantityFilter">
+                            <option value="">All Quantities</option>
+                            <option value="25-100">25-100 pieces</option>
+                            <option value="100-500">100-500 pieces</option>
+                            <option value="500-1000">500-1000 pieces</option>
+                            <option value="1000+">1000+ pieces</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Paper Type:</label>
+                        <select class="form-select" id="paperFilter">
+                            <option value="">All Paper Types</option>
+                            <option value="text">Text Weight</option>
+                            <option value="cover">Cover Weight</option>
+                            <option value="uncoated">Uncoated</option>
+                            <option value="silk">Silk Finish</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Turnaround:</label>
+                        <select class="form-select" id="turnaroundFilter">
+                            <option value="">All Turnarounds</option>
+                            <option value="same-day">Same Day</option>
+                            <option value="next-day">Next Day</option>
+                            <option value="2-day">2-Day Rush</option>
+                            <option value="standard">Standard (3-5 days)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-outline-primary reset-filters">Reset Filters</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Grid -->
+        <section class="product-catalog">
+            <div class="container">
+                <div class="products-grid" id="productsGrid">
+                    <!-- Brochures Product Card -->
+                    <div class="product-card-enhanced" data-product="brochures" data-quantity="25-2500" data-paper="text,cover" data-turnaround="same-day,next-day,2-day,standard">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <rect x="8" y="14" width="48" height="36" fill="#e3f2fd" stroke="#CC0633" stroke-width="2" rx="2"/>
+                                    <line x1="32" y1="14" x2="32" y2="50" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                                    <line x1="44" y1="14" x2="44" y2="50" stroke="#CC0633" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                                    <path d="M 20 14 L 32 14 L 32 50 L 20 50 Q 14 50 14 44 L 14 20 Q 14 14 20 14" fill="#CC0633" opacity="0.8"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Brochures</h4>
+                            <p class="product-description">Tri-fold and bi-fold brochures on premium paper stocks. Perfect for marketing campaigns and information materials.</p>
+                            <div class="product-specs">
+                                <span class="spec-item"><strong>Qty:</strong> 25-2,500</span>
+                                <span class="spec-item"><strong>Sizes:</strong> 8.5×11", 11×17"</span>
+                                <span class="spec-item"><strong>Efficiency:</strong> 0.75</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="price-from">Starting from</span>
+                                <span class="price-amount">$0.85</span>
+                                <span class="price-unit">per piece</span>
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <a href="brochures.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="product-brochures.html" class="btn btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+
+                    <!-- Postcards Product Card -->
+                    <div class="product-card-enhanced" data-product="postcards" data-quantity="100-5000" data-paper="text,cover" data-turnaround="next-day,2-day,standard">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <rect x="8" y="16" width="48" height="32" fill="#ffffff" stroke="#CC0633" stroke-width="2" rx="2"/>
+                                    <line x1="32" y1="16" x2="32" y2="48" stroke="#CC0633" stroke-width="1" opacity="0.3"/>
+                                    <rect x="12" y="20" width="16" height="24" fill="#CC0633" opacity="0.2" rx="1"/>
+                                    <rect x="44" y="19" width="8" height="8" fill="#A6192E" stroke="#CC0633" stroke-width="1" rx="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Postcards</h4>
+                            <p class="product-description">High-quality postcards for direct mail campaigns, event announcements, and promotional materials.</p>
+                            <div class="product-specs">
+                                <span class="spec-item"><strong>Qty:</strong> 100-5,000</span>
+                                <span class="spec-item"><strong>Sizes:</strong> 4×6", 5×7", 5.5×8.5", 6×9"</span>
+                                <span class="spec-item"><strong>Efficiency:</strong> 0.70</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="price-from">Starting from</span>
+                                <span class="price-amount">$0.45</span>
+                                <span class="price-unit">per piece</span>
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <a href="postcards.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="product-postcards.html" class="btn btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+
+                    <!-- Flyers Product Card -->
+                    <div class="product-card-enhanced" data-product="flyers" data-quantity="25-2500" data-paper="text,cover" data-turnaround="same-day,next-day,2-day,standard">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <path d="M 14 10 L 46 10 Q 50 10 50 14 L 50 44 Q 50 46 48 47 L 46 48 Q 44 49 42 48 L 40 46 Q 38 44 38 42 L 38 40 L 16 40 Q 14 40 14 38 L 14 10 Z" fill="#ffffff" stroke="#CC0633" stroke-width="2"/>
+                                    <line x1="20" y1="18" x2="40" y2="18" stroke="#CC0633" stroke-width="2" stroke-linecap="round"/>
+                                    <line x1="20" y1="24" x2="36" y2="24" stroke="#666666" stroke-width="1.5" stroke-linecap="round"/>
+                                    <rect x="20" y="42" width="16" height="4" fill="#A6192E" rx="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Flyers</h4>
+                            <p class="product-description">Single and double-sided flyers for events, promotions, and announcements. Various sizes available.</p>
+                            <div class="product-specs">
+                                <span class="spec-item"><strong>Qty:</strong> 25-2,500</span>
+                                <span class="spec-item"><strong>Sizes:</strong> 5.5×8.5", 8.5×11", 8.5×14", 11×17"</span>
+                                <span class="spec-item"><strong>Efficiency:</strong> 0.70</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="price-from">Starting from</span>
+                                <span class="price-amount">$0.65</span>
+                                <span class="price-unit">per piece</span>
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <a href="flyers.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="product-flyers.html" class="btn btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+
+                    <!-- Bookmarks Product Card -->
+                    <div class="product-card-enhanced" data-product="bookmarks" data-quantity="100-2500" data-paper="cover" data-turnaround="next-day,2-day,standard">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <rect x="24" y="8" width="16" height="44" fill="#ffffff" stroke="#CC0633" stroke-width="2" rx="2"/>
+                                    <path d="M 24 52 L 32 46 L 40 52 L 40 44 L 24 44 Z" fill="#CC0633" opacity="0.9"/>
+                                    <line x1="28" y1="16" x2="36" y2="16" stroke="#CC0633" stroke-width="2" stroke-linecap="round"/>
+                                    <rect x="28" y="38" width="8" height="3" fill="#A6192E" rx="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Bookmarks</h4>
+                            <p class="product-description">Professional bookmarks on premium cover stock, perfect for libraries, events, and marketing campaigns.</p>
+                            <div class="product-specs">
+                                <span class="spec-item"><strong>Qty:</strong> 100-2,500</span>
+                                <span class="spec-item"><strong>Sizes:</strong> 2×6", 2×7", 2×8"</span>
+                                <span class="spec-item"><strong>Efficiency:</strong> 0.65</span>
+                            </div>
+                            <div class="product-pricing">
+                                <span class="price-from">Starting from</span>
+                                <span class="price-amount">$0.75</span>
+                                <span class="price-unit">per piece</span>
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <a href="bookmarks.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="product-bookmarks.html" class="btn btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="no-results" id="noResults" style="display: none;">
+                    <h4>No products match your filters</h4>
+                    <p>Try adjusting your filter criteria or <button class="btn btn-link p-0" onclick="resetFilters()">reset all filters</button>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Features -->
+        <section class="category-features">
+            <div class="container">
+                <h3>Why Choose Our Small Format Printing?</h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <h4>HP Indigo Quality</h4>
+                        <p>Digital press technology delivers consistent, vibrant colors and sharp text quality.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
+                        <h4>Fast Turnaround</h4>
+                        <p>Same-day to 5 business days depending on quantity and complexity.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <h4>Premium Papers</h4>
+                        <p>Extensive selection of text and cover weight papers in uncoated and silk finishes.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h4>Volume Discounts</h4>
+                        <p>Efficient pricing with volume discounts. Larger quantities mean better per-unit pricing.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <script src="../js/sw-register.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="../js/small-format-filters.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
