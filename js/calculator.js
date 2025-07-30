@@ -726,6 +726,238 @@ if (bookmarkForm) {
   });
 }
 
+async function calculateBookletPrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const pages = parseInt(formData.get('pages'));
+  const coverPaperCode = formData.get('coverPaperType');
+  const textPaperCode = formData.get('textPaperType');
+  const rushType = formData.get('rushType') || 'standard';
+  
+  // Validate pages
+  const bookletConstraints = data.pricingConfigs.product_constraints.booklets;
+  
+  if (pages < bookletConstraints.minPages || pages > bookletConstraints.maxPages) {
+    return { error: `Page count must be between ${bookletConstraints.minPages} and ${bookletConstraints.maxPages}` };
+  }
+  
+  if (pages % bookletConstraints.pageMultiple !== 0) {
+    return { error: `Page count must be a multiple of ${bookletConstraints.pageMultiple}` };
+  }
+  
+  // Validate quantity constraints
+  const validation = validateQuantity(quantity, 'booklets', data.pricingConfigs.product_constraints);
+  if (!validation.valid) {
+    return { error: validation.message };
+  }
+  
+  // Get paper data
+  const coverPaper = data.paperStocks[coverPaperCode];
+  const textPaper = data.paperStocks[textPaperCode];
+  
+  if (!coverPaper || !textPaper) {
+    return { error: 'Invalid paper selection' };
+  }
+  
+  // Calculate text sheets (pages - 4 for cover) / 4
+  const textSheets = (pages - 4) / 4;
+  
+  // Get imposition
+  const imposition = data.pricingConfigs.imposition_data.booklets['8.5x11'] || 4;
+  
+  // Calculate materials cost per booklet
+  // Calculate sheets per booklet
+  const coverSheetsPerBooklet = 1;  // Always 1 cover sheet per booklet
+  const textSheetsPerBooklet = textSheets;  // Already calculated as (pages-4)/4
+
+  // Get click cost from config
+  const clicksCost = data.pricingConfigs.formula.clicksCost || 0.10;
+  const clicksPerBooklet = pages / 2;  // Pages/2 = impressions (both sides)
+
+  // Calculate material cost per booklet
+  const coverCost = coverSheetsPerBooklet * coverPaper.costPerSheet;
+  const textCost = textSheetsPerBooklet * textPaper.costPerSheet;  
+  const clickCost = clicksPerBooklet * clicksCost;
+  const materialsCostPerUnit = (coverCost + textCost + clickCost) * 1.25;
+  
+  // Get finishing costs
+  const bookletFinishing = data.pricingConfigs.finishing_costs.bookletFinishing;
+  const finishingPerUnit = bookletFinishing.coverCreasing + (bookletFinishing.bindingPerSheet * textSheets);
+  
+  // Apply formula: C(Q) = S_base + S_pages + P(Q) + M(Q) + F_base + F_variable
+  // Where M(Q) includes paper costs + click charges
+  const baseSetup = 30 + (2 * pages);
+  const production = Math.pow(quantity, 0.75) * 6;
+  const materials = quantity * materialsCostPerUnit;
+  const finishingSetup = 30;
+  const finishing = quantity * finishingPerUnit;
+  
+  // Get rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  
+  // Calculate totals
+  const subtotal = baseSetup + production + materials + finishingSetup + finishing;
+  const totalCost = subtotal * rushMultiplier;
+  const unitPrice = totalCost / quantity;
+  
+  // Calculate sheets required
+  const coverSheetsRequired = Math.ceil((quantity * 1) / imposition);  // 1 sheet per booklet
+  const textSheetsRequired = Math.ceil((quantity * textSheets) / imposition);  // textSheets per booklet
+  const totalSheetsRequired = coverSheetsRequired + textSheetsRequired;
+  
+  console.log('Booklet calculation details:', {
+    pages: pages,
+    textSheets: textSheets,
+    coverPaper: coverPaper.displayName || coverPaper.display_name,
+    textPaper: textPaper.displayName || textPaper.display_name,
+    baseSetup: baseSetup,
+    production: production,
+    coverCost: coverCost,
+    textCost: textCost, 
+    clickCost: clickCost,
+    materialsCostPerUnit: materialsCostPerUnit,
+    materials: materials,
+    finishingSetup: finishingSetup,
+    finishing: finishing,
+    finishingPerUnit: finishingPerUnit,
+    subtotal: subtotal,
+    totalCost: totalCost,
+    unitPrice: unitPrice,
+    rushMultiplier: rushMultiplier
+  });
+  
+  return {
+    printingSetupCost: baseSetup.toFixed(2),
+    finishingSetupCost: finishingSetup.toFixed(2),
+    needsFinishing: true,
+    productionCost: production.toFixed(2),
+    materialCost: materials.toFixed(2),
+    finishingCost: finishing.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(3),
+    sheetsRequired: totalSheetsRequired,
+    coverPaperUsed: coverPaper.displayName || coverPaper.display_name,
+    textPaperUsed: textPaper.displayName || textPaper.display_name,
+    pages: pages,
+    textSheets: textSheets,
+    imposition: imposition,
+    // Additional breakdown data for configurator compatibility
+    breakdown: {
+      setupFee: baseSetup,
+      finishingSetupFee: finishingSetup,
+      productionCost: production,
+      materialCost: materials,
+      finishingCost: finishing,
+      subtotal: subtotal,
+      rushMultiplier: rushMultiplier,
+      sheetsRequired: totalSheetsRequired,
+      // Detailed material breakdown for display
+      coverCost: coverCost,
+      textCost: textCost,
+      clickCost: clickCost,
+      materialsCostPerUnit: materialsCostPerUnit
+    }
+  };
+}
+
+// Handle booklet form
+const bookletForm = document.getElementById('bookletCalculator');
+const bookletResults = document.getElementById('resultsSection');
+
+if (bookletForm) {
+  bookletForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitBtn = bookletForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Calculating...';
+    submitBtn.disabled = true;
+    
+    try {
+      const formData = new FormData(bookletForm);
+      const pricing = await calculateBookletPrice(formData);
+      
+      // Handle errors
+      if (pricing.error) {
+        alert(pricing.error);
+        return;
+      }
+      
+      // Update the display
+      document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
+      document.getElementById('productionCost').textContent = `$${pricing.productionCost}`;
+      document.getElementById('materialCost').textContent = `$${pricing.materialCost}`;
+      document.getElementById('finishingCost').textContent = `$${pricing.finishingCost}`;
+      document.getElementById('subtotal').textContent = `$${pricing.subtotal}`;
+      document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
+      document.getElementById('totalPrice').textContent = `$${pricing.totalCost}`;
+      document.getElementById('sheetsRequired').textContent = pricing.sheetsRequired;
+      
+      // Show/hide finishing setup cost
+      const finishingSetupItem = document.getElementById('finishingSetupItem');
+      const finishingSetupCost = document.getElementById('finishingSetupCost');
+      
+      if (pricing.needsFinishing) {
+        finishingSetupItem.style.display = 'flex';
+        finishingSetupCost.textContent = `$${pricing.finishingSetupCost}`;
+      } else {
+        finishingSetupItem.style.display = 'none';
+      }
+      
+      // Show/hide rush multiplier
+      const rushMultiplierItem = document.getElementById('rushMultiplierItem');
+      const rushMultiplierSpan = document.getElementById('rushMultiplier');
+      
+      if (pricing.rushMultiplier > 1.0) {
+        rushMultiplierItem.style.display = 'flex';
+        rushMultiplierSpan.textContent = `${pricing.rushMultiplier}x`;
+      } else {
+        rushMultiplierItem.style.display = 'none';
+      }
+      
+      bookletResults.style.display = 'block';
+      bookletResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      // Show Add to Cart button
+      const addToCartBtn = document.getElementById('addToCartBtn');
+      if (addToCartBtn) {
+        addToCartBtn.style.display = 'inline-block';
+        addToCartBtn.onclick = () => {
+          if (window.cartManager) {
+            window.cartManager.addCurrentConfiguration('booklets', formData, pricing);
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Calculation error:', error);
+      alert('Error calculating price. Please try again.');
+    } finally {
+      // Restore button state
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  });
+  
+  bookletForm.addEventListener('reset', () => {
+    bookletResults.style.display = 'none';
+    
+    // Hide Add to Cart button
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    if (addToCartBtn) {
+      addToCartBtn.style.display = 'none';
+    }
+  });
+}
+
 // Card Selection Functionality
 class CardSelection {
   constructor() {

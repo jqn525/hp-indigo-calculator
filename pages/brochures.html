@@ -159,29 +159,64 @@
                         <!-- Live Pricing Display -->
                         <div class="live-pricing">
                             <div class="price-summary">
+                                <div class="unit-price">
+                                    <span class="price-label">Per unit:</span>
+                                    <span class="price-value" id="liveUnitPrice">$0.00</span>
+                                </div>
                                 <div class="current-price">
                                     <span class="price-label">Total Price</span>
                                     <span class="price-value" id="livePrice">$0.00</span>
-                                </div>
-                                <div class="unit-price">
-                                    <span class="unit-label">Per unit:</span>
-                                    <span class="unit-value" id="liveUnitPrice">$0.00</span>
                                 </div>
                             </div>
                             <div class="price-status" id="priceStatus">
                                 <span class="status-text">Configure your product to see pricing</span>
                             </div>
+                            
+                            <!-- Collapsible Price Breakdown Inside Red Cell -->
+                            <button class="price-breakdown-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#redCellBreakdown" aria-expanded="false" aria-controls="redCellBreakdown">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7,10L12,15L17,10H7Z"/>
+                                </svg>
+                                VIEW PRICE BREAKDOWN
+                            </button>
+                            
+                            <div class="collapse mt-2" id="redCellBreakdown">
+                                <div class="red-cell-breakdown">
+                                    <div class="breakdown-row">
+                                        <span>Setup Fee:</span>
+                                        <span id="redSetupCost">$0.00</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span>Production:</span>
+                                        <span id="redProductionCost">$0.00</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span>Materials:</span>
+                                        <span id="redMaterialCost">$0.00</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span>Finishing:</span>
+                                        <span id="redFinishingCost">$0.00</span>
+                                    </div>
+                                    <div class="breakdown-row subtotal">
+                                        <span>Subtotal:</span>
+                                        <span id="redSubtotal">$0.00</span>
+                                    </div>
+                                    <div class="breakdown-row" id="redRushMultiplierItem" style="display: none;">
+                                        <span>Rush:</span>
+                                        <span id="redRushMultiplier">1x</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
-                        <!-- Quick Actions -->
-                        <div class="quick-actions">
-                            <button type="button" class="btn btn-primary btn-lg" id="addToCartBtn" disabled>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
-                                </svg>
-                                Add to Cart
-                            </button>
-                        </div>
+                        <!-- Add to Cart Button (Separate) -->
+                        <button type="button" class="btn btn-add-to-cart" id="addToCartBtn" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                            </svg>
+                            Add to Cart
+                        </button>
                     </div>
                 </div>
 
@@ -394,61 +429,23 @@
                     </form>
                 </div>
             </div>
-            
-            <!-- Detailed Price Breakdown (Collapsible) -->
-            <div class="price-breakdown-section">
-                <div class="container">
-                    <div class="breakdown-toggle">
-                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#priceBreakdown" aria-expanded="false">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7,10L12,15L17,10H7Z"/>
-                            </svg>
-                            View Price Breakdown
-                        </button>
-                    </div>
-                    <div class="collapse" id="priceBreakdown">
-                        <div class="breakdown-content">
-                            <h4>Detailed Cost Breakdown</h4>
-                            <div class="breakdown-grid">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Setup Fee:</span>
-                                    <span class="breakdown-value" id="setupCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Production Cost:</span>
-                                    <span class="breakdown-value" id="productionCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Material Cost:</span>
-                                    <span class="breakdown-value" id="materialCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Finishing Cost:</span>
-                                    <span class="breakdown-value" id="finishingCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item subtotal">
-                                    <span class="breakdown-label">Subtotal:</span>
-                                    <span class="breakdown-value" id="subtotal">$0.00</span>
-                                </div>
-                                <div class="breakdown-item rush-multiplier" id="rushMultiplierItem" style="display: none;">
-                                    <span class="breakdown-label">Rush Multiplier:</span>
-                                    <span class="breakdown-value" id="rushMultiplier">1.0x</span>
-                                </div>
-                                <div class="breakdown-item total">
-                                    <span class="breakdown-label">Total Price:</span>
-                                    <span class="breakdown-value" id="breakdownTotal">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Sheets Required:</span>
-                                    <span class="breakdown-value" id="sheetsRequired">0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        </div>
+    </main>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Help Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="helpModalBody">
+                    <!-- Dynamic content will be inserted here -->
                 </div>
             </div>
         </div>
-    </main>
+    </div>
     
     <script src="../js/sw-register.js"></script>
     <script src="../js/app.js"></script>
@@ -459,5 +456,166 @@
     <script src="../js/configurator.js"></script>
     <script src="../js/header.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script>
+        // Help Modal Content Data
+        const helpContent = {
+            size: {
+                title: 'Size Options (Before Fold)',
+                content: `
+                    <div class="help-section">
+                        <h6>Available Sizes</h6>
+                        <div class="option-grid mb-3">
+                            <div class="option-card selected">
+                                <div class="option-content">
+                                    <div class="option-title">8.5" × 11"</div>
+                                    <div class="option-subtitle">Standard Letter Size</div>
+                                    <div class="option-badge recommended">Recommended</div>
+                                </div>
+                            </div>
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">11" × 17"</div>
+                                    <div class="option-subtitle">Tabloid Size</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p><strong>8.5" × 11"</strong> is the most popular choice and offers the best value for standard brochure layouts.</p>
+                        <p><strong>11" × 17"</strong> provides more space for complex layouts and larger images, ideal for detailed product catalogs.</p>
+                    </div>
+                `
+            },
+            fold: {
+                title: 'Folding Styles',
+                content: `
+                    <div class="help-section">
+                        <h6>Folding Options</h6>
+                        <div class="mb-3">
+                            <strong>Tri-fold:</strong> Classic brochure format with three panels. Perfect for step-by-step information or before/during/after layouts.
+                        </div>
+                        <div>
+                            <strong>Bi-fold:</strong> Book-style layout with four panels. Ideal for storytelling, detailed product information, or magazine-style content.
+                        </div>
+                    </div>
+                `
+            },
+            paper: {
+                title: 'Paper Stock Options',
+                content: `
+                    <div class="help-section">
+                        <h6>Text Weight Options</h6>
+                        <div class="paper-options mb-4">
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong>80# Text Uncoated</strong>
+                                    <span class="option-badge recommended">Recommended</span>
+                                </div>
+                                <div class="text-muted small mb-2">LYNO416FSC</div>
+                                <p class="mb-0">Natural white, smooth finish. Perfect for easy readability and professional appearance. Best for text-heavy brochures.</p>
+                            </div>
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <strong>80# Text Silk</strong>
+                                <div class="text-muted small mb-2">PACDIS42FSC</div>
+                                <p class="mb-0">Smooth silk finish with enhanced print quality. Ideal for image-heavy brochures with photos and graphics.</p>
+                            </div>
+                        </div>
+                        
+                        <h6>Cover Weight Options</h6>
+                        <div class="paper-options">
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <strong>80# Cover Uncoated</strong>
+                                <div class="text-muted small mb-2">LYNOC76FSC</div>
+                                <p class="mb-0">Heavier weight for premium feel. Excellent for high-end marketing materials and presentation pieces.</p>
+                            </div>
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <strong>80# Cover Silk</strong>
+                                <div class="text-muted small mb-2">PACDISC7613FSC</div>
+                                <p class="mb-0">Premium silk finish with superior durability. Perfect for presentation materials and client-facing documents.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            quantity: {
+                title: 'Quantity Selection',
+                content: `
+                    <div class="help-section">
+                        <div class="mb-3">
+                            <strong>Quantity Range:</strong> 25 to 2,500 pieces
+                        </div>
+                        <div class="mb-3">
+                            <strong>Optimal Range:</strong> 100-500 pieces for best value
+                        </div>
+                        <div class="mb-3">
+                            <strong>Volume Discounts:</strong> Significant savings at higher quantities due to setup cost distribution
+                        </div>
+                        <div class="p-3 bg-light rounded">
+                            <strong>Tip:</strong> Our pricing model includes economies of scale, so larger quantities offer better per-unit pricing. Use the quantity slider to find your optimal price point.
+                        </div>
+                    </div>
+                `
+            },
+            turnaround: {
+                title: 'Turnaround Time Options',
+                content: `
+                    <div class="help-section">
+                        <div class="mb-3">
+                            <strong>Standard (3-5 days):</strong> Our regular production schedule with no additional charges.
+                        </div>
+                        <div class="mb-3">
+                            <strong>Rush (1-2 days):</strong> Priority production with additional rush charges applied.
+                        </div>
+                        <div class="p-3 bg-light rounded">
+                            <strong>Note:</strong> Turnaround time begins after file approval and payment confirmation. Rush orders may have limited paper stock options.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Initialize help modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const helpToggles = document.querySelectorAll('.help-toggle');
+            const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+            const helpModalLabel = document.getElementById('helpModalLabel');
+            const helpModalBody = document.getElementById('helpModalBody');
+
+            helpToggles.forEach(toggle => {
+                // Remove tooltip functionality
+                toggle.removeAttribute('data-bs-toggle');
+                toggle.removeAttribute('title');
+                
+                // Add click event for modal
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Determine content type based on parent section
+                    const section = this.closest('.config-section');
+                    let contentType = 'size'; // default
+                    
+                    if (section) {
+                        const sectionText = section.querySelector('h3').textContent.toLowerCase();
+                        if (sectionText.includes('fold')) {
+                            contentType = 'fold';
+                        } else if (sectionText.includes('paper')) {
+                            contentType = 'paper';
+                        } else if (sectionText.includes('quantity')) {
+                            contentType = 'quantity';
+                        } else if (sectionText.includes('turnaround')) {
+                            contentType = 'turnaround';
+                        }
+                    }
+                    
+                    // Set modal content
+                    const content = helpContent[contentType];
+                    helpModalLabel.textContent = content.title;
+                    helpModalBody.innerHTML = content.content;
+                    
+                    // Show modal
+                    helpModal.show();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

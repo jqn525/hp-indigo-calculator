@@ -1,4 +1,4 @@
-const CACHE_NAME = 'indigo-calc-v88';
+const CACHE_NAME = 'indigo-calc-v107';
 
 // Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -35,6 +35,7 @@ const urlsToCache = [
   `${basePath}/pages/postcards.html`,
   `${basePath}/pages/flyers.html`,
   `${basePath}/pages/bookmarks.html`,
+  `${basePath}/pages/booklets.html`,
   `${basePath}/pages/small-format.html`,
   `${basePath}/pages/large-format.html`,
   `${basePath}/pages/cart.html`,
@@ -45,10 +46,7 @@ const urlsToCache = [
   `${basePath}/pages/tote-bags.html`,
   `${basePath}/pages/quotes.html`,
   `${basePath}/pages/admin.html`,
-  `${basePath}/pages/product-brochures.html`,
-  `${basePath}/pages/product-postcards.html`,
-  `${basePath}/pages/product-flyers.html`,
-  `${basePath}/pages/product-bookmarks.html`,
+  `${basePath}/pages/templates.html`,
   `${basePath}/login.html`,
   `${basePath}/manifest.json`,
   `${basePath}/fonts/NovemberCondensedFNI-Heavy.otf`,

@@ -1090,7 +1090,7 @@ PRODUCT CATEGORY & CATALOG PAGES
 
 .product-info {
   flex: 1;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .product-info h4 {
@@ -1106,7 +1106,7 @@ PRODUCT CATEGORY & CATALOG PAGES
 .product-description {
   color: var(--text-light);
   line-height: 1.6;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .product-specs {
@@ -2484,7 +2484,7 @@ footer {
 .product-preview-section {
   background: white;
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 2rem;
   box-shadow: var(--shadow);
   height: fit-content;
   position: sticky;
@@ -2575,6 +2575,110 @@ footer {
 
 .status-text.error {
   color: #ffcccb;
+}
+
+/* Price Breakdown Toggle in Red Cell */
+.price-breakdown-toggle {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.price-breakdown-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+.price-breakdown-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.price-breakdown-toggle svg {
+  transition: transform 0.2s ease;
+}
+
+.price-breakdown-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+/* Red Cell Breakdown Styles */
+.red-cell-breakdown {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.red-cell-breakdown .breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.red-cell-breakdown .breakdown-row:last-child {
+  border-bottom: none;
+}
+
+.red-cell-breakdown .breakdown-row.subtotal {
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+/* Add to Cart Button - Red Cell Styling */
+.btn-add-to-cart {
+  background: linear-gradient(135deg, #CC0633, #A6192E) !important;
+  border: none !important;
+  color: white !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  width: 100% !important;
+  margin-top: 1rem !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(204, 6, 51, 0.3) !important;
+}
+
+.btn-add-to-cart:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(204, 6, 51, 0.4) !important;
+  background: linear-gradient(135deg, #A6192E, #8B1426) !important;
+}
+
+.btn-add-to-cart:active:not(:disabled) {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(204, 6, 51, 0.3) !important;
+  background: linear-gradient(135deg, #8B1426, #7A1122) !important;
+}
+
+.btn-add-to-cart:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: 0 1px 4px rgba(204, 6, 51, 0.2) !important;
+}
+
+.btn-add-to-cart.success {
+  background: linear-gradient(135deg, #28a745, #20c997) !important;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
 }
 
 /* Quick Actions */
@@ -2855,6 +2959,7 @@ footer {
   padding: 1.25rem;
   border-radius: 6px;
   margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .config-summary h4 {
@@ -2969,7 +3074,7 @@ footer {
   .product-preview-section {
     position: static;
     margin-bottom: 1rem;
-    padding: 1rem;
+    padding: 1.5rem;
   }
   
   .configuration-panel {

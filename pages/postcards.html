@@ -151,29 +151,64 @@
 
                     <div class="live-pricing">
                         <div class="price-summary">
+                            <div class="unit-price">
+                                <span class="price-label">Per unit:</span>
+                                <span class="price-value" id="liveUnitPrice">$0.00</span>
+                            </div>
                             <div class="current-price">
                                 <span class="price-label">Total Price</span>
                                 <span class="price-value" id="livePrice">$0.00</span>
-                            </div>
-                            <div class="unit-price">
-                                <span class="unit-label">Per unit:</span>
-                                <span class="unit-value" id="liveUnitPrice">$0.00</span>
                             </div>
                         </div>
                         <div class="price-status" id="priceStatus">
                             <span class="status-text">Configure options to see pricing</span>
                         </div>
+                        
+                        <!-- Collapsible Price Breakdown Inside Red Cell -->
+                        <button class="price-breakdown-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#redCellBreakdown" aria-expanded="false" aria-controls="redCellBreakdown">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7,10L12,15L17,10H7Z"/>
+                            </svg>
+                            VIEW PRICE BREAKDOWN
+                        </button>
+                        
+                        <div class="collapse mt-2" id="redCellBreakdown">
+                            <div class="red-cell-breakdown">
+                                <div class="breakdown-row">
+                                    <span>Setup Fee:</span>
+                                    <span id="redSetupCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Production:</span>
+                                    <span id="redProductionCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Materials:</span>
+                                    <span id="redMaterialCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Finishing:</span>
+                                    <span id="redFinishingCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row subtotal">
+                                    <span>Subtotal:</span>
+                                    <span id="redSubtotal">$0.00</span>
+                                </div>
+                                <div class="breakdown-row" id="redRushMultiplierItem" style="display: none;">
+                                    <span>Rush:</span>
+                                    <span id="redRushMultiplier">1x</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                         
-                    <!-- Quick Actions -->
-                    <div class="quick-actions">
-                        <button type="button" class="btn btn-primary btn-lg" id="addToCartBtn" disabled>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
-                            </svg>
-                            Add to Cart
-                        </button>
-                    </div>
+                    <!-- Add to Cart Button (Separate) -->
+                    <button type="button" class="btn btn-add-to-cart" id="addToCartBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
 
                 <!-- Configuration Panel -->
@@ -373,62 +408,23 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Detailed Price Breakdown (Collapsible) -->
-            <div class="price-breakdown-section">
-                <div class="container">
-                    <div class="breakdown-toggle">
-                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#priceBreakdown" aria-expanded="false">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7,10L12,15L17,10H7Z"/>
-                            </svg>
-                            View Price Breakdown
-                        </button>
-                    </div>
-                    <div class="collapse" id="priceBreakdown">
-                        <div class="breakdown-content">
-                            <h4>Detailed Cost Breakdown</h4>
-                            <div class="breakdown-grid">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Setup Fee:</span>
-                                    <span class="breakdown-value" id="setupCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Production Cost:</span>
-                                    <span class="breakdown-value" id="productionCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Material Cost:</span>
-                                    <span class="breakdown-value" id="materialCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Finishing Cost:</span>
-                                    <span class="breakdown-value" id="finishingCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item subtotal">
-                                    <span class="breakdown-label">Subtotal:</span>
-                                    <span class="breakdown-value" id="subtotal">$0.00</span>
-                                </div>
-                                <div class="breakdown-item rush-multiplier" id="rushMultiplierItem" style="display: none;">
-                                    <span class="breakdown-label">Rush Multiplier:</span>
-                                    <span class="breakdown-value" id="rushMultiplier">1.0x</span>
-                                </div>
-                                <div class="breakdown-item total">
-                                    <span class="breakdown-label">Total Price:</span>
-                                    <span class="breakdown-value" id="breakdownTotal">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Sheets Required:</span>
-                                    <span class="breakdown-value" id="sheetsRequired">0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Help Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="helpModalBody">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/paperStocks.js"></script>
@@ -438,5 +434,196 @@
     <script src="../js/configurator.js"></script>
     <script src="../js/header.js"></script>
     <script src="../js/app.js"></script>
+    
+    <script>
+        // Help Modal Content Data for Postcards
+        const helpContent = {
+            size: {
+                title: 'Postcard Size Options',
+                content: `
+                    <div class="help-section">
+                        <h6>Available Sizes</h6>
+                        <div class="option-grid mb-3">
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">4" × 6"</div>
+                                    <div class="option-subtitle">Standard Mail Size</div>
+                                </div>
+                            </div>
+                            <div class="option-card selected">
+                                <div class="option-content">
+                                    <div class="option-title">5" × 7"</div>
+                                    <div class="option-subtitle">Popular Choice</div>
+                                    <div class="option-badge recommended">Recommended</div>
+                                </div>
+                            </div>
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">5.5" × 8.5"</div>
+                                    <div class="option-subtitle">Half Letter Size</div>
+                                </div>
+                            </div>
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">6" × 9"</div>
+                                    <div class="option-subtitle">Large Format</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>4" × 6":</strong> Standard postcard size, meets USPS requirements for postcard mailing rates.
+                        </div>
+                        <div class="mb-3">
+                            <strong>5" × 7":</strong> Most popular choice offering great balance of space and cost-effectiveness.
+                        </div>
+                        <div class="mb-3">
+                            <strong>5.5" × 8.5":</strong> Half letter size provides ample space for detailed messaging.
+                        </div>
+                        <div>
+                            <strong>6" × 9":</strong> Large format for maximum impact and visibility.
+                        </div>
+                    </div>
+                `
+            },
+            paper: {
+                title: 'Paper Stock Options',
+                content: `
+                    <div class="help-section">
+                        <h6>Text Weight Options</h6>
+                        <div class="paper-options mb-4">
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong>100# Text Uncoated</strong>
+                                    <span class="option-badge recommended">Recommended</span>
+                                </div>
+                                <div class="text-muted small mb-2">Standard postcard weight</div>
+                                <p class="mb-0">Natural white finish, perfect for postcards with text and simple graphics. Cost-effective and reliable.</p>
+                            </div>
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <strong>100# Text Silk</strong>
+                                <div class="text-muted small mb-2">Premium postcard stock</div>
+                                <p class="mb-0">Smooth silk finish with enhanced print quality. Ideal for photo-heavy postcards and premium mailings.</p>
+                            </div>
+                        </div>
+                        
+                        <h6>Cover Weight Options</h6>
+                        <div class="paper-options">
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <strong>100# Cover Uncoated</strong>
+                                <div class="text-muted small mb-2">Heavy-duty postcard stock</div>
+                                <p class="mb-0">Thicker stock for premium feel and durability. Excellent for high-end direct mail campaigns.</p>
+                            </div>
+                            <div class="paper-option mb-3 p-3 border rounded">
+                                <strong>100# Cover Silk</strong>
+                                <div class="text-muted small mb-2">Premium heavy stock</div>
+                                <p class="mb-0">Premium silk finish with superior durability. Perfect for presentation postcards and luxury mailings.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h6>USPS Mailing Guidelines</h6>
+                            <ul class="mb-0">
+                                <li><strong>Minimum Size:</strong> 3.5" × 5" to qualify for postcard rates</li>
+                                <li><strong>Maximum Size:</strong> 4.25" × 6" for standard postcard rates</li>
+                                <li><strong>Thickness:</strong> 0.007" minimum, 0.016" maximum</li>
+                                <li><strong>Address Area:</strong> Right half of back must be reserved for address</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            quantity: {
+                title: 'Quantity Selection',
+                content: `
+                    <div class="help-section">
+                        <div class="mb-3">
+                            <strong>Quantity Range:</strong> 100 to 5,000 pieces
+                        </div>
+                        <div class="mb-3">
+                            <strong>Optimal Range:</strong> 250-1,000 pieces for best value
+                        </div>
+                        <div class="mb-3">
+                            <strong>Volume Discounts:</strong> Significant per-unit savings at higher quantities
+                        </div>
+                        <div class="p-3 bg-light rounded">
+                            <strong>Mailing Tip:</strong> For direct mail campaigns, consider USPS bulk mailing discounts available for quantities of 200+ pieces to the same ZIP codes.
+                        </div>
+                    </div>
+                `
+            },
+            turnaround: {
+                title: 'Turnaround Time Options',
+                content: `
+                    <div class="help-section">
+                        <div class="option-grid mb-3">
+                            <div class="option-card selected">
+                                <div class="option-content">
+                                    <div class="option-title">Standard</div>
+                                    <div class="option-subtitle">3-5 Business Days</div>
+                                </div>
+                            </div>
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">Rush</div>
+                                    <div class="option-subtitle">1-2 Business Days</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Standard (3-5 days):</strong> Regular production schedule with no additional charges.
+                        </div>
+                        <div class="mb-3">
+                            <strong>Rush (1-2 days):</strong> Priority production with rush charges applied.
+                        </div>
+                        <div class="p-3 bg-light rounded">
+                            <strong>Mailing Campaigns:</strong> Allow extra time for mailing list preparation and postal processing when planning direct mail campaigns.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Initialize help modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const helpToggles = document.querySelectorAll('.help-toggle');
+            const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+            const helpModalLabel = document.getElementById('helpModalLabel');
+            const helpModalBody = document.getElementById('helpModalBody');
+
+            helpToggles.forEach(toggle => {
+                // Remove tooltip functionality
+                toggle.removeAttribute('data-bs-toggle');
+                toggle.removeAttribute('title');
+                
+                // Add click event for modal
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Determine content type based on parent section
+                    const section = this.closest('.config-section');
+                    let contentType = 'size'; // default
+                    
+                    if (section) {
+                        const sectionText = section.querySelector('h3').textContent.toLowerCase();
+                        if (sectionText.includes('paper')) {
+                            contentType = 'paper';
+                        } else if (sectionText.includes('quantity')) {
+                            contentType = 'quantity';
+                        } else if (sectionText.includes('turnaround')) {
+                            contentType = 'turnaround';
+                        }
+                    }
+                    
+                    // Set modal content
+                    const content = helpContent[contentType];
+                    helpModalLabel.textContent = content.title;
+                    helpModalBody.innerHTML = content.content;
+                    
+                    // Show modal
+                    helpModal.show();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -240,6 +240,16 @@ class DataMigrator {
           efficiency_exponent: 0.65,
           imposition_data: { '2x6': 10, '2x7': 10, '2x8': 10 },
           is_active: true
+        },
+        {
+          name: 'Booklets',
+          slug: 'booklets',
+          description: 'Saddle-stitched booklets from 8 to 48 pages',
+          min_quantity: 10,
+          max_quantity: 500,
+          efficiency_exponent: 0.75,
+          imposition_data: { '8.5x11': 4 },
+          is_active: true
         }
       ];
 

@@ -4,13 +4,24 @@ class ProductConfigurator {
         // Detect current product type
         this.productType = this.detectProductType();
         
-        this.currentConfig = {
-            size: '8.5x11',
-            foldType: 'bifold',
-            paperType: 'LYNOC95FSC', // Default to 100# Cover Uncoated for postcard compatibility
-            rushType: 'standard',
-            quantity: 100
-        };
+        // Initialize configuration based on product type
+        if (this.productType === 'booklets') {
+            this.currentConfig = {
+                pages: 8,
+                coverPaperType: 'LYNOC95FSC',  // Default to 100# Cover Uncoated
+                textPaperType: 'LYNO416FSC',   // Default to 80# Text Uncoated
+                rushType: 'standard',
+                quantity: 100
+            };
+        } else {
+            this.currentConfig = {
+                size: '8.5x11',
+                foldType: 'bifold',
+                paperType: 'LYNOC95FSC', // Default to 100# Cover Uncoated for postcard compatibility
+                rushType: 'standard',
+                quantity: 100
+            };
+        }
         
         this.currentPricing = {
             total: 0,
@@ -34,6 +45,8 @@ class ProductConfigurator {
             return 'bookmarks';
         } else if (document.getElementById('brochureForm')) {
             return 'brochures';
+        } else if (document.getElementById('bookletCalculator')) {
+            return 'booklets';
         }
         return 'brochures'; // Default fallback
     }
@@ -95,6 +108,8 @@ class ProductConfigurator {
                 return typeof calculateFlyerPrice === 'function' ? calculateFlyerPrice : null;
             case 'bookmarks':
                 return typeof calculateBookmarkPrice === 'function' ? calculateBookmarkPrice : null;
+            case 'booklets':
+                return typeof calculateBookletPrice === 'function' ? calculateBookletPrice : null;
             default:
                 return null;
         }
@@ -195,7 +210,10 @@ class ProductConfigurator {
             'size': 'size',
             'fold': 'foldType',
             'paper': 'paperType',
-            'turnaround': 'rushType'
+            'turnaround': 'rushType',
+            'coverPaper': 'coverPaperType',
+            'textPaper': 'textPaperType',
+            'pages': 'pages'
         };
         return mapping[option] || option;
     }
@@ -261,6 +279,19 @@ class ProductConfigurator {
                 'LYNOC76FSC': '80# Cover Uncoated',
                 'PACDISC7613FSC': '80# Cover Silk'
             },
+            coverPaperType: {
+                'LYNOC76FSC': '80# Cover Uncoated',
+                'PACDISC7613FSC': '80# Cover Silk',
+                'LYNOC95FSC': '100# Cover Uncoated',
+                'PACDISC9513FSC': '100# Cover Silk'
+            },
+            textPaperType: {
+                'LYNODI312FSC': '60# Text Uncoated',
+                'LYNO416FSC': '80# Text Uncoated',
+                'PACDIS42FSC': '80# Text Silk',
+                'LYNO52FSC': '100# Text Uncoated',
+                'PACDIS52FSC': '100# Text Silk'
+            },
             rushType: {
                 'standard': 'Standard (3-5 days)',
                 '2-day': '2-Day Rush',
@@ -269,18 +300,33 @@ class ProductConfigurator {
             }
         };
 
-        // Update summary values
-        const summarySize = document.getElementById('summarySize');
-        const summaryFold = document.getElementById('summaryFold');
-        const summaryPaper = document.getElementById('summaryPaper');
-        const summaryTurnaround = document.getElementById('summaryTurnaround');
-        const summaryQuantity = document.getElementById('summaryQuantity');
+        if (this.productType === 'booklets') {
+            // Handle booklet-specific summary fields
+            const summaryPages = document.getElementById('summaryPages');
+            const summaryCoverPaper = document.getElementById('summaryCoverPaper');
+            const summaryTextPaper = document.getElementById('summaryTextPaper');
+            const summaryTurnaround = document.getElementById('summaryTurnaround');
+            const summaryQuantity = document.getElementById('summaryQuantity');
 
-        if (summarySize) summarySize.textContent = summaryMapping.size[this.currentConfig.size];
-        if (summaryFold) summaryFold.textContent = summaryMapping.foldType[this.currentConfig.foldType];
-        if (summaryPaper) summaryPaper.textContent = summaryMapping.paperType[this.currentConfig.paperType];
-        if (summaryTurnaround) summaryTurnaround.textContent = summaryMapping.rushType[this.currentConfig.rushType];
-        if (summaryQuantity) summaryQuantity.textContent = `${this.currentConfig.quantity} pieces`;
+            if (summaryPages) summaryPages.textContent = `${this.currentConfig.pages} pages`;
+            if (summaryCoverPaper) summaryCoverPaper.textContent = summaryMapping.coverPaperType[this.currentConfig.coverPaperType] || 'Select paper';
+            if (summaryTextPaper) summaryTextPaper.textContent = summaryMapping.textPaperType[this.currentConfig.textPaperType] || 'Select paper';
+            if (summaryTurnaround) summaryTurnaround.textContent = summaryMapping.rushType[this.currentConfig.rushType];
+            if (summaryQuantity) summaryQuantity.textContent = `${this.currentConfig.quantity} pieces`;
+        } else {
+            // Handle standard product summary fields
+            const summarySize = document.getElementById('summarySize');
+            const summaryFold = document.getElementById('summaryFold');
+            const summaryPaper = document.getElementById('summaryPaper');
+            const summaryTurnaround = document.getElementById('summaryTurnaround');
+            const summaryQuantity = document.getElementById('summaryQuantity');
+
+            if (summarySize) summarySize.textContent = summaryMapping.size[this.currentConfig.size];
+            if (summaryFold) summaryFold.textContent = summaryMapping.foldType[this.currentConfig.foldType];
+            if (summaryPaper) summaryPaper.textContent = summaryMapping.paperType[this.currentConfig.paperType];
+            if (summaryTurnaround) summaryTurnaround.textContent = summaryMapping.rushType[this.currentConfig.rushType];
+            if (summaryQuantity) summaryQuantity.textContent = `${this.currentConfig.quantity} pieces`;
+        }
     }
 
     debouncedCalculation() {
@@ -325,6 +371,13 @@ class ProductConfigurator {
                 
                 this.updatePricingDisplay('success');
                 this.enableAddToCart();
+                
+                // Dispatch custom event for booklet detailed breakdown
+                if (this.productType === 'booklets') {
+                    window.dispatchEvent(new CustomEvent('bookletPricingUpdate', {
+                        detail: result
+                    }));
+                }
             } else {
                 console.error('❌ Invalid pricing result:', result);
                 this.updatePricingDisplay('error');
@@ -352,13 +405,22 @@ class ProductConfigurator {
         // Create FormData object with appropriate parameters for each product type
         const formData = new FormData();
         formData.append('quantity', config.quantity);
-        formData.append('size', config.size);
-        formData.append('paperType', config.paperType);
         formData.append('rushType', config.rushType);
         
-        // Only add foldType for brochures
-        if (this.productType === 'brochures') {
-            formData.append('foldType', config.foldType);
+        if (this.productType === 'booklets') {
+            // Booklet-specific fields
+            formData.append('pages', config.pages);
+            formData.append('coverPaperType', config.coverPaperType);
+            formData.append('textPaperType', config.textPaperType);
+        } else {
+            // Standard product fields
+            formData.append('size', config.size);
+            formData.append('paperType', config.paperType);
+            
+            // Only add foldType for brochures
+            if (this.productType === 'brochures') {
+                formData.append('foldType', config.foldType);
+            }
         }
         
         const result = await pricingFunction(formData);
@@ -424,12 +486,30 @@ class ProductConfigurator {
         if (breakdownTotal) breakdownTotal.textContent = `$${this.currentPricing.total.toFixed(2)}`;
         if (sheetsRequired) sheetsRequired.textContent = breakdown.sheetsRequired || 0;
 
+        // Update red cell breakdown elements
+        const redSetupCost = document.getElementById('redSetupCost');
+        const redProductionCost = document.getElementById('redProductionCost');
+        const redMaterialCost = document.getElementById('redMaterialCost');
+        const redFinishingCost = document.getElementById('redFinishingCost');
+        const redSubtotal = document.getElementById('redSubtotal');
+        const redRushMultiplier = document.getElementById('redRushMultiplier');
+        const redRushMultiplierItem = document.getElementById('redRushMultiplierItem');
+
+        if (redSetupCost) redSetupCost.textContent = `$${(breakdown.setupFee || 0).toFixed(2)}`;
+        if (redProductionCost) redProductionCost.textContent = `$${(breakdown.productionCost || 0).toFixed(2)}`;
+        if (redMaterialCost) redMaterialCost.textContent = `$${(breakdown.materialCost || 0).toFixed(2)}`;
+        if (redFinishingCost) redFinishingCost.textContent = `$${(breakdown.finishingCost || 0).toFixed(2)}`;
+        if (redSubtotal) redSubtotal.textContent = `$${(breakdown.subtotal || 0).toFixed(2)}`;
+
         // Show/hide rush multiplier
         if (breakdown.rushMultiplier && breakdown.rushMultiplier > 1) {
             if (rushMultiplier) rushMultiplier.textContent = `${breakdown.rushMultiplier.toFixed(1)}x`;
             if (rushMultiplierItem) rushMultiplierItem.style.display = 'flex';
+            if (redRushMultiplier) redRushMultiplier.textContent = `${breakdown.rushMultiplier.toFixed(1)}x`;
+            if (redRushMultiplierItem) redRushMultiplierItem.style.display = 'flex';
         } else {
             if (rushMultiplierItem) rushMultiplierItem.style.display = 'none';
+            if (redRushMultiplierItem) redRushMultiplierItem.style.display = 'none';
         }
     }
 
@@ -451,13 +531,22 @@ class ProductConfigurator {
             // Create FormData to match what other calculators use
             const formData = new FormData();
             formData.append('quantity', this.currentConfig.quantity);
-            formData.append('size', this.currentConfig.size);
-            formData.append('paperType', this.currentConfig.paperType);
             formData.append('rushType', this.currentConfig.rushType);
             
-            // Only add foldType for brochures
-            if (this.productType === 'brochures') {
-                formData.append('foldType', this.currentConfig.foldType);
+            if (this.productType === 'booklets') {
+                // Booklet-specific fields
+                formData.append('pages', this.currentConfig.pages);
+                formData.append('coverPaperType', this.currentConfig.coverPaperType);
+                formData.append('textPaperType', this.currentConfig.textPaperType);
+            } else {
+                // Standard product fields
+                formData.append('size', this.currentConfig.size);
+                formData.append('paperType', this.currentConfig.paperType);
+                
+                // Only add foldType for brochures
+                if (this.productType === 'brochures') {
+                    formData.append('foldType', this.currentConfig.foldType);
+                }
             }
             
             // Use the proper pricing structure
@@ -508,7 +597,8 @@ class ProductConfigurator {
             'brochures': 'Brochures',
             'postcards': 'Postcards', 
             'flyers': 'Flyers',
-            'bookmarks': 'Bookmarks'
+            'bookmarks': 'Bookmarks',
+            'booklets': 'Booklets'
         };
         
         const quoteData = {

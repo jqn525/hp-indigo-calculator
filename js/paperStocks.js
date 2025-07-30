@@ -17,6 +17,15 @@ const paperStocks = {
     "costPerSheet": 0.11397,
     "displayName": "80# Text Uncoated"
   },
+  "LYNO52FSC": {
+    "brand": "Lynx",
+    "type": "text_stock",
+    "finish": "Uncoated",
+    "size": "13x19",
+    "weight": "100#",
+    "costPerSheet": 0.1425,
+    "displayName": "100# Text Uncoated"
+  },
   "LYNOC76FSC": {
     "brand": "Lynx",
     "type": "cover_stock",

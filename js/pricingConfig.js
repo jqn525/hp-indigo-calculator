@@ -29,6 +29,13 @@ const pricingConfig = {
       minQuantity: 100,  // 10-up imposition
       maxQuantity: 2500
     },
+    booklets: {
+      minQuantity: 10,
+      maxQuantity: 500,
+      minPages: 8,
+      maxPages: 48,
+      pageMultiple: 4
+    },
     // Future products can be added here
     businessCards: {
       minQuantity: 100,  // Higher min due to high imposition
@@ -63,6 +70,9 @@ const pricingConfig = {
       '8.5x11': 2,
       '8.5x14': 1,
       '11x17': 1
+    },
+    booklets: {
+      '8.5x11': 4  // 4-up imposition for standard booklet size
     }
   },
 
@@ -73,7 +83,11 @@ const pricingConfig = {
       'trifold': 0.10
     },
     cutting: 0.05,  // Postcards cutting cost per piece
-    scoring: 0.10   // Future finishing option
+    scoring: 0.10,   // Future finishing option
+    bookletFinishing: {
+      coverCreasing: 0.10,
+      bindingPerSheet: 0.05
+    }
   },
 
   // Rush order multipliers

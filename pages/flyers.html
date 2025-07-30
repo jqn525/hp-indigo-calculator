@@ -151,29 +151,64 @@
 
                     <div class="live-pricing">
                         <div class="price-summary">
+                            <div class="unit-price">
+                                <span class="price-label">Per unit:</span>
+                                <span class="price-value" id="liveUnitPrice">$0.00</span>
+                            </div>
                             <div class="current-price">
                                 <span class="price-label">Total Price</span>
                                 <span class="price-value" id="livePrice">$0.00</span>
-                            </div>
-                            <div class="unit-price">
-                                <span class="unit-label">Per unit:</span>
-                                <span class="unit-value" id="liveUnitPrice">$0.00</span>
                             </div>
                         </div>
                         <div class="price-status" id="priceStatus">
                             <span class="status-text">Configure options to see pricing</span>
                         </div>
+                        
+                        <!-- Collapsible Price Breakdown Inside Red Cell -->
+                        <button class="price-breakdown-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#redCellBreakdown" aria-expanded="false" aria-controls="redCellBreakdown">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7,10L12,15L17,10H7Z"/>
+                            </svg>
+                            VIEW PRICE BREAKDOWN
+                        </button>
+                        
+                        <div class="collapse mt-2" id="redCellBreakdown">
+                            <div class="red-cell-breakdown">
+                                <div class="breakdown-row">
+                                    <span>Setup Fee:</span>
+                                    <span id="redSetupCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Production:</span>
+                                    <span id="redProductionCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Materials:</span>
+                                    <span id="redMaterialCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Finishing:</span>
+                                    <span id="redFinishingCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row subtotal">
+                                    <span>Subtotal:</span>
+                                    <span id="redSubtotal">$0.00</span>
+                                </div>
+                                <div class="breakdown-row" id="redRushMultiplierItem" style="display: none;">
+                                    <span>Rush:</span>
+                                    <span id="redRushMultiplier">1x</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                         
-                    <!-- Quick Actions -->
-                    <div class="quick-actions">
-                        <button type="button" class="btn btn-primary btn-lg" id="addToCartBtn" disabled>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
-                            </svg>
-                            Add to Cart
-                        </button>
-                    </div>
+                    <!-- Add to Cart Button (Separate) -->
+                    <button type="button" class="btn btn-add-to-cart" id="addToCartBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
 
                 <!-- Configuration Panel -->
@@ -375,59 +410,6 @@
                             <div class="sheets-info">
                                 <span>Sheets Required:</span>
                                 <span id="sheetsRequired">0</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Detailed Price Breakdown (Collapsible) -->
-            <div class="price-breakdown-section">
-                <div class="container">
-                    <div class="breakdown-toggle">
-                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#priceBreakdown" aria-expanded="false">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7,10L12,15L17,10H7Z"/>
-                            </svg>
-                            View Price Breakdown
-                        </button>
-                    </div>
-                    <div class="collapse" id="priceBreakdown">
-                        <div class="breakdown-content">
-                            <h4>Detailed Cost Breakdown</h4>
-                            <div class="breakdown-grid">
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Setup Fee:</span>
-                                    <span class="breakdown-value" id="setupCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Production Cost:</span>
-                                    <span class="breakdown-value" id="productionCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Material Cost:</span>
-                                    <span class="breakdown-value" id="materialCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Finishing Cost:</span>
-                                    <span class="breakdown-value" id="finishingCost">$0.00</span>
-                                </div>
-                                <div class="breakdown-item subtotal">
-                                    <span class="breakdown-label">Subtotal:</span>
-                                    <span class="breakdown-value" id="subtotal">$0.00</span>
-                                </div>
-                                <div class="breakdown-item rush-multiplier" id="rushMultiplierItem" style="display: none;">
-                                    <span class="breakdown-label">Rush Multiplier:</span>
-                                    <span class="breakdown-value" id="rushMultiplier">1.0x</span>
-                                </div>
-                                <div class="breakdown-item total">
-                                    <span class="breakdown-label">Total Price:</span>
-                                    <span class="breakdown-value" id="breakdownTotal">$0.00</span>
-                                </div>
-                                <div class="breakdown-item">
-                                    <span class="breakdown-label">Sheets Required:</span>
-                                    <span class="breakdown-value" id="sheetsRequired">0</span>
-                                </div>
                             </div>
                         </div>
                     </div>

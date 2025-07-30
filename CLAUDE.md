@@ -8,7 +8,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Live URL**: https://docsol.ca
 
-### ⭐ **Latest Updates (2025-07-29)**
+### ⭐ **Latest Updates (2025-07-30)**
+- **PRICING LAYOUT MIGRATION**: All product pages now have identical pricing interface matching booklets design
+- **INTEGRATED PRICE BREAKDOWN**: "VIEW PRICE BREAKDOWN" moved inside red pricing cell with collapsible details
+- **CONSISTENT ADD TO CART**: Red gradient buttons separated from pricing cell across all products
+- **UNIT PRICE FIRST**: Per-unit pricing now displays before total price on all configurators
+- **BOOKLETS PRODUCT**: Added new saddle-stitched booklets with dual paper selection (8-48 pages, 10-500 units)
+- **ENHANCED CONFIGURATOR**: Improved configurator.js with booklet support and red cell breakdown integration
+
+### Previous Updates (2025-07-29)
 - **UI CONSISTENCY COMPLETE**: Standardized all product configurator layouts and functionality
 - **BUTTON STANDARDIZATION**: Add to Cart buttons in left sidebar, removed Calculate Pricing buttons
 - **PRICE BREAKDOWN**: Added collapsible "View Price Breakdown" section to all product pages
@@ -35,6 +43,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Postcards** (4x6, 5x7, 5.5x8.5, 6x9) - 100-5000 units, e=0.70
 - **Flyers** (5.5x8.5, 8.5x11, 8.5x14, 11x17) - 25-2500 units, e=0.70
 - **Bookmarks** (2x6, 2x7, 2x8) - 100-2500 units, e=0.65
+- **Booklets** (8-48 pages, multiples of 4) - 10-500 units, e=0.75, dual paper selection
 
 #### Product Information Pages:
 - **Product Brochures** (`/pages/product-brochures.html`) - Detailed brochure specifications
@@ -155,7 +164,7 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Product Integration**: Seamless Add to Cart from all calculators
 
 ### Service Worker Strategy
-- Cache name: `indigo-calc-v25` (increment version to force cache update)
+- Cache name: `indigo-calc-v107` (increment version to force cache update)
 - Environment detection for localhost vs GitHub Pages paths
 - Pre-caches all static assets on install
 - Cache-first strategy for all requests
@@ -233,7 +242,7 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 
 ### Cache Busting
 To force users to get updated files:
-1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v88`)
+1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v107`)
 2. This triggers service worker update cycle and clears old cache
 3. Always increment version when deploying CSS/JS changes
 

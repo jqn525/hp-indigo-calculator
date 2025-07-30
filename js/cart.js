@@ -337,20 +337,39 @@ class CartManager {
       parts.push(`${config.quantity} units`);
     }
     
-    // Add size
-    if (config && config.size) {
-      parts.push(config.size);
-    }
-    
-    // Add paper type (display name if available)
-    if (config && config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
-      parts.push(window.paperStocks[config.paperType].displayName);
-    }
-    
-    // Add fold type for brochures
-    if (config && config.foldType && config.foldType !== 'none') {
-      const foldDisplay = config.foldType.charAt(0).toUpperCase() + config.foldType.slice(1);
-      parts.push(foldDisplay);
+    // Handle booklet-specific fields
+    if (productType === 'booklets') {
+      // Add page count
+      if (config.pages) {
+        parts.push(`${config.pages} pages`);
+      }
+      
+      // Add cover paper type
+      if (config.coverPaperType && window.paperStocks && window.paperStocks[config.coverPaperType]) {
+        parts.push(`Cover: ${window.paperStocks[config.coverPaperType].displayName}`);
+      }
+      
+      // Add text paper type
+      if (config.textPaperType && window.paperStocks && window.paperStocks[config.textPaperType]) {
+        parts.push(`Text: ${window.paperStocks[config.textPaperType].displayName}`);
+      }
+    } else {
+      // Standard products
+      // Add size
+      if (config && config.size) {
+        parts.push(config.size);
+      }
+      
+      // Add paper type (display name if available)
+      if (config && config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+        parts.push(window.paperStocks[config.paperType].displayName);
+      }
+      
+      // Add fold type for brochures
+      if (config && config.foldType && config.foldType !== 'none') {
+        const foldDisplay = config.foldType.charAt(0).toUpperCase() + config.foldType.slice(1);
+        parts.push(foldDisplay);
+      }
     }
     
     // Add rush if not standard
@@ -416,6 +435,7 @@ class CartManager {
       'postcards': 'Postcard',
       'flyers': 'Flyer',
       'bookmarks': 'Bookmark',
+      'booklets': 'Booklet',
       'large-format': 'Large Format Print',
       'magnets': 'Custom Magnets',
       'stickers': 'Custom Stickers',
