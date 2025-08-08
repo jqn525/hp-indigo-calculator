@@ -25,7 +25,6 @@ class AuthGuard {
     // Set up logout functionality
     this.setupLogout();
     
-    console.log('✅ Auth Guard: User authenticated');
     return true;
   }
 
@@ -37,19 +36,16 @@ class AuthGuard {
   isAuthenticated() {
     const authData = this.getAuthData();
     if (!authData) {
-      console.log('❌ Auth Guard: No auth data found');
       return false;
     }
 
     // Check if token is expired
     const expires = new Date(authData.expires);
     if (expires <= new Date()) {
-      console.log('❌ Auth Guard: Token expired');
       this.clearAuth();
       return false;
     }
 
-    console.log('✅ Auth Guard: Valid token found for', authData.user.email);
     return true;
   }
 
@@ -106,8 +102,7 @@ class AuthGuard {
     const currentPath = window.location.pathname + window.location.search;
     const returnUrl = encodeURIComponent(currentPath);
     
-    console.log('🔒 Auth Guard: Redirecting to login');
-    window.location.href = `login.html?return=${returnUrl}`;
+    window.location.href = `/login.html?return=${returnUrl}`;
   }
 
   setupGlobalAuth() {
@@ -171,7 +166,6 @@ class AuthGuard {
 
   logout() {
     if (confirm('Are you sure you want to sign out?')) {
-      console.log('🔓 Auth Guard: User logging out');
       
       // Clear authentication data
       this.clearAuth();

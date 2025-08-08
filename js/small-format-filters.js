@@ -179,6 +179,7 @@ class SmallFormatFilters {
     const baseRates = {
       'brochures': 0.85,
       'postcards': 0.45,
+      'name-tags': 0.45,
       'flyers': 0.65,
       'bookmarks': 0.75
     };

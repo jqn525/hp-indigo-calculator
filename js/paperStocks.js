@@ -106,6 +106,15 @@ const paperStocks = {
     "weight": "130#",
     "costPerSheet": 0.23176,
     "displayName": "130# Cover Silk"
+  },
+  "PAC51319WP": {
+    "brand": "Pacesetter",
+    "type": "adhesive_stock",
+    "finish": "Adhesive",
+    "size": "13x19",
+    "weight": "Adhesive",
+    "costPerSheet": 3.705,
+    "displayName": "Adhesive Stock"
   }
 };
 

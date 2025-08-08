@@ -34,12 +34,10 @@ class AdminPanel {
         supabase: window.isSupabaseConfigured ? window.isSupabaseConfigured() : true
       };
       
-      console.log('Admin dependencies check:', deps);
       return deps.authManager && deps.dbManager && deps.dataMigrator && deps.supabase;
     };
 
     if (!checkDependencies()) {
-      console.log('Waiting for admin dependencies to load...');
       
       await new Promise(resolve => {
         let attempts = 0;
@@ -49,7 +47,6 @@ class AdminPanel {
           attempts++;
           
           if (checkDependencies()) {
-            console.log('All admin dependencies loaded successfully');
             clearInterval(interval);
             resolve();
           } else if (attempts >= maxAttempts) {
@@ -70,11 +67,6 @@ class AdminPanel {
       this.isAdmin = await this.checkAdminStatus();
     }
 
-    console.log('Admin panel auth status:', {
-      user: this.currentUser?.email,
-      isAdmin: this.isAdmin,
-      authManagerAvailable: !!window.authManager
-    });
   }
 
   async checkAdminStatus() {
@@ -92,9 +84,7 @@ class AdminPanel {
         this.currentUser.email  // Allow current user as admin
       ];
       
-      console.log('Checking admin status for:', this.currentUser.email);
       const isAdmin = adminEmails.includes(this.currentUser.email);
-      console.log('Admin status:', isAdmin);
       
       return isAdmin;
     } catch (error) {
@@ -110,13 +100,7 @@ class AdminPanel {
     document.getElementById('checkDataBtn')?.addEventListener('click', () => this.checkData());
     document.getElementById('resetDbBtn')?.addEventListener('click', () => this.resetDatabase());
 
-    // Paper stocks management
-    document.getElementById('loadPaperStocksBtn')?.addEventListener('click', () => this.loadPaperStocks());
-    document.getElementById('refreshCacheBtn')?.addEventListener('click', () => this.refreshCache());
-
-    // Pricing configuration
-    document.getElementById('loadPricingConfigBtn')?.addEventListener('click', () => this.loadPricingConfig());
-    document.getElementById('savePricingConfigBtn')?.addEventListener('click', () => this.savePricingConfig());
+    // Removed pricing management - now handled via static files
 
     // Auth state changes - check if function exists first
     if (window.authManager && typeof window.authManager.onAuthStateChange === 'function') {
@@ -128,7 +112,6 @@ class AdminPanel {
         });
       });
     } else {
-      console.log('Auth state change listener not available, will check periodically');
       // Fallback: check auth state periodically
       setInterval(() => {
         const currentUser = window.authManager?.getUser();
@@ -273,116 +256,7 @@ class AdminPanel {
     }
   }
 
-  // Paper Stocks Management
-  async loadPaperStocks() {
-    const table = document.getElementById('paperStocksTable');
-    const tbody = document.getElementById('paperStocksBody');
-    
-    try {
-      const paperStocks = await window.dbManager.getPaperStocks(false);
-      
-      if (!paperStocks) {
-        alert('No paper stocks data available');
-        return;
-      }
-
-      // Clear existing rows
-      tbody.innerHTML = '';
-
-      // Add rows
-      Object.entries(paperStocks).forEach(([code, stock]) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${code}</td>
-          <td>${stock.displayName}</td>
-          <td>${stock.type}</td>
-          <td>${stock.weight}</td>
-          <td>$${stock.costPerSheet.toFixed(5)}</td>
-          <td>
-            <button onclick="adminPanel.editPaperStock('${code}')" class="edit-btn">Edit</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-
-      table.style.display = 'block';
-      
-    } catch (error) {
-      alert('Error loading paper stocks: ' + error.message);
-    }
-  }
-
-  async refreshCache() {
-    try {
-      window.dbManager.clearCache();
-      alert('✅ Cache cleared successfully');
-    } catch (error) {
-      alert('❌ Error clearing cache: ' + error.message);
-    }
-  }
-
-  editPaperStock(code) {
-    // Placeholder for paper stock editing
-    alert(`Edit paper stock: ${code}\n(Feature coming soon)`);
-  }
-
-  // Pricing Configuration Management
-  async loadPricingConfig() {
-    const editor = document.getElementById('pricingConfigEditor');
-    const textarea = document.getElementById('configTextarea');
-    const saveBtn = document.getElementById('savePricingConfigBtn');
-    
-    try {
-      const configs = await window.dbManager.getPricingConfigs(false);
-      
-      if (!configs) {
-        alert('No pricing configuration data available');
-        return;
-      }
-
-      textarea.value = JSON.stringify(configs, null, 2);
-      editor.style.display = 'block';
-      saveBtn.style.display = 'inline-block';
-      
-    } catch (error) {
-      alert('Error loading pricing configuration: ' + error.message);
-    }
-  }
-
-  async savePricingConfig() {
-    const textarea = document.getElementById('configTextarea');
-    
-    try {
-      const configData = JSON.parse(textarea.value);
-      
-      // Validate the structure
-      const requiredKeys = ['formula', 'product_constraints', 'imposition_data', 'finishing_costs', 'rush_multipliers'];
-      const missingKeys = requiredKeys.filter(key => !configData[key]);
-      
-      if (missingKeys.length > 0) {
-        alert(`❌ Missing required configuration keys: ${missingKeys.join(', ')}`);
-        return;
-      }
-
-      if (!confirm('Save pricing configuration changes?\n\nThis will affect all future calculations.')) {
-        return;
-      }
-
-      // Save each configuration
-      for (const [key, value] of Object.entries(configData)) {
-        await window.dbManager.updatePricingConfig(key, value);
-      }
-
-      alert('✅ Pricing configuration saved successfully');
-      
-    } catch (error) {
-      if (error instanceof SyntaxError) {
-        alert('❌ Invalid JSON format. Please check your syntax.');
-      } else {
-        alert('❌ Error saving configuration: ' + error.message);
-      }
-    }
-  }
+  // Pricing management removed - now handled via static files only
 
   // System Information
   async updateSystemInfo() {
@@ -410,5 +284,170 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// Static File Generator Functions
+class StaticFileGenerator {
+  // Generate paperStocks.js content from database data
+  static generatePaperStocksFile(paperStocksData) {
+    let content = `const paperStocks = {\n`;
+    
+    // Sort by code for consistent output
+    const sortedStocks = Object.keys(paperStocksData).sort();
+    
+    for (let i = 0; i < sortedStocks.length; i++) {
+      const code = sortedStocks[i];
+      const stock = paperStocksData[code];
+      
+      content += `  "${code}": {\n`;
+      content += `    "brand": "${stock.brand}",\n`;
+      content += `    "type": "${stock.type}",\n`;
+      content += `    "finish": "${stock.finish}",\n`;
+      content += `    "size": "${stock.size}",\n`;
+      content += `    "weight": "${stock.weight}",\n`;
+      content += `    "costPerSheet": ${stock.costPerSheet},\n`;
+      content += `    "displayName": "${stock.displayName}"\n`;
+      content += `  }${i < sortedStocks.length - 1 ? ',' : ''}\n`;
+    }
+    
+    content += `};\n\n`;
+    content += `// Export for use in other modules\n`;
+    content += `if (typeof module !== 'undefined' && module.exports) {\n`;
+    content += `  module.exports = paperStocks;\n`;
+    content += `}`;
+    
+    return content;
+  }
+
+  // Generate pricingConfig.js content from database data
+  static generatePricingConfigFile(pricingConfigData) {
+    let content = `// Pricing Configuration for HP Indigo Calculator\n`;
+    content += `// All pricing rules, constraints, and multipliers\n\n`;
+    content += `const pricingConfig = {\n`;
+    
+    // Formula section
+    content += `  // Fixed formula values\n`;
+    content += `  formula: {\n`;
+    const formula = pricingConfigData.formula;
+    Object.keys(formula).forEach(key => {
+      const value = formula[key];
+      const comment = this.getFormulaComment(key);
+      content += `    ${key}: ${value},${comment ? ` // ${comment}` : ''}\n`;
+    });
+    content += `  },\n\n`;
+    
+    // Product constraints
+    content += `  // Product-specific constraints\n`;
+    content += `  productConstraints: {\n`;
+    const constraints = pricingConfigData.product_constraints;
+    Object.keys(constraints).forEach((product, index, array) => {
+      content += `    ${product}: {\n`;
+      content += `      minQuantity: ${constraints[product].minQuantity},\n`;
+      content += `      maxQuantity: ${constraints[product].maxQuantity}\n`;
+      content += `    }${index < array.length - 1 ? ',' : ''}\n`;
+    });
+    content += `  },\n\n`;
+    
+    // Imposition data
+    content += `  // Imposition data - how many pieces per 13x19 sheet\n`;
+    content += `  impositionData: {\n`;
+    const impositionData = pricingConfigData.imposition_data;
+    Object.keys(impositionData).forEach((product, index, array) => {
+      content += `    ${product}: {\n`;
+      Object.keys(impositionData[product]).forEach((size, sizeIndex, sizeArray) => {
+        content += `      '${size}': ${impositionData[product][size]}${sizeIndex < sizeArray.length - 1 ? ',' : ''}\n`;
+      });
+      content += `    }${index < array.length - 1 ? ',' : ''}\n`;
+    });
+    content += `  },\n\n`;
+    
+    // Finishing costs and rush multipliers (add other sections as needed)
+    if (pricingConfigData.finishing_costs) {
+      content += `  // Finishing costs per unit\n`;
+      content += `  finishingCosts: ${JSON.stringify(pricingConfigData.finishing_costs, null, 4).replace(/^/gm, '  ')},\n\n`;
+    }
+    
+    if (pricingConfigData.rush_multipliers) {
+      content += `  // Rush job multipliers\n`;
+      content += `  rushMultipliers: ${JSON.stringify(pricingConfigData.rush_multipliers, null, 4).replace(/^/gm, '  ')}\n`;
+    }
+    
+    content += `};\n\n`;
+    content += `// Export for use in other modules\n`;
+    content += `if (typeof module !== 'undefined' && module.exports) {\n`;
+    content += `  module.exports = pricingConfig;\n`;
+    content += `}`;
+    
+    return content;
+  }
+
+  // Helper function to get formula comments
+  static getFormulaComment(key) {
+    const comments = {
+      'setupFee': '$30.00 (prepress and printing setup)',
+      'finishingSetupFee': '$15.00 (finishing setup when required)',
+      'baseProductionRate': '$1.50',
+      'efficiencyExponent': '0.75',
+      'clicksCost': 'Double-sided printing cost'
+    };
+    return comments[key] || '';
+  }
+
+  // Download file to user's computer
+  static downloadFile(filename, content) {
+    const blob = new Blob([content], { type: 'text/javascript' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+}
+
+// Add export functionality to admin panel
+const staticExporter = {
+  async exportStaticFiles() {
+    try {
+      document.getElementById('exportStatus').innerHTML = '<div class="alert alert-info">🔄 Exporting static files...</div>';
+      
+      // Use current static files as source (database tables removed)
+      if (typeof paperStocks === 'undefined' || typeof pricingConfig === 'undefined') {
+        throw new Error('Static pricing files not loaded');
+      }
+      
+      // Generate static files from current static data
+      const paperStocksContent = StaticFileGenerator.generatePaperStocksFile(paperStocks);
+      const pricingConfigData = {
+        formula: pricingConfig.formula,
+        product_constraints: pricingConfig.productConstraints,
+        imposition_data: pricingConfig.impositionData,
+        finishing_costs: pricingConfig.finishingCosts,
+        rush_multipliers: pricingConfig.rushMultipliers
+      };
+      const pricingConfigContent = StaticFileGenerator.generatePricingConfigFile(pricingConfigData);
+      
+      // Download files
+      StaticFileGenerator.downloadFile('paperStocks.js', paperStocksContent);
+      StaticFileGenerator.downloadFile('pricingConfig.js', pricingConfigContent);
+      
+      document.getElementById('exportStatus').innerHTML = `
+        <div class="alert alert-success">
+          ✅ Static files exported successfully!<br>
+          <small>Files downloaded: paperStocks.js, pricingConfig.js<br>
+          Replace the files in /js/ directory and deploy to update production pricing.</small>
+        </div>
+      `;
+      
+    } catch (error) {
+      console.error('Export failed:', error);
+      document.getElementById('exportStatus').innerHTML = `
+        <div class="alert alert-danger">❌ Export failed: ${error.message}</div>
+      `;
+    }
+  }
+};
+
 // Make available globally for button onclick handlers
 window.adminPanel = adminPanel;
+window.staticExporter = staticExporter;

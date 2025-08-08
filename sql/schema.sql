@@ -278,6 +278,7 @@ ON CONFLICT (config_key) DO NOTHING;
 INSERT INTO public.products (name, slug, description, min_quantity, max_quantity, efficiency_exponent, imposition_data) VALUES
   ('Brochures', 'brochures', 'Tri-fold, bi-fold, and multi-page brochures', 25, 2500, 0.75, '{"8.5x11": 2, "8.5x14": 1, "11x17": 1}'),
   ('Postcards', 'postcards', 'Standard and custom postcard sizes', 100, 5000, 0.70, '{"4x6": 8, "5x7": 4, "5.5x8.5": 4, "6x9": 2}'),
+  ('Name Tags', 'name-tags', 'Professional name tags for events and identification', 100, 5000, 0.70, '{"4x6": 8, "5x7": 4, "5.5x8.5": 4, "6x9": 2}'),
   ('Flyers', 'flyers', 'Single and double-sided flyers', 25, 2500, 0.70, '{"5.5x8.5": 4, "8.5x11": 2, "8.5x14": 1, "11x17": 1}'),
   ('Bookmarks', 'bookmarks', 'Professional bookmarks on premium cover stock', 100, 2500, 0.65, '{"2x6": 10, "2x7": 10, "2x8": 10}')
 ON CONFLICT (slug) DO NOTHING;

@@ -52,47 +52,41 @@
                 </div>
             </div>
 
-            <!-- Paper Stocks Management -->
+            <!-- Pricing Management Note -->
             <div class="selection-card">
-                <h2>📄 Paper Stocks</h2>
-                <p>Manage paper types and pricing.</p>
+                <h2>💡 Pricing Management</h2>
+                <p>Pricing is now managed via static files for optimal performance and simplicity.</p>
                 
-                <div class="button-grid">
-                    <button id="loadPaperStocksBtn" class="calculate-btn">Load Paper Stocks</button>
-                    <button id="refreshCacheBtn" class="calculate-btn secondary">Refresh Cache</button>
-                </div>
-                
-                <div id="paperStocksTable" style="display: none;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Display Name</th>
-                                <th>Type</th>
-                                <th>Weight</th>
-                                <th>Cost/Sheet</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="paperStocksBody">
-                        </tbody>
-                    </table>
+                <div class="help-text">
+                    <strong>How to update pricing:</strong>
+                    <ol>
+                        <li>Edit <code>/js/paperStocks.js</code> for paper costs</li>
+                        <li>Edit <code>/js/pricingConfig.js</code> for constraints and formulas</li>
+                        <li>Commit changes via git</li>
+                        <li>Deploy automatically</li>
+                    </ol>
+                    <p><strong>Benefits:</strong> Faster calculations, version controlled pricing, no database maintenance needed.</p>
                 </div>
             </div>
 
-            <!-- Pricing Configuration -->
+            <!-- Static File Export (Optional) -->
             <div class="selection-card">
-                <h2>⚙️ Pricing Configuration</h2>
-                <p>View and edit pricing formulas and settings.</p>
+                <h2>📁 Static File Export</h2>
+                <p>Export current static files (for backup or reference).</p>
                 
                 <div class="button-grid">
-                    <button id="loadPricingConfigBtn" class="calculate-btn">Load Configuration</button>
-                    <button id="savePricingConfigBtn" class="calculate-btn" style="display: none;">Save Changes</button>
+                    <button id="exportStaticFilesBtn" class="calculate-btn" onclick="staticExporter.exportStaticFiles()">
+                        📥 Export Static Files
+                    </button>
                 </div>
                 
-                <div id="pricingConfigEditor" style="display: none;">
-                    <textarea id="configTextarea" rows="20" style="width: 100%; font-family: monospace; margin: 10px 0;"></textarea>
-                    <p class="help-text">⚠️ Be careful when editing. Invalid JSON will break the pricing system.</p>
+                <div id="exportStatus">
+                    <!-- Export status messages will appear here -->
+                </div>
+                
+                <div class="help-text">
+                    <strong>Use case:</strong> Download current static files for backup or to copy to another environment.
+                    <p><strong>Note:</strong> All pricing now comes from static files only - no database dependencies.</p>
                 </div>
             </div>
 

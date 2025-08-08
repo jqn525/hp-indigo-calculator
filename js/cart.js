@@ -141,10 +141,6 @@ class CartManager {
   }
 
   addItem(product) {
-    console.log('Adding product to cart:', product);
-    console.log('Product type:', product.productType);
-    console.log('Pricing:', product.pricing);
-    console.log('Configuration:', product.configuration);
     
     // Generate unique ID for the cart item
     const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -219,7 +215,6 @@ class CartManager {
       this.updateCartBadge();
       this.renderCartItems();
 
-      console.log(`Loaded ${quoteItems.length} items into cart from quote`);
       return true;
 
     } catch (error) {
@@ -433,6 +428,7 @@ class CartManager {
     const names = {
       'brochures': 'Brochure',
       'postcards': 'Postcard',
+      'name-tags': 'Name Tag',
       'flyers': 'Flyer',
       'bookmarks': 'Bookmark',
       'booklets': 'Booklet',

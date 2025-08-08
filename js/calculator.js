@@ -6,32 +6,13 @@ let pricingData = {
   isFromDatabase: false
 };
 
-// Initialize pricing data from database with fallback to static data
+// Initialize pricing data from static files with optional database override
 async function initializePricingData() {
   if (pricingData.isLoaded) {
     return pricingData;
   }
 
-  try {
-    // Try to get data from database
-    if (window.dbManager) {
-      const dbData = await window.dbManager.getPricingData();
-      
-      if (dbData.paperStocks && dbData.pricingConfigs) {
-        pricingData.paperStocks = dbData.paperStocks;
-        pricingData.pricingConfigs = dbData.pricingConfigs;
-        pricingData.isFromDatabase = dbData.isFromDatabase;
-        pricingData.isLoaded = true;
-        
-        console.log('✅ Pricing data loaded from database');
-        return pricingData;
-      }
-    }
-  } catch (error) {
-    console.warn('Database pricing data failed, falling back to static:', error);
-  }
-
-  // Fallback to static data
+  // Load from static files first (authoritative source)
   if (typeof paperStocks !== 'undefined' && typeof pricingConfig !== 'undefined') {
     pricingData.paperStocks = paperStocks;
     pricingData.pricingConfigs = {
@@ -44,8 +25,27 @@ async function initializePricingData() {
     pricingData.isFromDatabase = false;
     pricingData.isLoaded = true;
     
-    console.log('📄 Using static pricing data');
+    console.log('📄 Using static pricing data (authoritative)');
     return pricingData;
+  }
+
+  // Fallback to database only if static files unavailable
+  try {
+    if (window.dbManager) {
+      const dbData = await window.dbManager.getPricingData();
+      
+      if (dbData.paperStocks && dbData.pricingConfigs) {
+        pricingData.paperStocks = dbData.paperStocks;
+        pricingData.pricingConfigs = dbData.pricingConfigs;
+        pricingData.isFromDatabase = dbData.isFromDatabase;
+        pricingData.isLoaded = true;
+        
+        console.log('🗄️ Using database pricing data (fallback)');
+        return pricingData;
+      }
+    }
+  } catch (error) {
+    console.warn('Database fallback failed:', error);
   }
 
   console.error('❌ No pricing data available');
@@ -143,14 +143,6 @@ async function calculateBrochurePrice(formData) {
   const sheetsRequired = Math.ceil(quantity / imposition);
   const unitPrice = totalCost / quantity;
   
-  console.log('Calculation details:', {
-    selectedPaper: selectedPaper.displayName,
-    paperCost: paperCost,
-    imposition: imposition,
-    v: v,
-    f: f,
-    rushMultiplier: rushMultiplier
-  });
   
   return {
     printingSetupCost: printingSetupCost.toFixed(2),
@@ -235,14 +227,6 @@ async function calculatePostcardPrice(formData) {
   const sheetsRequired = Math.ceil(quantity / imposition);
   const unitPrice = totalCost / quantity;
   
-  console.log('Postcard calculation details:', {
-    selectedPaper: selectedPaper.displayName,
-    paperCost: paperCost,
-    imposition: imposition,
-    v: v,
-    f: f,
-    rushMultiplier: rushMultiplier
-  });
   
   return {
     printingSetupCost: printingSetupCost.toFixed(2),
@@ -259,6 +243,107 @@ async function calculatePostcardPrice(formData) {
     sheetsRequired: sheetsRequired,
     paperUsed: selectedPaper.displayName,
     imposition: imposition
+  };
+}
+
+// Calculate Name Tag pricing (identical to postcards)
+async function calculateNameTagPrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const paperCode = formData.get('paperType');
+  const rushType = formData.get('rushType') || 'standard';
+  const hasHolePunch = formData.get('holePunch') === 'true';
+  const hasLanyard = formData.get('lanyard') === 'true';
+  
+  // Validate quantity constraints
+  const validation = validateQuantity(quantity, 'name-tags', data.pricingConfigs.product_constraints);
+  if (!validation.valid) {
+    return {
+      error: validation.message
+    };
+  }
+  
+  // Get configuration values
+  const config = data.pricingConfigs.formula;
+  const S = 15.00;                         // $15.00 (printing setup - reduced for name tags)
+  const F_setup = 0;                       // No setup fee for finishing (standalone unit)
+  const k = config.baseProductionRate;     // $1.50
+  const e = 0.65;                          // 0.65 for name tags (better volume discounts)
+  const clicks = config.clicksCost;        // $0.10
+  
+  // Get paper and imposition data
+  const selectedPaper = data.paperStocks[paperCode];
+  if (!selectedPaper) {
+    return { error: 'Invalid paper selection' };
+  }
+  
+  const paperCost = selectedPaper.costPerSheet;
+  const imposition = data.pricingConfigs.imposition_data['name-tags'][size];
+  if (!imposition) {
+    return { error: 'Invalid size selection' };
+  }
+  
+  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
+  const v = (paperCost + clicks) * 1.5 / imposition;
+  
+  // Calculate finishing costs based on paper type and selections
+  // Only allow finishing for cover stock, not adhesive
+  const isAdhesive = paperCode === 'PAC51319WP';
+  let f = 0;
+  if (!isAdhesive) {
+    if (hasHolePunch) f += 0.05;  // $0.05 per tag for hole punch
+    if (hasLanyard) f += 1.25;    // $1.25 per tag for basic lanyard
+  }
+  const needsFinishing = f > 0;
+  
+  // Get rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  
+  // Calculate cost components
+  const printingSetupCost = S;
+  const finishingSetupCost = needsFinishing ? F_setup : 0;
+  const productionCost = Math.pow(quantity, e) * k;
+  const materialCost = quantity * v;
+  const finishingCost = quantity * f;
+  
+  // Calculate subtotal and apply rush multiplier
+  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
+  const totalCost = subtotal * rushMultiplier;
+  
+  // Calculate additional info
+  const sheetsRequired = Math.ceil(quantity / imposition);
+  const unitPrice = totalCost / quantity;
+  
+  
+  return {
+    printingSetupCost: printingSetupCost.toFixed(2),
+    finishingSetupCost: finishingSetupCost.toFixed(2),
+    needsFinishing: needsFinishing,
+    productionCost: productionCost.toFixed(2),
+    materialCost: materialCost.toFixed(2),
+    finishingCost: finishingCost.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(3),
+    sheetsRequired: sheetsRequired,
+    paperUsed: selectedPaper.displayName,
+    imposition: imposition,
+    breakdown: {
+      setupFee: printingSetupCost,
+      finishingSetupFee: finishingSetupCost,
+      productionCost: productionCost,
+      materialCost: materialCost,
+      finishingCost: finishingCost,
+      subtotal: subtotal,
+      rushMultiplier: rushMultiplier
+    }
   };
 }
 
@@ -430,6 +515,74 @@ if (postcardForm) {
   });
 }
 
+// Handle name tag form
+const nameTagForm = document.getElementById('nameTagForm');
+if (nameTagForm) {
+  nameTagForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(nameTagForm);
+    const pricing = await calculateNameTagPrice(formData);
+    
+    // Handle errors
+    if (pricing.error) {
+      alert(pricing.error);
+      return;
+    }
+    
+    // Update the display - Name tags use same elements as postcards
+    document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
+    document.getElementById('productionCost').textContent = `$${pricing.productionCost}`;
+    document.getElementById('materialCost').textContent = `$${pricing.materialCost}`;
+    document.getElementById('subtotal').textContent = `$${pricing.subtotal}`;
+    document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
+    document.getElementById('totalPrice').textContent = `$${pricing.totalCost}`;
+    document.getElementById('sheetsRequired').textContent = pricing.sheetsRequired;
+    
+    // Show/hide rush multiplier
+    const rushMultiplierItem = document.getElementById('rushMultiplierItem');
+    const rushMultiplierSpan = document.getElementById('rushMultiplier');
+    if (pricing.rushMultiplier > 1) {
+      rushMultiplierItem.style.display = 'flex';
+      rushMultiplierSpan.textContent = `${pricing.rushMultiplier}x`;
+    } else {
+      rushMultiplierItem.style.display = 'none';
+    }
+    
+    // Show results
+    const resultsSection = document.getElementById('resultsSection');
+    if (resultsSection) {
+      resultsSection.style.display = 'block';
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Show Add to Cart button
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    if (addToCartBtn) {
+      addToCartBtn.style.display = 'inline-block';
+      addToCartBtn.disabled = false;
+      addToCartBtn.onclick = () => {
+        if (window.cartManager) {
+          window.cartManager.addCurrentConfiguration('name-tags', formData, pricing);
+        }
+      };
+    }
+  });
+  
+  nameTagForm.addEventListener('reset', () => {
+    const resultsSection = document.getElementById('resultsSection');
+    if (resultsSection) {
+      resultsSection.style.display = 'none';
+    }
+    
+    // Hide Add to Cart button
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    if (addToCartBtn) {
+      addToCartBtn.style.display = 'none';
+    }
+  });
+}
+
 function calculateFlyerPrice(formData) {
   const quantity = parseInt(formData.get('quantity'));
   const size = formData.get('size');
@@ -488,14 +641,6 @@ function calculateFlyerPrice(formData) {
   const sheetsRequired = Math.ceil(quantity / imposition);
   const unitPrice = totalCost / quantity;
   
-  console.log('Flyer calculation details:', {
-    selectedPaper: selectedPaper.displayName,
-    paperCost: paperCost,
-    imposition: imposition,
-    v: v,
-    e: e,
-    rushMultiplier: rushMultiplier
-  });
   
   return {
     printingSetupCost: printingSetupCost.toFixed(2),
@@ -636,14 +781,6 @@ function calculateBookmarkPrice(formData) {
   const sheetsRequired = Math.ceil(quantity / imposition);
   const unitPrice = totalCost / quantity;
   
-  console.log('Bookmark calculation details:', {
-    selectedPaper: selectedPaper.displayName,
-    paperCost: paperCost,
-    imposition: imposition,
-    v: v,
-    e: e,
-    rushMultiplier: rushMultiplier
-  });
   
   return {
     printingSetupCost: printingSetupCost.toFixed(2),
@@ -810,26 +947,6 @@ async function calculateBookletPrice(formData) {
   const textSheetsRequired = Math.ceil((quantity * textSheets) / imposition);  // textSheets per booklet
   const totalSheetsRequired = coverSheetsRequired + textSheetsRequired;
   
-  console.log('Booklet calculation details:', {
-    pages: pages,
-    textSheets: textSheets,
-    coverPaper: coverPaper.displayName || coverPaper.display_name,
-    textPaper: textPaper.displayName || textPaper.display_name,
-    baseSetup: baseSetup,
-    production: production,
-    coverCost: coverCost,
-    textCost: textCost, 
-    clickCost: clickCost,
-    materialsCostPerUnit: materialsCostPerUnit,
-    materials: materials,
-    finishingSetup: finishingSetup,
-    finishing: finishing,
-    finishingPerUnit: finishingPerUnit,
-    subtotal: subtotal,
-    totalCost: totalCost,
-    unitPrice: unitPrice,
-    rushMultiplier: rushMultiplier
-  });
   
   return {
     printingSetupCost: baseSetup.toFixed(2),
@@ -1037,6 +1154,12 @@ class CardSelection {
         'rushType': 'standard'
       };
     } else if (path.includes('postcards')) {
+      defaults = {
+        'size': '5x7',
+        'paperType': 'LYNOC95FSC',
+        'rushType': 'standard'
+      };
+    } else if (path.includes('name-tags')) {
       defaults = {
         'size': '5x7',
         'paperType': 'LYNOC95FSC',

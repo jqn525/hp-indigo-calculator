@@ -8,14 +8,24 @@ let promoPricingData = {
   isFromDatabase: false
 };
 
-// Initialize promo pricing data from database with fallback to static data
+// Initialize promo pricing data from static files with optional database override
 async function initializePromoPricingData() {
   if (promoPricingData.isLoaded) {
     return promoPricingData;
   }
 
+  // Load from static files first (authoritative source)
+  if (typeof promoConfig !== 'undefined') {
+    promoPricingData.promoConfig = promoConfig;
+    promoPricingData.isFromDatabase = false;
+    promoPricingData.isLoaded = true;
+    
+    console.log('📄 Using static promo pricing data (authoritative)');
+    return promoPricingData;
+  }
+
+  // Fallback to database only if static files unavailable
   try {
-    // Try to get data from database
     if (window.dbManager) {
       const pricingConfigs = await window.dbManager.getPricingConfigs();
       
@@ -23,28 +33,18 @@ async function initializePromoPricingData() {
         promoPricingData.promoConfig = {
           pricing: pricingConfigs.promo_pricing,
           products: pricingConfigs.promo_products,
-          getVolumeDiscount: promoConfig?.getVolumeDiscount || function() { return 0; },
-          getBaseCost: promoConfig?.getBaseCost || function() { return 0; }
+          getVolumeDiscount: function() { return 0; },
+          getBaseCost: function() { return 0; }
         };
         promoPricingData.isFromDatabase = true;
         promoPricingData.isLoaded = true;
         
-        console.log('✅ Promo pricing data loaded from database');
+        console.log('🗄️ Using database promo pricing data (fallback)');
         return promoPricingData;
       }
     }
   } catch (error) {
-    console.warn('Database promo pricing data failed, falling back to static:', error);
-  }
-
-  // Fallback to static data
-  if (typeof promoConfig !== 'undefined') {
-    promoPricingData.promoConfig = promoConfig;
-    promoPricingData.isFromDatabase = false;
-    promoPricingData.isLoaded = true;
-    
-    console.log('📄 Using static promo pricing data');
-    return promoPricingData;
+    console.warn('Database promo fallback failed:', error);
   }
 
   console.error('❌ No promo pricing data available');

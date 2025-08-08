@@ -531,74 +531,6 @@
                         </div>
                     </div>
 
-                    <!-- Collapsible Price Breakdown -->
-                    <div class="mt-4">
-                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#priceBreakdown" aria-expanded="false" aria-controls="priceBreakdown">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7,10L12,15L17,10H7Z"/>
-                            </svg>
-                            View Price Breakdown
-                        </button>
-                        <div class="collapse mt-3" id="priceBreakdown">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Detailed Cost Analysis</h5>
-                                    
-                                    <!-- Cost Breakdown Table -->
-                                    <div class="breakdown-table">
-                                        <div class="breakdown-row">
-                                            <span>Setup Fee (Base + Pages):</span>
-                                            <span id="breakdownSetupCost">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-row">
-                                            <span>Production Cost:</span>
-                                            <span id="breakdownProductionCost">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-row">
-                                            <span>Materials Cost:</span>
-                                            <span id="breakdownMaterialCost">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-sub-item">
-                                            <span>• Cover Paper:</span>
-                                            <span id="breakdownCoverCost">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-sub-item">
-                                            <span>• Text Paper:</span>
-                                            <span id="breakdownTextCost">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-sub-item">
-                                            <span>• Click Charges:</span>
-                                            <span id="breakdownClickCost">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-row">
-                                            <span>Finishing Setup:</span>
-                                            <span id="breakdownFinishingSetup">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-row">
-                                            <span>Finishing Cost:</span>
-                                            <span id="breakdownFinishingCost">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-row subtotal">
-                                            <span>Subtotal:</span>
-                                            <span id="breakdownSubtotal">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-row" id="breakdownRushMultiplierItem" style="display: none;">
-                                            <span>Rush Multiplier:</span>
-                                            <span id="breakdownRushMultiplier">1x</span>
-                                        </div>
-                                        <div class="breakdown-row total">
-                                            <span>Total Price:</span>
-                                            <span id="breakdownTotalPrice">$0.00</span>
-                                        </div>
-                                        <div class="breakdown-row">
-                                            <span>Unit Price:</span>
-                                            <span id="breakdownUnitPrice">$0.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -677,19 +609,6 @@
                 
                 const breakdown = pricingData.breakdown;
                 
-                // Update main breakdown elements
-                document.getElementById('breakdownSetupCost').textContent = `$${breakdown.setupFee.toFixed(2)}`;
-                document.getElementById('breakdownProductionCost').textContent = `$${breakdown.productionCost.toFixed(2)}`;
-                document.getElementById('breakdownMaterialCost').textContent = `$${breakdown.materialCost.toFixed(2)}`;
-                document.getElementById('breakdownCoverCost').textContent = `$${breakdown.coverCost.toFixed(2)}`;
-                document.getElementById('breakdownTextCost').textContent = `$${breakdown.textCost.toFixed(2)}`;
-                document.getElementById('breakdownClickCost').textContent = `$${breakdown.clickCost.toFixed(2)}`;
-                document.getElementById('breakdownFinishingSetup').textContent = `$${breakdown.finishingSetupFee.toFixed(2)}`;
-                document.getElementById('breakdownFinishingCost').textContent = `$${breakdown.finishingCost.toFixed(2)}`;
-                document.getElementById('breakdownSubtotal').textContent = `$${breakdown.subtotal.toFixed(2)}`;
-                document.getElementById('breakdownTotalPrice').textContent = `$${pricingData.totalCost}`;
-                document.getElementById('breakdownUnitPrice').textContent = `$${pricingData.unitPrice}`;
-                
                 // Update red cell breakdown elements
                 document.getElementById('redSetupCost').textContent = `$${breakdown.setupFee.toFixed(2)}`;
                 document.getElementById('redProductionCost').textContent = `$${breakdown.productionCost.toFixed(2)}`;
@@ -697,14 +616,11 @@
                 document.getElementById('redFinishingCost').textContent = `$${breakdown.finishingCost.toFixed(2)}`;
                 document.getElementById('redSubtotal').textContent = `$${breakdown.subtotal.toFixed(2)}`;
                 
-                // Show/hide rush multiplier in both breakdowns
+                // Show/hide rush multiplier in red cell breakdown
                 if (breakdown.rushMultiplier && breakdown.rushMultiplier > 1) {
-                    document.getElementById('breakdownRushMultiplier').textContent = `${breakdown.rushMultiplier.toFixed(1)}x`;
-                    document.getElementById('breakdownRushMultiplierItem').style.display = 'flex';
                     document.getElementById('redRushMultiplier').textContent = `${breakdown.rushMultiplier.toFixed(1)}x`;
                     document.getElementById('redRushMultiplierItem').style.display = 'flex';
                 } else {
-                    document.getElementById('breakdownRushMultiplierItem').style.display = 'none';
                     document.getElementById('redRushMultiplierItem').style.display = 'none';
                 }
             }

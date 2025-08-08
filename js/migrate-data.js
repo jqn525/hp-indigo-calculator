@@ -1,6 +1,7 @@
-// Database Migration Script
-// Populates Supabase database with current static data
-// Run this once to migrate from static files to database
+// Database Migration Script (DEPRECATED)
+// NOTE: Pricing tables (paper_stocks, pricing_configs, products) have been removed
+// This file is kept for reference but pricing migration is no longer needed
+// All pricing data now comes from static files only
 
 class DataMigrator {
   constructor() {
@@ -33,7 +34,6 @@ class DataMigrator {
 
   // Migrate paper stocks to database
   async migratePaperStocks() {
-    console.log('🗂️ Migrating paper stocks...');
     
     try {
       // Convert paperStocks object to array format for database
@@ -56,7 +56,6 @@ class DataMigrator {
         .limit(1);
 
       if (existing && existing.length > 0) {
-        console.log('📄 Paper stocks already exist, updating...');
         
         // Update existing records
         for (const stock of stocksArray) {
@@ -69,7 +68,6 @@ class DataMigrator {
           }
         }
       } else {
-        console.log('📄 Inserting new paper stocks...');
         
         // Insert new records
         const { error } = await this.client
@@ -82,7 +80,6 @@ class DataMigrator {
         }
       }
 
-      console.log(`✅ Migrated ${stocksArray.length} paper stocks`);
       this.migrationStatus.paperStocks = true;
       
     } catch (error) {
@@ -93,7 +90,6 @@ class DataMigrator {
 
   // Migrate pricing configurations to database
   async migratePricingConfigs() {
-    console.log('⚙️ Migrating pricing configurations...');
     
     try {
       const configs = [
@@ -140,7 +136,6 @@ class DataMigrator {
         }
       }
 
-      console.log(`✅ Migrated ${configs.length} pricing configurations`);
       this.migrationStatus.pricingConfigs = true;
       
     } catch (error) {
@@ -151,7 +146,6 @@ class DataMigrator {
 
   // Migrate promotional product configurations to database
   async migratePromoConfigs() {
-    console.log('🎁 Migrating promotional product configurations...');
     
     try {
       const promoConfigs = [
@@ -180,7 +174,6 @@ class DataMigrator {
         }
       }
 
-      console.log(`✅ Migrated ${promoConfigs.length} promotional configurations`);
       this.migrationStatus.promoConfigs = true;
       
     } catch (error) {
@@ -191,7 +184,6 @@ class DataMigrator {
 
   // Ensure products table has all current products
   async verifyProducts() {
-    console.log('📦 Verifying products table...');
     
     try {
       const { data: existingProducts } = await this.client
@@ -215,6 +207,16 @@ class DataMigrator {
           name: 'Postcards',
           slug: 'postcards',
           description: 'Standard and custom postcard sizes',
+          min_quantity: 100,
+          max_quantity: 5000,
+          efficiency_exponent: 0.70,
+          imposition_data: { '4x6': 8, '5x7': 4, '5.5x8.5': 4, '6x9': 2 },
+          is_active: true
+        },
+        {
+          name: 'Name Tags',
+          slug: 'name-tags',
+          description: 'Professional name tags for events and identification',
           min_quantity: 100,
           max_quantity: 5000,
           efficiency_exponent: 0.70,
@@ -266,9 +268,7 @@ class DataMigrator {
           throw error;
         }
         
-        console.log(`✅ Added ${missingProducts.length} missing products`);
       } else {
-        console.log('✅ All products already exist');
       }
 
       this.migrationStatus.products = true;
@@ -281,8 +281,6 @@ class DataMigrator {
 
   // Run complete migration
   async runMigration() {
-    console.log('🚀 Starting database migration...');
-    console.log('==========================================');
     
     try {
       await this.init();
@@ -299,22 +297,17 @@ class DataMigrator {
       await this.migratePromoConfigs();
       await this.verifyProducts();
       
-      console.log('==========================================');
-      console.log('🎉 Migration completed successfully!');
-      console.log('Status:', this.migrationStatus);
       
       return this.migrationStatus;
       
     } catch (error) {
       console.error('💥 Migration failed:', error);
-      console.log('Partial status:', this.migrationStatus);
       throw error;
     }
   }
 
   // Reset migration (for testing)
   async resetDatabase() {
-    console.log('🗑️ Resetting database (WARNING: This will delete all data!)');
     
     if (!confirm('Are you sure you want to reset the database? This will delete ALL data!')) {
       return;
@@ -331,7 +324,6 @@ class DataMigrator {
       await this.client.from('pricing_configs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       await this.client.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       
-      console.log('✅ Database reset complete');
       
     } catch (error) {
       console.error('❌ Database reset failed:', error);

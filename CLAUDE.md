@@ -8,7 +8,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Live URL**: https://docsol.ca
 
-### ⭐ **Latest Updates (2025-07-30)**
+### ⭐ **Latest Updates (2025-08-08)**
+- **CLEAN ARCHITECTURE COMPLETE**: Complete migration to static-first pricing system
+- **DATABASE STREAMLINED**: Removed all pricing tables (paper_stocks, pricing_configs, products)
+- **STATIC FILES AUTHORITATIVE**: All pricing now comes from `/js/paperStocks.js` and `/js/pricingConfig.js`
+- **NAME TAGS OPTIMIZED**: Reduced pricing (setup $15, efficiency 0.65) and minimum quantity 50 units
+- **ADMIN PANEL SIMPLIFIED**: Focused on user management only, pricing managed via code files
+- **ZERO DATABASE MAINTENANCE**: No Supabase updates needed for pricing changes ever again
+
+### Previous Updates (2025-07-30)
 - **PRICING LAYOUT MIGRATION**: All product pages now have identical pricing interface matching booklets design
 - **INTEGRATED PRICE BREAKDOWN**: "VIEW PRICE BREAKDOWN" moved inside red pricing cell with collapsible details
 - **CONSISTENT ADD TO CART**: Red gradient buttons separated from pricing cell across all products
@@ -43,6 +51,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Postcards** (4x6, 5x7, 5.5x8.5, 6x9) - 100-5000 units, e=0.70
 - **Flyers** (5.5x8.5, 8.5x11, 8.5x14, 11x17) - 25-2500 units, e=0.70
 - **Bookmarks** (2x6, 2x7, 2x8) - 100-2500 units, e=0.65
+- **Name Tags** (2.33x3, 3x4, 4x6) - 50-5000 units, e=0.65, optimized pricing
 - **Booklets** (8-48 pages, multiples of 4) - 10-500 units, e=0.75, dual paper selection
 
 #### Product Information Pages:
@@ -112,11 +121,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Start local server (Python)
 python -m http.server 8000
 
-# Start local server (Node.js)
-npx serve
+# Start local server (Node.js) - Recommended for external drives
+npx serve -p 8000 -s .
 ```
 
 Access at: http://localhost:8000
+
+**Note**: Use `npx serve` instead of Python server when working on external drives (Lexar ES3) to avoid connection drops due to macOS power management.
 
 ### Deployment
 ```bash
@@ -136,15 +147,17 @@ git push origin main
 - **Service Worker** (`sw.js`) - Offline caching with cache-first strategy
 - **PWA Manifest** (`manifest.json`) - App installation configuration
 
-### Pricing Engine
+### Pricing Engine (Static-First Architecture)
 The pricing calculation logic is centralized in `/js/calculator.js`:
+- **Static Files Authoritative**: All pricing data comes from static files only
 - `pricingConfig` object in `/js/pricingConfig.js` contains all pricing rules and constraints
 - `paperStocks` object in `/js/paperStocks.js` contains paper costs and specifications
+- **Database**: Used only for user data (accounts, carts, quotes) - NO pricing data
 - Core pricing formula: `C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r`
-  - S = Setup fee ($30)
+  - S = Setup fee (varies by product: $30 standard, $15 for name tags)
   - F_setup = Finishing setup fee ($15, if finishing required)
   - Q = Quantity
-  - e = Efficiency exponent (0.75 for brochures, 0.70 for postcards/flyers)
+  - e = Efficiency exponent (0.75 brochures, 0.70 postcards/flyers, 0.65 name tags/bookmarks)
   - k = Base production rate ($1.50)
   - v = Variable cost per piece (paper + clicks × 1.5 / imposition)
   - f = Finishing cost per piece
@@ -155,6 +168,7 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Postcards**: qty 100-5000, 4 sizes, no finishing, e=0.70
 - **Flyers**: qty 25-2500, 4 sizes, text + cover stock subset, e=0.70
 - **Bookmarks**: qty 100-2500, 3 sizes (2x6, 2x7, 2x8), 130# Cover Uncoated/Silk, e=0.65
+- **Name Tags**: qty 50-5000, 3 sizes (2.33x3, 3x4, 4x6), optimized pricing, e=0.65
 
 ### Cart System (NEW)
 - **localStorage Persistence**: Cart items saved across browser sessions
@@ -239,10 +253,11 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Button Grid**: 3-column button layout (Calculate, Add to Cart, Clear) matching selection cards
 - **Responsive Design**: Optimized for iPhone 14 Pro Max and all mobile devices
 - **Color Scheme**: SFU Light Red (#CC0633), SFU Dark Red (#A6192E), consistent SFU branding
+- **Button Styling**: All buttons use SFU red colors including outline buttons (btn-outline-primary)
 
 ### Cache Busting
 To force users to get updated files:
-1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v107`)
+1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v110`)
 2. This triggers service worker update cycle and clears old cache
 3. Always increment version when deploying CSS/JS changes
 
@@ -259,7 +274,46 @@ To force users to get updated files:
 
 ---
 
-## Recent Session Summary (2025-07-23) - DATABASE MIGRATION COMPLETE! 🗄️
+## Recent Session Summary (2025-08-08) - CLEAN ARCHITECTURE COMPLETE! ✨
+
+### MAJOR ACHIEVEMENT: Static-First Pricing System
+
+Successfully implemented the cleanest possible architecture by removing all pricing dependencies from the database:
+
+#### What's New:
+- ✅ **Static Files Authoritative**: All pricing data now comes from `/js/paperStocks.js` and `/js/pricingConfig.js`
+- ✅ **Database Streamlined**: Removed `paper_stocks`, `pricing_configs`, and `products` tables entirely
+- ✅ **Admin Panel Simplified**: Focused on user management only, pricing managed via code files
+- ✅ **Name Tags Optimized**: Reduced setup fee ($15), better efficiency (0.65), minimum quantity 50
+- ✅ **Zero Database Maintenance**: No Supabase updates needed for pricing changes ever again
+
+#### Benefits Achieved:
+- **Faster Performance**: No database calls for pricing calculations
+- **Version Controlled Pricing**: All pricing changes tracked in git
+- **Easier Deployments**: Edit static files, commit, deploy - done
+- **Cleaner Database**: Only essential user data (accounts, carts, quotes)
+- **Future-Proof**: New products require only static file edits
+
+#### Files Updated:
+- `js/calculator.js` - Static-first pricing data loading ✅
+- `js/db.js` - Removed all pricing-related methods ✅
+- `js/admin.js` - Simplified to user management only ✅
+- `pages/admin.html` - Removed pricing management UI ✅
+- `js/migrate-data.js` - Marked deprecated ✅
+
+#### Database Tables Now:
+- **Keep**: `profiles` (users), `carts` (shopping), `quotes` (history), `quote_items` (details)
+- **Removed**: `paper_stocks`, `pricing_configs`, `products` - all pricing is static
+
+#### How to Update Pricing:
+1. Edit `/js/paperStocks.js` for paper costs
+2. Edit `/js/pricingConfig.js` for constraints and formulas  
+3. Commit via git
+4. Deploy automatically via Vercel
+
+---
+
+## Previous Session Summary (2025-07-23) - DATABASE MIGRATION (DEPRECATED)
 
 ### MAJOR ACHIEVEMENT: Complete Database Migration System
 
@@ -590,8 +644,8 @@ Successfully integrated Supabase for cloud storage and user management:
 ✅ **350 pieces 3x3**: Supplier $392.20 → Customer $490.25  
 ✅ **35 pieces 4x4**: Supplier $88.60 → Customer $110.75  
 
-#### Current Cache Version: v69
-- Latest version with all new components and pages
+#### Current Cache Version: v110
+- Latest version with SFU red button branding complete
 - Increment for any CSS/JS changes
 
 ---

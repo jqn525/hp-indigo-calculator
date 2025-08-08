@@ -39,6 +39,8 @@ class ProductConfigurator {
         // Detect product type based on form ID
         if (document.getElementById('postcardForm')) {
             return 'postcards';
+        } else if (document.getElementById('nameTagForm')) {
+            return 'name-tags';
         } else if (document.getElementById('flyerForm')) {
             return 'flyers';
         } else if (document.getElementById('bookmarkForm')) {
@@ -52,7 +54,6 @@ class ProductConfigurator {
     }
 
     async init() {
-        console.log('🚀 Initializing Product Configurator...');
         
         try {
             this.setupEventListeners();
@@ -63,10 +64,8 @@ class ProductConfigurator {
             await this.waitForDependencies();
             
             // Initial calculation
-            console.log('📊 Starting initial pricing calculation...');
             await this.calculatePricing();
             
-            console.log('✅ Product Configurator initialized successfully');
         } catch (error) {
             console.error('❌ Product Configurator initialization failed:', error);
             this.updatePricingDisplay('error');
@@ -83,11 +82,9 @@ class ProductConfigurator {
             const hasPricingData = (typeof window.pricingConfigs !== 'undefined' || typeof window.dbManager !== 'undefined');
             
             if (hasProductFunction && hasPricingData) {
-                console.log('✅ Dependencies ready for product type:', this.productType);
                 return;
             }
             
-            console.log(`⏳ Waiting for dependencies... (${attempts + 1}/${maxAttempts})`);
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
         }
@@ -104,6 +101,8 @@ class ProductConfigurator {
                 return typeof calculateBrochurePrice === 'function' ? calculateBrochurePrice : null;
             case 'postcards':
                 return typeof calculatePostcardPrice === 'function' ? calculatePostcardPrice : null;
+            case 'name-tags':
+                return typeof calculateNameTagPrice === 'function' ? calculateNameTagPrice : null;
             case 'flyers':
                 return typeof calculateFlyerPrice === 'function' ? calculateFlyerPrice : null;
             case 'bookmarks':
@@ -351,7 +350,6 @@ class ProductConfigurator {
             // Use existing calculator function
             const result = await this.callPricingCalculator();
             
-            console.log('📊 Pricing calculation result:', result);
             
             if (result && result.totalCost && !result.error) {
                 this.currentPricing = {
@@ -399,8 +397,6 @@ class ProductConfigurator {
         }
         
         const config = this.currentConfig;
-        console.log('🔧 Calling pricing calculator with config:', config);
-        console.log('🏷️ Product type:', this.productType);
         
         // Create FormData object with appropriate parameters for each product type
         const formData = new FormData();
@@ -424,7 +420,6 @@ class ProductConfigurator {
         }
         
         const result = await pricingFunction(formData);
-        console.log('💰 Raw pricing result:', result);
         
         return result;
     }
@@ -596,6 +591,7 @@ class ProductConfigurator {
         const productNames = {
             'brochures': 'Brochures',
             'postcards': 'Postcards', 
+            'name-tags': 'Name Tags',
             'flyers': 'Flyers',
             'bookmarks': 'Bookmarks',
             'booklets': 'Booklets'

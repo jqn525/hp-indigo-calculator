@@ -4,8 +4,9 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 
 ## ✨ Features
 
+- ⚡ **Static-First Pricing** - Lightning-fast calculations with zero database dependencies
 - 🔐 **Secure Authentication** - Front-door login system with SFU branding
-- ☁️ **Cloud Integration** - Supabase database for quotes and user management
+- ☁️ **Cloud Integration** - Supabase database for user data and quotes only
 - 📱 **Progressive Web App** - Installable on tablets and phones
 - 🔄 **Offline Support** - Works without internet after first visit
 - 📋 **Quote Management** - Save, view, and manage customer quotes
@@ -19,6 +20,7 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 - ✅ **Postcards** - 4 standard sizes, 100-5000 units  
 - ✅ **Flyers** - 4 standard sizes, 25-2500 units
 - ✅ **Bookmarks** - 3 sizes on premium cover stock, 100-2500 units
+- ✅ **Name Tags** - 3 sizes with optimized pricing, 50-5000 units
 - ✅ **Small Format Hub** - Unified product selection and filtering
 
 ### Promotional Products
@@ -37,13 +39,13 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 ## 🛠️ Technology Stack
 
 - **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5
-- **Backend**: Supabase (Database, Authentication, Real-time)
+- **Backend**: Supabase (User Authentication, Quotes, Cart Sync)
 - **Hosting**: Vercel with custom domain (docsol.ca)
-- **PWA Features**: Service Worker (v69), Web App Manifest
+- **PWA Features**: Service Worker (v115), Web App Manifest
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
-- **Database**: Dynamic pricing with smart caching and fallback support
-- **Architecture**: Modular component system with configurators
+- **Pricing**: Static files only - no database dependencies
+- **Architecture**: Clean static-first system with modular components
 
 ## 💻 Local Development
 
@@ -73,7 +75,7 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 The application uses hardcoded Supabase credentials for simplicity. For production deployments, consider using environment variables.
 
 ### Service Worker
-- Current cache version: `v69`
+- Current cache version: `v115`
 - Increment version in `sw.js` when deploying CSS/JS changes
 - Implements cache-first strategy with network-first for CSS files
 
@@ -103,16 +105,17 @@ The application uses hardcoded Supabase credentials for simplicity. For producti
 
 ## 💾 Data Management
 
-### Quote System
-- **Save Quotes**: Customer information with detailed line items
+### Database Usage (Supabase)
+- **User Accounts**: Authentication and profiles
+- **Quote System**: Save quotes with customer information
+- **Cart Sync**: Cross-device cart synchronization
 - **Quote History**: View and manage all saved quotes
-- **Export Functionality**: Generate formatted quote files
-- **Reopen Carts**: Load saved quotes back into cart for modifications
 
-### Cart Features
-- **Multi-Product**: Add multiple configurations to single quote
-- **Real-time Pricing**: Live price updates as options change
-- **Persistent Storage**: Cart survives browser sessions
+### Pricing Data (Static Files)
+- **Paper Costs**: `/js/paperStocks.js` - All paper specifications and pricing
+- **Product Config**: `/js/pricingConfig.js` - Constraints, formulas, imposition data
+- **Version Controlled**: All pricing changes tracked in git
+- **Zero Maintenance**: No database updates needed for pricing changes
 
 ## 🚀 Deployment
 
@@ -130,22 +133,30 @@ git push origin main
 # Vercel automatically deploys
 ```
 
-## 📊 Pricing Engine
+## 📊 Pricing Engine (Static-First)
 
-The calculator uses a sophisticated pricing formula:
+The calculator uses a sophisticated pricing formula with data from static files only:
 ```
 C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r
 ```
 
 Where:
-- S = Setup fee ($30)
+- S = Setup fee (varies: $30 standard, $15 name tags)
 - F_setup = Finishing setup fee ($15, if applicable)
 - Q = Quantity
-- e = Efficiency exponent (varies by product)
+- e = Efficiency exponent (0.75 brochures, 0.70 postcards/flyers, 0.65 name tags/bookmarks)
 - k = Base production rate ($1.50)
 - v = Variable cost per piece (paper + clicks)
 - f = Finishing cost per piece
 - r = Rush multiplier (1.0-2.0x)
+
+### How to Update Pricing
+1. Edit `/js/paperStocks.js` for paper costs
+2. Edit `/js/pricingConfig.js` for formulas and constraints
+3. Commit changes via git
+4. Deploy automatically via Vercel
+
+No database updates ever needed for pricing changes!
 
 ## 🛡️ Browser Support
 

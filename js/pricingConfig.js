@@ -21,6 +21,10 @@ const pricingConfig = {
       minQuantity: 100,
       maxQuantity: 5000
     },
+    'name-tags': {
+      minQuantity: 50,
+      maxQuantity: 5000
+    },
     flyers: {
       minQuantity: 25,
       maxQuantity: 2500
@@ -64,6 +68,11 @@ const pricingConfig = {
       '5x7': 4,
       '5.5x8.5': 4,
       '6x9': 2
+    },
+    'name-tags': {
+      '2.33x3': 20,
+      '3x4': 12,
+      '4x6': 4
     },
     flyers: {
       '5.5x8.5': 4,

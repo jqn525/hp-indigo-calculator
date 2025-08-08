@@ -84,6 +84,21 @@ Updated: 2025-07-24
   --bs-btn-active-border-color: #70101E;
 }
 
+.btn-outline-primary {
+  --bs-btn-color: #CC0633;
+  --bs-btn-border-color: #CC0633;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #CC0633;
+  --bs-btn-hover-border-color: #CC0633;
+  --bs-btn-focus-shadow-rgb: 204, 6, 51;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #A6192E;
+  --bs-btn-active-border-color: #A6192E;
+  --bs-btn-disabled-color: #CC0633;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: #CC0633;
+}
+
 .text-primary {
   color: #CC0633 !important;
 }
