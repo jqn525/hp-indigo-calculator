@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Calculate pricing for custom promotional apparel">
-    <meta name="theme-color" content="#0096D6">
+    <meta name="description" content="Configure and order custom promotional apparel - real-time pricing">
+    <meta name="theme-color" content="#CC0633">
     
-    <title>Custom Apparel - Promo Calculator</title>
+    <title>Custom Apparel | SFU Document Solutions</title>
     
     <link rel="manifest" href="../manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -15,214 +15,542 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+    
+    <!-- Authentication Guard - Protects entire application -->
+    <script src="../js/auth-guard.js"></script>
 </head>
 <body>
+    <!-- Desktop Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand/Logo -->
+            <a href="../index.html" class="header-brand">
+                <div class="brand-text">SFU Document Solutions</div>
+            </a>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="header-search">
+                    <input type="text" placeholder="Search products..." />
+                    <button type="submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="header-user-menu">
+                    <button class="user-menu-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Account
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="signin.html" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                            </svg>
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="header-cart">
+                    <a href="cart.html" class="cart-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item">
+                <a href="small-format.html" class="mobile-nav-link">Small Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="large-format.html" class="mobile-nav-link">Large Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="promo.html" class="mobile-nav-link">Promotional</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#about" class="mobile-nav-link">About</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#contact" class="mobile-nav-link">Contact</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="cart.html" class="mobile-nav-link">Cart</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="signin.html" class="mobile-nav-link">Sign In</a>
+            </li>
+        </ul>
+    </nav>
+
     <main>
-        <div class="calculator-container">
-            <h2>Custom Apparel</h2>
-            <p class="page-description">High-quality custom apparel sourced from premium suppliers. Perfect for team uniforms, corporate events, promotional giveaways, and branded merchandise.</p>
-            
-            <form id="apparelForm">
-                <!-- Type Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Garment Type</h3>
-                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
-                    </div>
-                    <div class="selection-grid">
-                        <div class="selection-card selected" data-value="gildan-6400">
-                            <span>T-shirts</span>
-                            <span class="description">100% Cotton, Soft Style - Gildan 6400</span>
-                        </div>
-                        <div class="selection-card" data-value="atc-f2700">
-                            <span>Quarter Zip</span>
-                            <span class="description">50/50, Fleece Blend - ATC F2700</span>
-                        </div>
-                        <div class="selection-card" data-value="gildan-sf000">
-                            <span>Crewneck</span>
-                            <span class="description">80/20, Soft Style Blend - Gildan SF000</span>
-                        </div>
-                        <div class="selection-card" data-value="gildan-1801">
-                            <span>Crewneck</span>
-                            <span class="description">50/50, Heavy Blend - Gildan 1801</span>
-                        </div>
-                        <div class="selection-card" data-value="gildan-sf500">
-                            <span>Hoodie</span>
-                            <span class="description">100% Cotton, Soft Style - Gildan SF500</span>
-                        </div>
-                        <div class="selection-card" data-value="gildan-1850">
-                            <span>Hoodie</span>
-                            <span class="description">50/50, Heavy Blend - Gildan 1850</span>
-                        </div>
-                    </div>
-                    <input type="hidden" id="garmentType" name="garmentType" value="gildan-6400" required>
-                </div>
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="promo.html">Promotional Products</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Custom Apparel</li>
+                </ol>
+            </div>
+        </nav>
 
-                <!-- Decoration Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Decoration</h3>
-                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
-                    </div>
-                    <div class="selection-grid">
-                        <div class="selection-card selected" data-value="dtf">
-                            <span>DTF (Direct-to-Film)</span>
-                            <span class="description">Full Color Printing</span>
-                        </div>
-                        <div class="selection-card disabled" data-value="screen-print">
-                            <span>Screen Print</span>
-                            <span class="description">1-2 Colors</span>
-                        </div>
-                    </div>
-                    <input type="hidden" id="decorationType" name="decorationType" value="dtf" required>
-                </div>
-
-                <!-- Size Breakdown Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Size Breakdown</h3>
-                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
+        <!-- Product Configurator -->
+        <div class="container">
+            <div class="configurator-layout">
+                <!-- Product Preview Section -->
+                <div class="product-preview-section">
+                    <div class="preview-header">
+                        <h1>Custom Apparel</h1>
+                        <p class="preview-subtitle">High-quality custom apparel sourced from premium suppliers. Perfect for team uniforms, corporate events, promotional giveaways, and branded merchandise.</p>
                     </div>
                     
-                    <div class="size-tier">
-                        <h4>Standard Sizes (Same Price)</h4>
-                        <div class="size-inputs-grid">
-                            <div class="size-input">
-                                <label>XS</label>
-                                <input type="number" name="sizeXS" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                    <div class="config-summary">
+                        <h4>Your Configuration</h4>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="summary-label">Garment:</span>
+                                <span class="summary-value" id="summarySize">T-shirts</span>
                             </div>
-                            <div class="size-input">
-                                <label>S</label>
-                                <input type="number" name="sizeS" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                            <div class="summary-item">
+                                <span class="summary-label">Decoration:</span>
+                                <span class="summary-value" id="summaryPaper">DTF Printing</span>
                             </div>
-                            <div class="size-input">
-                                <label>M</label>
-                                <input type="number" name="sizeM" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                            <div class="summary-item">
+                                <span class="summary-label">Total Quantity:</span>
+                                <span class="summary-value" id="summaryQuantity">0</span>
                             </div>
-                            <div class="size-input">
-                                <label>L</label>
-                                <input type="number" name="sizeL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                            <div class="summary-item">
+                                <span class="summary-label">Turnaround:</span>
+                                <span class="summary-value" id="summaryTurnaround">Standard</span>
                             </div>
-                            <div class="size-input">
-                                <label>XL</label>
-                                <input type="number" name="sizeXL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                        </div>
+                        
+                        <!-- Size Breakdown Display -->
+                        <div class="size-breakdown-summary" id="sizeBreakdownSummary" style="display: none;">
+                            <h5>Size Breakdown:</h5>
+                            <div class="size-breakdown-display" id="sizeBreakdownDisplay">
+                                <!-- Populated dynamically -->
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="size-tier">
-                        <h4>Extended Sizes (Higher Price)</h4>
-                        <div class="size-inputs-grid">
-                            <div class="size-input">
-                                <label>2XL</label>
-                                <input type="number" name="size2XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+
+                    <div class="live-pricing">
+                        <div class="price-summary">
+                            <div class="unit-price">
+                                <span class="price-label">Per unit:</span>
+                                <span class="price-value" id="liveUnitPrice">$0.00</span>
                             </div>
-                            <div class="size-input">
-                                <label>3XL</label>
-                                <input type="number" name="size3XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                            <div class="current-price">
+                                <span class="price-label">Total Price</span>
+                                <span class="price-value" id="livePrice">$0.00</span>
                             </div>
-                            <div class="size-input">
-                                <label>4XL</label>
-                                <input type="number" name="size4XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                        </div>
+                        <div class="price-status" id="priceStatus">
+                            <span class="status-text">Add garment sizes to see pricing</span>
+                        </div>
+                        
+                        <!-- Collapsible Price Breakdown Inside Red Cell -->
+                        <button class="price-breakdown-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#redCellBreakdown" aria-expanded="false" aria-controls="redCellBreakdown">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7,10L12,15L17,10H7Z"/>
+                            </svg>
+                            VIEW PRICE BREAKDOWN
+                        </button>
+                        
+                        <div class="collapse mt-2" id="redCellBreakdown">
+                            <div class="red-cell-breakdown">
+                                <div class="breakdown-row">
+                                    <span>Stock Cost:</span>
+                                    <span id="redStockCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Printing Cost:</span>
+                                    <span id="redPrintingCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row subtotal">
+                                    <span>Subtotal:</span>
+                                    <span id="redSubtotal">$0.00</span>
+                                </div>
+                                <div class="breakdown-row" id="redRushMultiplierItem" style="display: none;">
+                                    <span>Rush:</span>
+                                    <span id="redRushMultiplier">1x</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="total-quantity">
-                        Total: <span id="totalQuantity">0</span> pieces
-                        <div class="quantity-note">Minimum: 10 pieces total</div>
-                    </div>
+                        
+                    <!-- Add to Cart Button (Separate) -->
+                    <button type="button" class="btn btn-add-to-cart" id="addToCartBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
 
-                <!-- Hidden input for total quantity -->
-                <input type="hidden" id="totalQuantityInput" name="totalQuantity" value="0" required>
-
-                <!-- Rush Options Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Production Time</h3>
-                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
-                    </div>
-                    <div class="selection-grid">
-                        <div class="selection-card selected" data-value="standard">
-                            <span>10-14 Business Days</span>
-                            <span class="description">Standard</span>
+                <!-- Configuration Panel -->
+                <div class="configuration-panel">
+                    <form id="apparelForm" class="configurator-form">
+                        <!-- Garment Type Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Garment Type</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
+                                        title="Choose from available apparel options">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card selected" data-option="garment" data-value="gildan-6400">
+                                    <input type="radio" name="garmentType" value="gildan-6400" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">T-shirts</div>
+                                        <div class="option-subtitle">100% Cotton, Soft Style</div>
+                                        <div class="option-badge recommended">Recommended</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="garment" data-value="atc-f2700">
+                                    <input type="radio" name="garmentType" value="atc-f2700" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Quarter Zip</div>
+                                        <div class="option-subtitle">50/50 Fleece Blend</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="garment" data-value="gildan-sf000">
+                                    <input type="radio" name="garmentType" value="gildan-sf000" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Crewneck</div>
+                                        <div class="option-subtitle">80/20 Soft Style Blend</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="garment" data-value="gildan-sf500">
+                                    <input type="radio" name="garmentType" value="gildan-sf500" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Hoodie</div>
+                                        <div class="option-subtitle">100% Cotton, Soft Style</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                        <div class="selection-card" data-value="rush">
-                            <span>5-7 Business Days</span>
-                            <span class="description">Rush (+35%)</span>
+
+                        <!-- Decoration Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Decoration</h3>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card selected" data-option="decoration" data-value="dtf">
+                                    <input type="radio" name="decorationType" value="dtf" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">DTF (Direct-to-Film)</div>
+                                        <div class="option-subtitle">Full Color Printing</div>
+                                        <div class="option-badge recommended">Recommended</div>
+                                    </div>
+                                </label>
+                                <label class="option-card disabled" data-option="decoration" data-value="screen-print">
+                                    <input type="radio" name="decorationType" value="screen-print" hidden disabled>
+                                    <div class="option-content">
+                                        <div class="option-title">Screen Print</div>
+                                        <div class="option-subtitle">1-2 Colors (Coming Soon)</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <input type="hidden" id="rushType" name="rushType" value="standard" required>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="button-grid">
-                    <button type="submit" class="btn btn-primary">Calculate</button>
-                    <button type="button" class="btn btn-secondary" id="addToCartBtn">Add to Cart</button>
-                    <button type="button" class="btn btn-light" id="clearBtn">Clear</button>
-                </div>
-            </form>
+                        <!-- Size Breakdown Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Size Breakdown</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
+                                        title="Enter quantities for each size needed">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="size-tier">
+                                <h4>Standard Sizes (Same Price)</h4>
+                                <div class="size-inputs-grid">
+                                    <div class="size-input">
+                                        <label>XS</label>
+                                        <input type="number" name="sizeXS" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                                    </div>
+                                    <div class="size-input">
+                                        <label>S</label>
+                                        <input type="number" name="sizeS" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                                    </div>
+                                    <div class="size-input">
+                                        <label>M</label>
+                                        <input type="number" name="sizeM" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                                    </div>
+                                    <div class="size-input">
+                                        <label>L</label>
+                                        <input type="number" name="sizeL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                                    </div>
+                                    <div class="size-input">
+                                        <label>XL</label>
+                                        <input type="number" name="sizeXL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity">
+                                    </div>
+                                </div>
+                            </div>
 
-            <!-- Results Section -->
-            <div class="results-section" id="resultsSection" style="display: none;">
-                <h3>Price Estimate</h3>
-                <div class="price-display">
-                    <span id="totalPrice">$0.00</span>
-                </div>
-                
-                <div class="price-breakdown">
-                    <h4>Cost Breakdown:</h4>
-                    <div class="breakdown-item">
-                        <span>DTF Setup Fee:</span>
-                        <span id="setupFee">$0.00</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Garment Cost:</span>
-                        <span id="garmentCost">$0.00</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Printing Cost:</span>
-                        <span id="printingCost">$0.00</span>
-                    </div>
-                    <div class="breakdown-item" id="volumeDiscountItem" style="display: none;">
-                        <span>Volume Discount:</span>
-                        <span id="volumeDiscountAmount">$0.00</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">$0.00</span>
-                    </div>
-                    <div class="breakdown-item" id="rushMultiplierItem" style="display: none;">
-                        <span>Rush Multiplier:</span>
-                        <span id="rushMultiplier">1.0x</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Price per Unit:</span>
-                        <span id="unitPrice">$0.00</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Quantity:</span>
-                        <span id="quantityBreakdown">0</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Garment:</span>
-                        <span id="garmentDescription">-</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Production:</span>
-                        <span id="productionTime">-</span>
-                    </div>
+                            <div class="size-tier">
+                                <h4>Premium Sizes (+20% per piece)</h4>
+                                <div class="size-inputs-grid">
+                                    <div class="size-input">
+                                        <label>2XL</label>
+                                        <input type="number" name="size2XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity premium-size">
+                                    </div>
+                                    <div class="size-input">
+                                        <label>3XL</label>
+                                        <input type="number" name="size3XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity premium-size">
+                                    </div>
+                                    <div class="size-input">
+                                        <label>4XL</label>
+                                        <input type="number" name="size4XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity premium-size">
+                                    </div>
+                                    <div class="size-input">
+                                        <label>5XL</label>
+                                        <input type="number" name="size5XL" min="0" max="500" value="0" class="form-control form-control-sm size-quantity premium-size">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="total-quantity">
+                                <strong>Total Quantity: <span id="totalQuantity">0</span> pieces</strong>
+                                <div class="minimum-note">Minimum order: 12 pieces</div>
+                            </div>
+                        </div>
+
+                        <!-- Turnaround Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Production Time</h3>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card selected" data-option="turnaround" data-value="standard">
+                                    <input type="radio" name="rushType" value="standard" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Standard</div>
+                                        <div class="option-subtitle">7-10 business days</div>
+                                        <div class="option-price">No extra charge</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="turnaround" data-value="rush">
+                                    <input type="radio" name="rushType" value="rush" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Rush</div>
+                                        <div class="option-subtitle">3-5 business days</div>
+                                        <div class="option-price">+25% surcharge</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
             </div>
         </div>
     </main>
-    
-    
-    <script src="../js/sw-register.js"></script>
-    <script src="../js/cart.js"></script>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Help Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="helpModalBody">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/promoConfig.js"></script>
     <script src="../js/promoCalculator.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/configurator.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        // Help Modal Content Data for Apparel
+        const helpContent = {
+            garment: {
+                title: 'Garment Type Options',
+                content: `
+                    <div class="help-section">
+                        <h6>Available Garments</h6>
+                        <div class="mb-3">
+                            <strong>T-shirts (Gildan 6400):</strong> 100% cotton, soft style. Perfect for casual wear and events.
+                        </div>
+                        <div class="mb-3">
+                            <strong>Quarter Zip (ATC F2700):</strong> 50/50 fleece blend. Great for corporate and team wear.
+                        </div>
+                        <div class="mb-3">
+                            <strong>Crewneck (Gildan SF000):</strong> 80/20 soft style blend. Comfortable for all seasons.
+                        </div>
+                        <div>
+                            <strong>Hoodie (Gildan SF500):</strong> 100% cotton, soft style. Perfect for outdoor events and cold weather.
+                        </div>
+                    </div>
+                `
+            },
+            sizes: {
+                title: 'Size Breakdown Guide',
+                content: `
+                    <div class="help-section">
+                        <div class="mb-3">
+                            <strong>Standard Sizes:</strong> XS, S, M, L, XL - Same price per piece
+                        </div>
+                        <div class="mb-3">
+                            <strong>Premium Sizes:</strong> 2XL, 3XL, 4XL, 5XL - 20% surcharge per piece
+                        </div>
+                        <div class="mb-3">
+                            <strong>Minimum Order:</strong> 12 pieces total across all sizes
+                        </div>
+                        <div class="p-3 bg-light rounded">
+                            <strong>Tip:</strong> Consider ordering a variety of sizes for events. Most orders need more Medium and Large sizes than others.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Size breakdown management
+        let totalQty = 0;
+
+        // Initialize size calculation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sizeInputs = document.querySelectorAll('.size-quantity');
+            const totalQuantityDisplay = document.getElementById('totalQuantity');
+            const summaryQuantityDisplay = document.getElementById('summaryQuantity');
+            const sizeBreakdownSummary = document.getElementById('sizeBreakdownSummary');
+            const sizeBreakdownDisplay = document.getElementById('sizeBreakdownDisplay');
+
+            // Update total quantity when size inputs change
+            function updateTotalQuantity() {
+                let total = 0;
+                const breakdown = [];
+
+                sizeInputs.forEach(input => {
+                    const qty = parseInt(input.value) || 0;
+                    total += qty;
+                    
+                    if (qty > 0) {
+                        const sizeName = input.name.replace('size', '');
+                        const isPremium = input.classList.contains('premium-size');
+                        breakdown.push({
+                            size: sizeName,
+                            quantity: qty,
+                            premium: isPremium
+                        });
+                    }
+                });
+
+                totalQty = total;
+                totalQuantityDisplay.textContent = total;
+                summaryQuantityDisplay.textContent = total;
+
+                // Update size breakdown display
+                if (breakdown.length > 0) {
+                    sizeBreakdownSummary.style.display = 'block';
+                    sizeBreakdownDisplay.innerHTML = breakdown.map(item => 
+                        `<span class="size-breakdown-item">${item.size}: ${item.quantity}${item.premium ? ' (Premium)' : ''}</span>`
+                    ).join(', ');
+                } else {
+                    sizeBreakdownSummary.style.display = 'none';
+                }
+
+                // Enable/disable add to cart based on minimum
+                const addToCartBtn = document.getElementById('addToCartBtn');
+                const priceStatus = document.getElementById('priceStatus');
+                
+                if (total >= 12) {
+                    addToCartBtn.disabled = false;
+                    priceStatus.querySelector('.status-text').textContent = 'Ready to add to cart';
+                } else if (total > 0) {
+                    addToCartBtn.disabled = true;
+                    priceStatus.querySelector('.status-text').textContent = `Need ${12 - total} more pieces (minimum 12)`;
+                } else {
+                    addToCartBtn.disabled = true;
+                    priceStatus.querySelector('.status-text').textContent = 'Add garment sizes to see pricing';
+                }
+            }
+
+            // Attach event listeners to size inputs
+            sizeInputs.forEach(input => {
+                input.addEventListener('input', updateTotalQuantity);
+            });
+
+            // Initialize help modal functionality
+            const helpToggles = document.querySelectorAll('.help-toggle');
+            const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+            const helpModalLabel = document.getElementById('helpModalLabel');
+            const helpModalBody = document.getElementById('helpModalBody');
+
+            helpToggles.forEach(toggle => {
+                // Remove tooltip functionality
+                toggle.removeAttribute('data-bs-toggle');
+                toggle.removeAttribute('title');
+                
+                // Add click event for modal
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Determine content type based on parent section
+                    const section = this.closest('.config-section');
+                    let contentType = 'garment'; // default
+                    
+                    if (section) {
+                        const sectionText = section.querySelector('h3').textContent.toLowerCase();
+                        if (sectionText.includes('size')) {
+                            contentType = 'sizes';
+                        }
+                    }
+                    
+                    // Set modal content
+                    const content = helpContent[contentType];
+                    helpModalLabel.textContent = content.title;
+                    helpModalBody.innerHTML = content.content;
+                    
+                    // Show modal
+                    helpModal.show();
+                });
+            });
+
+            // Initial calculation
+            updateTotalQuantity();
+        });
+    </script>
 </body>
 </html>

@@ -13,6 +13,36 @@ class ProductConfigurator {
                 rushType: 'standard',
                 quantity: 100
             };
+        } else if (this.productType === 'magnets') {
+            this.currentConfig = {
+                size: '3x3',
+                magnetType: 'super-matte',
+                rushType: 'standard',
+                quantity: 25
+            };
+        } else if (this.productType === 'stickers') {
+            this.currentConfig = {
+                size: '3x3',
+                stickerType: 'kiss-cut-matte',
+                rushType: 'standard',
+                quantity: 25
+            };
+        } else if (this.productType === 'apparel') {
+            this.currentConfig = {
+                garmentType: 'gildan-6400',
+                decorationType: 'dtf',
+                rushType: 'standard',
+                totalQuantity: 0,
+                sizeBreakdown: {}
+            };
+        } else if (this.productType === 'tote-bags') {
+            this.currentConfig = {
+                size: '10x10',
+                bagType: 'canvas-tote',
+                decorationType: 'dtf',
+                rushType: 'standard',
+                quantity: 15
+            };
         } else {
             this.currentConfig = {
                 size: '8.5x11',
@@ -49,6 +79,14 @@ class ProductConfigurator {
             return 'brochures';
         } else if (document.getElementById('bookletCalculator')) {
             return 'booklets';
+        } else if (document.getElementById('magnetForm')) {
+            return 'magnets';
+        } else if (document.getElementById('stickerForm')) {
+            return 'stickers';
+        } else if (document.getElementById('apparelForm')) {
+            return 'apparel';
+        } else if (document.getElementById('toteBagForm')) {
+            return 'tote-bags';
         }
         return 'brochures'; // Default fallback
     }
@@ -109,6 +147,14 @@ class ProductConfigurator {
                 return typeof calculateBookmarkPrice === 'function' ? calculateBookmarkPrice : null;
             case 'booklets':
                 return typeof calculateBookletPrice === 'function' ? calculateBookletPrice : null;
+            case 'magnets':
+                return typeof calculateMagnetPrice === 'function' ? calculateMagnetPrice : null;
+            case 'stickers':
+                return typeof calculateStickerPrice === 'function' ? calculateStickerPrice : null;
+            case 'apparel':
+                return typeof calculateApparelPrice === 'function' ? calculateApparelPrice : null;
+            case 'tote-bags':
+                return typeof calculateToteBagPrice === 'function' ? calculateToteBagPrice : null;
             default:
                 return null;
         }
@@ -178,6 +224,18 @@ class ProductConfigurator {
                 this.requestQuote();
             });
         }
+
+        // Apparel size input listeners
+        if (this.productType === 'apparel') {
+            const sizeInputs = document.querySelectorAll('.size-quantity');
+            sizeInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    this.updateApparelSizeBreakdown();
+                    this.updateConfigurationSummary();
+                    this.debouncedCalculation();
+                });
+            });
+        }
     }
 
     selectOption(option, value, cardElement) {
@@ -197,6 +255,11 @@ class ProductConfigurator {
         // Update configuration
         this.currentConfig[this.getConfigKey(option)] = value;
 
+        // For apparel products, also handle size breakdown updates
+        if (this.productType === 'apparel') {
+            this.updateApparelSizeBreakdown();
+        }
+
         // Update configuration summary
         this.updateConfigurationSummary();
 
@@ -209,10 +272,15 @@ class ProductConfigurator {
             'size': 'size',
             'fold': 'foldType',
             'paper': 'paperType',
+            'type': 'magnetType',
             'turnaround': 'rushType',
             'coverPaper': 'coverPaperType',
             'textPaper': 'textPaperType',
-            'pages': 'pages'
+            'pages': 'pages',
+            'stickerType': 'stickerType',
+            'garment': 'garmentType',
+            'decoration': 'decorationType',
+            'bagType': 'bagType'
         };
         return mapping[option] || option;
     }
@@ -261,12 +329,63 @@ class ProductConfigurator {
         }
     }
 
+    updateApparelSizeBreakdown() {
+        // Only for apparel products
+        if (this.productType !== 'apparel') return;
+        
+        const sizeInputs = document.querySelectorAll('.size-quantity');
+        if (sizeInputs.length === 0) return;
+        
+        let totalQuantity = 0;
+        const sizeBreakdown = {};
+        
+        sizeInputs.forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if (qty > 0) {
+                const sizeName = input.name.replace('size', '');
+                sizeBreakdown[sizeName] = qty;
+                totalQuantity += qty;
+            }
+        });
+        
+        // Update configuration
+        this.currentConfig.totalQuantity = totalQuantity;
+        this.currentConfig.sizeBreakdown = sizeBreakdown;
+        
+        // Update display elements if they exist
+        const totalQuantityDisplay = document.getElementById('totalQuantity');
+        if (totalQuantityDisplay) {
+            totalQuantityDisplay.textContent = totalQuantity;
+        }
+        
+        // Update size breakdown summary display
+        const sizeBreakdownSummary = document.getElementById('sizeBreakdownSummary');
+        const sizeBreakdownDisplay = document.getElementById('sizeBreakdownDisplay');
+        
+        if (sizeBreakdownSummary && sizeBreakdownDisplay) {
+            if (Object.keys(sizeBreakdown).length > 0) {
+                sizeBreakdownSummary.style.display = 'block';
+                const breakdownItems = Object.entries(sizeBreakdown).map(([size, qty]) => {
+                    const isPremium = ['2XL', '3XL', '4XL', '5XL'].includes(size);
+                    return `<span class="size-breakdown-item">${size}: ${qty}${isPremium ? ' (Premium)' : ''}</span>`;
+                }).join(', ');
+                sizeBreakdownDisplay.innerHTML = breakdownItems;
+            } else {
+                sizeBreakdownSummary.style.display = 'none';
+            }
+        }
+    }
+
 
     updateConfigurationSummary() {
         const summaryMapping = {
             size: {
                 '8.5x11': '8.5" × 11"',
-                '11x17': '11" × 17"'
+                '11x17': '11" × 17"',
+                '2x2': '2" × 2"',
+                '3x3': '3" × 3"',
+                '4x4': '4" × 4"',
+                '5x5': '5" × 5"'
             },
             foldType: {
                 'trifold': 'Tri-Fold',
@@ -291,11 +410,32 @@ class ProductConfigurator {
                 'LYNO52FSC': '100# Text Uncoated',
                 'PACDIS52FSC': '100# Text Silk'
             },
+            magnetType: {
+                'super-matte': 'Super Matte'
+            },
+            stickerType: {
+                'kiss-cut-matte': 'Kiss Cut Matte',
+                'kiss-cut-gloss': 'Kiss Cut Gloss'
+            },
+            garmentType: {
+                'gildan-6400': 'T-shirts',
+                'atc-f2700': 'Quarter Zip',
+                'gildan-sf000': 'Crewneck',
+                'gildan-sf500': 'Hoodie'
+            },
+            decorationType: {
+                'dtf': 'DTF Printing',
+                'screen-print': 'Screen Print'
+            },
+            bagType: {
+                'canvas-tote': 'Canvas Tote'
+            },
             rushType: {
                 'standard': 'Standard (3-5 days)',
                 '2-day': '2-Day Rush',
                 'next-day': 'Next-Day Rush',
-                'same-day': 'Same-Day Rush'
+                'same-day': 'Same-Day Rush',
+                'rush': 'Rush (3-5 days)'
             }
         };
 
@@ -320,11 +460,38 @@ class ProductConfigurator {
             const summaryTurnaround = document.getElementById('summaryTurnaround');
             const summaryQuantity = document.getElementById('summaryQuantity');
 
-            if (summarySize) summarySize.textContent = summaryMapping.size[this.currentConfig.size];
+            if (summarySize) {
+                if (this.productType === 'apparel') {
+                    summarySize.textContent = summaryMapping.garmentType[this.currentConfig.garmentType];
+                } else {
+                    summarySize.textContent = summaryMapping.size[this.currentConfig.size];
+                }
+            }
             if (summaryFold) summaryFold.textContent = summaryMapping.foldType[this.currentConfig.foldType];
-            if (summaryPaper) summaryPaper.textContent = summaryMapping.paperType[this.currentConfig.paperType];
+            
+            // Handle paper/type/decoration depending on product
+            if (summaryPaper) {
+                if (this.productType === 'magnets') {
+                    summaryPaper.textContent = summaryMapping.magnetType[this.currentConfig.magnetType];
+                } else if (this.productType === 'stickers') {
+                    summaryPaper.textContent = summaryMapping.stickerType[this.currentConfig.stickerType];
+                } else if (this.productType === 'apparel') {
+                    summaryPaper.textContent = summaryMapping.decorationType[this.currentConfig.decorationType];
+                } else if (this.productType === 'tote-bags') {
+                    summaryPaper.textContent = summaryMapping.bagType[this.currentConfig.bagType];
+                } else {
+                    summaryPaper.textContent = summaryMapping.paperType[this.currentConfig.paperType];
+                }
+            }
+            
             if (summaryTurnaround) summaryTurnaround.textContent = summaryMapping.rushType[this.currentConfig.rushType];
-            if (summaryQuantity) summaryQuantity.textContent = `${this.currentConfig.quantity} pieces`;
+            if (summaryQuantity) {
+                if (this.productType === 'apparel') {
+                    summaryQuantity.textContent = `${this.currentConfig.totalQuantity} pieces`;
+                } else {
+                    summaryQuantity.textContent = `${this.currentConfig.quantity} pieces`;
+                }
+            }
         }
     }
 
@@ -355,17 +522,41 @@ class ProductConfigurator {
                 this.currentPricing = {
                     total: parseFloat(result.totalCost),
                     unitPrice: parseFloat(result.unitPrice),
-                    breakdown: {
-                        setupFee: parseFloat(result.printingSetupCost),
-                        finishingSetupFee: result.needsFinishing ? parseFloat(result.finishingSetupCost) : 0,
-                        productionCost: parseFloat(result.productionCost),
-                        materialCost: parseFloat(result.materialCost),
-                        finishingCost: parseFloat(result.finishingCost),
-                        subtotal: parseFloat(result.subtotal),
-                        rushMultiplier: result.rushMultiplier,
-                        sheetsRequired: result.sheetsRequired
-                    }
+                    breakdown: {}
                 };
+                
+                // Handle different pricing structures for promotional vs standard products
+                if (['magnets', 'stickers', 'apparel', 'tote-bags'].includes(this.productType)) {
+                    // Promotional product breakdown
+                    this.currentPricing.breakdown = {
+                        supplierCost: parseFloat(result.supplierCost || 0),
+                        priceAfterMarkup: parseFloat(result.priceAfterMarkup || result.totalCost),
+                        setupFee: parseFloat(result.setupFee || 0),
+                        subtotal: parseFloat(result.subtotal || result.priceAfterMarkup || result.totalCost),
+                        rushMultiplier: result.rushMultiplier || 1.0,
+                        // Store composite cost components for apparel and tote bags
+                        garmentSubtotal: parseFloat(result.garmentSubtotal || 0),
+                        printingSubtotal: parseFloat(result.printingSubtotal || 0),
+                        bagCost: parseFloat(result.bagCost || 0),
+                        printingCost: parseFloat(result.printingCost || 0),
+                        // Map promotional properties to standard names for compatibility
+                        printingSetupCost: parseFloat(result.setupFee || 0),
+                        materialCost: parseFloat(result.supplierCost || result.bagCost || 0),
+                        productionCost: parseFloat(result.printingCost || 0)
+                    };
+                } else {
+                    // Standard product breakdown  
+                    this.currentPricing.breakdown = {
+                        setupFee: parseFloat(result.printingSetupCost || 0),
+                        finishingSetupFee: result.needsFinishing ? parseFloat(result.finishingSetupCost) : 0,
+                        productionCost: parseFloat(result.productionCost || 0),
+                        materialCost: parseFloat(result.materialCost || 0),
+                        finishingCost: parseFloat(result.finishingCost || 0),
+                        subtotal: parseFloat(result.subtotal || 0),
+                        rushMultiplier: result.rushMultiplier || 1.0,
+                        sheetsRequired: result.sheetsRequired || 0
+                    };
+                }
                 
                 this.updatePricingDisplay('success');
                 this.enableAddToCart();
@@ -408,6 +599,30 @@ class ProductConfigurator {
             formData.append('pages', config.pages);
             formData.append('coverPaperType', config.coverPaperType);
             formData.append('textPaperType', config.textPaperType);
+        } else if (this.productType === 'magnets') {
+            // Magnet-specific fields
+            formData.append('size', config.size);
+            formData.append('magnetType', config.magnetType);
+        } else if (this.productType === 'stickers') {
+            // Sticker-specific fields
+            formData.append('size', config.size);
+            formData.append('stickerType', config.stickerType);
+        } else if (this.productType === 'apparel') {
+            // Apparel-specific fields
+            formData.append('garmentType', config.garmentType);
+            formData.append('decorationType', config.decorationType);
+            formData.append('totalQuantity', config.totalQuantity);
+            // Size breakdown handled separately
+            Object.entries(config.sizeBreakdown).forEach(([size, qty]) => {
+                if (qty > 0) {
+                    formData.append(`size${size}`, qty);
+                }
+            });
+        } else if (this.productType === 'tote-bags') {
+            // Tote bag-specific fields
+            formData.append('size', config.size);
+            formData.append('bagType', config.bagType);
+            formData.append('decorationType', config.decorationType);
         } else {
             // Standard product fields
             formData.append('size', config.size);
@@ -482,21 +697,54 @@ class ProductConfigurator {
         if (sheetsRequired) sheetsRequired.textContent = breakdown.sheetsRequired || 0;
 
         // Update red cell breakdown elements
-        const redSetupCost = document.getElementById('redSetupCost');
-        const redProductionCost = document.getElementById('redProductionCost');
-        const redMaterialCost = document.getElementById('redMaterialCost');
-        const redFinishingCost = document.getElementById('redFinishingCost');
-        const redSubtotal = document.getElementById('redSubtotal');
-        const redRushMultiplier = document.getElementById('redRushMultiplier');
-        const redRushMultiplierItem = document.getElementById('redRushMultiplierItem');
+        if (this.productType === 'magnets' || this.productType === 'stickers') {
+            // Single supplier cost breakdown for magnets and stickers
+            const redSupplierCost = document.getElementById('redSupplierCost');
+            const redMarkupCost = document.getElementById('redMarkupCost');
+            const redSubtotal = document.getElementById('redSubtotal');
 
-        if (redSetupCost) redSetupCost.textContent = `$${(breakdown.setupFee || 0).toFixed(2)}`;
-        if (redProductionCost) redProductionCost.textContent = `$${(breakdown.productionCost || 0).toFixed(2)}`;
-        if (redMaterialCost) redMaterialCost.textContent = `$${(breakdown.materialCost || 0).toFixed(2)}`;
-        if (redFinishingCost) redFinishingCost.textContent = `$${(breakdown.finishingCost || 0).toFixed(2)}`;
-        if (redSubtotal) redSubtotal.textContent = `$${(breakdown.subtotal || 0).toFixed(2)}`;
+            if (redSupplierCost) redSupplierCost.textContent = `$${(breakdown.supplierCost || 0).toFixed(2)}`;
+            if (redMarkupCost) redMarkupCost.textContent = `$${((breakdown.priceAfterMarkup || 0) - (breakdown.supplierCost || 0)).toFixed(2)}`;
+            if (redSubtotal) redSubtotal.textContent = `$${(breakdown.priceAfterMarkup || 0).toFixed(2)}`;
+        } else if (this.productType === 'apparel') {
+            // Two-line breakdown for apparel: garment + printing
+            const redStockCost = document.getElementById('redStockCost');
+            const redPrintingCost = document.getElementById('redPrintingCost');
+            const redSubtotal = document.getElementById('redSubtotal');
+
+            if (redStockCost) redStockCost.textContent = `$${(breakdown.garmentSubtotal || 0).toFixed(2)}`;
+            if (redPrintingCost) redPrintingCost.textContent = `$${(breakdown.printingSubtotal || 0).toFixed(2)}`;
+            if (redSubtotal) redSubtotal.textContent = `$${(breakdown.subtotal || 0).toFixed(2)}`;
+        } else if (this.productType === 'tote-bags') {
+            // Two-line breakdown for tote bags: bag + printing
+            const redStockCost = document.getElementById('redStockCost');
+            const redPrintingCost = document.getElementById('redPrintingCost');
+            const redSubtotal = document.getElementById('redSubtotal');
+
+            if (redStockCost) redStockCost.textContent = `$${(breakdown.bagCost || 0).toFixed(2)}`;
+            if (redPrintingCost) redPrintingCost.textContent = `$${(breakdown.printingCost || 0).toFixed(2)}`;
+            if (redSubtotal) redSubtotal.textContent = `$${(breakdown.subtotal || 0).toFixed(2)}`;
+        } else {
+            // Standard product red cell breakdown
+            const redSetupCost = document.getElementById('redSetupCost');
+            const redProductionCost = document.getElementById('redProductionCost');
+            const redMaterialCost = document.getElementById('redMaterialCost');
+            const redFinishingCost = document.getElementById('redFinishingCost');
+            const redSubtotal = document.getElementById('redSubtotal');
+            const redRushMultiplier = document.getElementById('redRushMultiplier');
+            const redRushMultiplierItem = document.getElementById('redRushMultiplierItem');
+
+            if (redSetupCost) redSetupCost.textContent = `$${(breakdown.setupFee || 0).toFixed(2)}`;
+            if (redProductionCost) redProductionCost.textContent = `$${(breakdown.productionCost || 0).toFixed(2)}`;
+            if (redMaterialCost) redMaterialCost.textContent = `$${(breakdown.materialCost || 0).toFixed(2)}`;
+            if (redFinishingCost) redFinishingCost.textContent = `$${(breakdown.finishingCost || 0).toFixed(2)}`;
+            if (redSubtotal) redSubtotal.textContent = `$${(breakdown.subtotal || 0).toFixed(2)}`;
+        }
 
         // Show/hide rush multiplier
+        const redRushMultiplier = document.getElementById('redRushMultiplier');
+        const redRushMultiplierItem = document.getElementById('redRushMultiplierItem');
+        
         if (breakdown.rushMultiplier && breakdown.rushMultiplier > 1) {
             if (rushMultiplier) rushMultiplier.textContent = `${breakdown.rushMultiplier.toFixed(1)}x`;
             if (rushMultiplierItem) rushMultiplierItem.style.display = 'flex';
@@ -533,6 +781,30 @@ class ProductConfigurator {
                 formData.append('pages', this.currentConfig.pages);
                 formData.append('coverPaperType', this.currentConfig.coverPaperType);
                 formData.append('textPaperType', this.currentConfig.textPaperType);
+            } else if (this.productType === 'magnets') {
+                // Magnet-specific fields
+                formData.append('size', this.currentConfig.size);
+                formData.append('magnetType', this.currentConfig.magnetType);
+            } else if (this.productType === 'stickers') {
+                // Sticker-specific fields
+                formData.append('size', this.currentConfig.size);
+                formData.append('stickerType', this.currentConfig.stickerType);
+            } else if (this.productType === 'apparel') {
+                // Apparel-specific fields
+                formData.append('garmentType', this.currentConfig.garmentType);
+                formData.append('decorationType', this.currentConfig.decorationType);
+                formData.append('totalQuantity', this.currentConfig.totalQuantity);
+                // Size breakdown handled separately
+                Object.entries(this.currentConfig.sizeBreakdown).forEach(([size, qty]) => {
+                    if (qty > 0) {
+                        formData.append(`size${size}`, qty);
+                    }
+                });
+            } else if (this.productType === 'tote-bags') {
+                // Tote bag-specific fields
+                formData.append('size', this.currentConfig.size);
+                formData.append('bagType', this.currentConfig.bagType);
+                formData.append('decorationType', this.currentConfig.decorationType);
             } else {
                 // Standard product fields
                 formData.append('size', this.currentConfig.size);
@@ -549,14 +821,14 @@ class ProductConfigurator {
                 unitPrice: this.currentPricing.unitPrice,
                 totalCost: this.currentPricing.total, // Note: totalCost, not totalPrice
                 totalPrice: this.currentPricing.total, // Include both for compatibility
-                sheetsRequired: this.currentPricing.breakdown.sheetsRequired,
-                printingSetupCost: this.currentPricing.breakdown.setupFee,
+                sheetsRequired: this.currentPricing.breakdown.sheetsRequired || 0,
+                printingSetupCost: this.currentPricing.breakdown.setupFee || this.currentPricing.breakdown.printingSetupCost || 0,
                 finishingSetupCost: this.currentPricing.breakdown.finishingSetupFee || 0,
-                productionCost: this.currentPricing.breakdown.productionCost,
-                materialCost: this.currentPricing.breakdown.materialCost,
+                productionCost: this.currentPricing.breakdown.productionCost || 0,
+                materialCost: this.currentPricing.breakdown.materialCost || 0,
                 finishingCost: this.currentPricing.breakdown.finishingCost || 0,
-                subtotal: this.currentPricing.breakdown.subtotal,
-                rushMultiplier: this.currentPricing.breakdown.rushMultiplier
+                subtotal: this.currentPricing.breakdown.subtotal || 0,
+                rushMultiplier: this.currentPricing.breakdown.rushMultiplier || 1.0
             };
             
             // Use the cartManager method that other calculators use

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Calculate pricing for custom promotional stickers">
-    <meta name="theme-color" content="#0096D6">
+    <meta name="description" content="Configure and order custom promotional stickers - real-time pricing">
+    <meta name="theme-color" content="#CC0633">
     
-    <title>Custom Stickers - Promo Calculator</title>
+    <title>Custom Stickers | SFU Document Solutions</title>
     
     <link rel="manifest" href="../manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -15,136 +15,451 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+    
+    <!-- Authentication Guard - Protects entire application -->
+    <script src="../js/auth-guard.js"></script>
 </head>
 <body>
+    <!-- Desktop Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand/Logo -->
+            <a href="../index.html" class="header-brand">
+                <div class="brand-text">SFU Document Solutions</div>
+            </a>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="header-search">
+                    <input type="text" placeholder="Search products..." />
+                    <button type="submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="header-user-menu">
+                    <button class="user-menu-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Account
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="signin.html" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                            </svg>
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="header-cart">
+                    <a href="cart.html" class="cart-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item">
+                <a href="small-format.html" class="mobile-nav-link">Small Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="large-format.html" class="mobile-nav-link">Large Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="promo.html" class="mobile-nav-link">Promotional</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#about" class="mobile-nav-link">About</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#contact" class="mobile-nav-link">Contact</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="cart.html" class="mobile-nav-link">Cart</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="signin.html" class="mobile-nav-link">Sign In</a>
+            </li>
+        </ul>
+    </nav>
+
     <main>
-        <div class="calculator-container">
-            <h2>Custom Stickers</h2>
-            <p class="page-description">High-quality die-cut stickers, vinyl decals, and sheet stickers sourced from premium suppliers. Perfect for branding, promotions, and custom applications.</p>
-            
-            <form id="stickerForm">
-                <!-- Size Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Size</h3>
-                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="promo.html">Promotional Products</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Custom Stickers</li>
+                </ol>
+            </div>
+        </nav>
+
+        <!-- Product Configurator -->
+        <div class="container">
+            <div class="configurator-layout">
+                <!-- Product Preview Section -->
+                <div class="product-preview-section">
+                    <div class="preview-header">
+                        <h1>Custom Stickers</h1>
+                        <p class="preview-subtitle">High-quality die-cut stickers, vinyl decals, and sheet stickers sourced from premium suppliers. Perfect for branding, promotions, and custom applications.</p>
                     </div>
-                    <div class="selection-grid size-grid">
-                        <div class="selection-card" data-value="2x2">
-                            <span>2" x 2"</span>
-                            <span class="description">Small</span>
-                        </div>
-                        <div class="selection-card selected" data-value="3x3">
-                            <span>3" x 3"</span>
-                            <span class="popular-badge">Recommended</span>
-                        </div>
-                        <div class="selection-card" data-value="4x4">
-                            <span>4" x 4"</span>
-                            <span class="description">Large</span>
-                        </div>
-                        <div class="selection-card" data-value="5x5">
-                            <span>5" x 5"</span>
-                            <span class="description">Extra Large</span>
+                    
+                    <div class="config-summary">
+                        <h4>Your Configuration</h4>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="summary-label">Size:</span>
+                                <span class="summary-value" id="summarySize">3" × 3"</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Type:</span>
+                                <span class="summary-value" id="summaryPaper">Kiss Cut Matte</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Quantity:</span>
+                                <span class="summary-value" id="summaryQuantity">25</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Turnaround:</span>
+                                <span class="summary-value" id="summaryTurnaround">Standard</span>
+                            </div>
                         </div>
                     </div>
-                    <input type="hidden" id="size" name="size" value="3x3" required>
+
+                    <div class="live-pricing">
+                        <div class="price-summary">
+                            <div class="unit-price">
+                                <span class="price-label">Per unit:</span>
+                                <span class="price-value" id="liveUnitPrice">$0.00</span>
+                            </div>
+                            <div class="current-price">
+                                <span class="price-label">Total Price</span>
+                                <span class="price-value" id="livePrice">$0.00</span>
+                            </div>
+                        </div>
+                        <div class="price-status" id="priceStatus">
+                            <span class="status-text">Configure options to see pricing</span>
+                        </div>
+                        
+                        <!-- Collapsible Price Breakdown Inside Red Cell -->
+                        <button class="price-breakdown-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#redCellBreakdown" aria-expanded="false" aria-controls="redCellBreakdown">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7,10L12,15L17,10H7Z"/>
+                            </svg>
+                            VIEW PRICE BREAKDOWN
+                        </button>
+                        
+                        <div class="collapse mt-2" id="redCellBreakdown">
+                            <div class="red-cell-breakdown">
+                                <div class="breakdown-row">
+                                    <span>Supplier Cost:</span>
+                                    <span id="redSupplierCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Markup (25%):</span>
+                                    <span id="redMarkupCost">$0.00</span>
+                                </div>
+                                <div class="breakdown-row subtotal">
+                                    <span>Subtotal:</span>
+                                    <span id="redSubtotal">$0.00</span>
+                                </div>
+                                <div class="breakdown-row" id="redRushMultiplierItem" style="display: none;">
+                                    <span>Rush:</span>
+                                    <span id="redRushMultiplier">1x</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        
+                    <!-- Add to Cart Button (Separate) -->
+                    <button type="button" class="btn btn-add-to-cart" id="addToCartBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
 
-                <!-- Type Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Type</h3>
-                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
-                    </div>
-                    <div class="selection-grid">
-                        <div class="selection-card selected" data-value="kiss-cut-matte">
-                            <span>Kiss Cut Super Matte</span>
-                            <span class="description">Premium Matte Finish</span>
+                <!-- Configuration Panel -->
+                <div class="configuration-panel">
+                    <form id="stickerForm" class="configurator-form">
+                        <!-- Size Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Size</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
+                                        title="Choose from standard sticker sizes">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card" data-option="size" data-value="2x2">
+                                    <input type="radio" name="size" value="2x2" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">2" × 2"</div>
+                                        <div class="option-subtitle">Small Format</div>
+                                    </div>
+                                </label>
+                                <label class="option-card selected" data-option="size" data-value="3x3">
+                                    <input type="radio" name="size" value="3x3" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">3" × 3"</div>
+                                        <div class="option-subtitle">Popular Choice</div>
+                                        <div class="option-badge recommended">Recommended</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="size" data-value="4x4">
+                                    <input type="radio" name="size" value="4x4" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">4" × 4"</div>
+                                        <div class="option-subtitle">Large Format</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="size" data-value="5x5">
+                                    <input type="radio" name="size" value="5x5" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">5" × 5"</div>
+                                        <div class="option-subtitle">Extra Large</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                        <div class="selection-card" data-value="kiss-cut-gloss">
-                            <span>Kiss Cut Super Gloss</span>
-                            <span class="description">Premium Gloss Finish</span>
+
+                        <!-- Type Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Finish</h3>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card selected" data-option="type" data-value="kiss-cut-matte">
+                                    <input type="radio" name="stickerType" value="kiss-cut-matte" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Kiss Cut Matte</div>
+                                        <div class="option-subtitle">Premium Matte Finish</div>
+                                        <div class="option-badge recommended">Recommended</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="type" data-value="kiss-cut-gloss">
+                                    <input type="radio" name="stickerType" value="kiss-cut-gloss" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Kiss Cut Gloss</div>
+                                        <div class="option-subtitle">Premium Gloss Finish</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <input type="hidden" id="stickerType" name="stickerType" value="vinyl" required>
-                </div>
 
-                <!-- Quantity Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Quantity</h3>
-                    </div>
-                    <div class="mb-3">
-                        <input type="number" class="form-control" id="quantity" name="quantity" value="25" min="25" max="1000" step="5" required>
-                        <div class="quantity-note">Minimum: 25 pieces (5-piece increments only)</div>
-                    </div>
-                </div>
-
-                <!-- Rush Options Section -->
-                <div class="selection-section mb-4">
-                    <div class="selection-header d-flex justify-content-between align-items-center mb-3">
-                        <h3>Production Time</h3>
-                        <a href="#" class="help-link link-primary text-decoration-none">What's this?</a>
-                    </div>
-                    <div class="selection-grid">
-                        <div class="selection-card selected" data-value="standard">
-                            <span>7-10 Business Days</span>
-                            <span class="description">Standard</span>
+                        <!-- Quantity Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Quantity</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
+                                        title="Order from 25 to 1,000 stickers">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="quantity-input-group">
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       value="25" min="25" max="1000" step="5" required>
+                                <div class="quantity-suggestions">
+                                    <button type="button" class="qty-suggestion active" data-qty="25">25</button>
+                                    <button type="button" class="qty-suggestion" data-qty="50">50</button>
+                                    <button type="button" class="qty-suggestion" data-qty="100">100</button>
+                                    <button type="button" class="qty-suggestion" data-qty="250">250</button>
+                                    <button type="button" class="qty-suggestion" data-qty="500">500</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="selection-card" data-value="rush">
-                            <span>3-5 Business Days</span>
-                            <span class="description">Rush (+25%)</span>
+
+                        <!-- Turnaround Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Production Time</h3>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card selected" data-option="turnaround" data-value="standard">
+                                    <input type="radio" name="rushType" value="standard" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Standard</div>
+                                        <div class="option-subtitle">7-10 business days</div>
+                                        <div class="option-price">No extra charge</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="turnaround" data-value="rush">
+                                    <input type="radio" name="rushType" value="rush" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Rush</div>
+                                        <div class="option-subtitle">3-5 business days</div>
+                                        <div class="option-price">+25% surcharge</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <input type="hidden" id="rushType" name="rushType" value="standard" required>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="button-grid">
-                    <button type="submit" class="btn btn-primary">Calculate</button>
-                    <button type="button" class="btn btn-secondary" id="addToCartBtn">Add to Cart</button>
-                    <button type="button" class="btn btn-light" id="clearBtn">Clear</button>
-                </div>
-            </form>
-
-            <!-- Results Section -->
-            <div class="results-section" id="resultsSection" style="display: none;">
-                <h3>Pricing Details</h3>
-                <div class="results-grid">
-                    <div class="result-item">
-                        <span class="result-label">Quantity:</span>
-                        <span class="result-value" id="resultQuantity">-</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Size:</span>
-                        <span class="result-value" id="resultSize">-</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Type:</span>
-                        <span class="result-value" id="resultType">-</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Production:</span>
-                        <span class="result-value" id="resultProduction">-</span>
-                    </div>
-                    <div class="result-item total">
-                        <span class="result-label">Total Price:</span>
-                        <span class="result-value" id="resultTotal">$0.00</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Unit Price:</span>
-                        <span class="result-value" id="resultUnitPrice">$0.00</span>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </main>
-    
-    
-    <script src="../js/sw-register.js"></script>
-    <script src="../js/cart.js"></script>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Help Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="helpModalBody">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/promoConfig.js"></script>
     <script src="../js/promoCalculator.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/configurator.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="../js/app.js"></script>
+    
+    <script>
+        // Help Modal Content Data for Stickers
+        const helpContent = {
+            size: {
+                title: 'Sticker Size Options',
+                content: `
+                    <div class="help-section">
+                        <h6>Available Sizes</h6>
+                        <div class="option-grid mb-3">
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">2" × 2"</div>
+                                    <div class="option-subtitle">Small Format</div>
+                                </div>
+                            </div>
+                            <div class="option-card selected">
+                                <div class="option-content">
+                                    <div class="option-title">3" × 3"</div>
+                                    <div class="option-subtitle">Popular Choice</div>
+                                    <div class="option-badge recommended">Recommended</div>
+                                </div>
+                            </div>
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">4" × 4"</div>
+                                    <div class="option-subtitle">Large Format</div>
+                                </div>
+                            </div>
+                            <div class="option-card">
+                                <div class="option-content">
+                                    <div class="option-title">5" × 5"</div>
+                                    <div class="option-subtitle">Extra Large</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>2" × 2":</strong> Perfect for small logos and labels.
+                        </div>
+                        <div class="mb-3">
+                            <strong>3" × 3":</strong> Most popular size offering great balance of visibility and cost.
+                        </div>
+                        <div class="mb-3">
+                            <strong>4" × 4":</strong> Large format ideal for detailed graphics and messaging.
+                        </div>
+                        <div>
+                            <strong>5" × 5":</strong> Maximum impact size for premium promotional campaigns.
+                        </div>
+                    </div>
+                `
+            },
+            quantity: {
+                title: 'Quantity Selection',
+                content: `
+                    <div class="help-section">
+                        <div class="mb-3">
+                            <strong>Quantity Range:</strong> 25 to 1,000 pieces
+                        </div>
+                        <div class="mb-3">
+                            <strong>Minimum Order:</strong> 25 pieces (5-piece increments only)
+                        </div>
+                        <div class="mb-3">
+                            <strong>Volume Discounts:</strong> Significant per-unit savings at higher quantities
+                        </div>
+                        <div class="p-3 bg-light rounded">
+                            <strong>Promotional Tip:</strong> Order larger quantities for events and campaigns to maximize cost effectiveness and ensure you have extras for future use.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Initialize help modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const helpToggles = document.querySelectorAll('.help-toggle');
+            const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+            const helpModalLabel = document.getElementById('helpModalLabel');
+            const helpModalBody = document.getElementById('helpModalBody');
+
+            helpToggles.forEach(toggle => {
+                // Remove tooltip functionality
+                toggle.removeAttribute('data-bs-toggle');
+                toggle.removeAttribute('title');
+                
+                // Add click event for modal
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Determine content type based on parent section
+                    const section = this.closest('.config-section');
+                    let contentType = 'size'; // default
+                    
+                    if (section) {
+                        const sectionText = section.querySelector('h3').textContent.toLowerCase();
+                        if (sectionText.includes('quantity')) {
+                            contentType = 'quantity';
+                        }
+                    }
+                    
+                    // Set modal content
+                    const content = helpContent[contentType];
+                    helpModalLabel.textContent = content.title;
+                    helpModalBody.innerHTML = content.content;
+                    
+                    // Show modal
+                    helpModal.show();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

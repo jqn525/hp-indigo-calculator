@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Promotional products pricing calculator - Custom magnets, stickers, apparel, and tote bags">
-    <meta name="theme-color" content="#0096D6">
+    <meta name="description" content="Promotional products - custom magnets, stickers, apparel, and tote bags from SFU Document Solutions">
+    <meta name="theme-color" content="#CC0633">
     
-    <title>Promo Products - HP Indigo Calculator</title>
+    <title>Promotional Products - SFU Document Solutions</title>
     
     <link rel="manifest" href="../manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -16,115 +16,340 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Indigo Calc">
     
-    <link rel="apple-touch-icon" href="../icons/icon-192.svg">
+    <!-- Authentication Guard - Protects entire application -->
+    <script src="../js/auth-guard.js"></script>
 </head>
 <body>
-    <main>
-        <div class="calculator-container">
-            <h2>Promotional Products</h2>
-            <p>Custom promotional items sourced from premium suppliers. Perfect for events, marketing campaigns, and corporate branding.</p>
-            
-            <div class="home-grid">
-                <a href="magnets.html" class="product-card">
-                    <div class="product-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-                            <g>
-                                <!-- Magnet horseshoe shape -->
-                                <path d="M 16 32 Q 16 16 32 16 Q 48 16 48 32 L 48 44 L 42 44 L 42 32 Q 42 22 32 22 Q 22 22 22 32 L 22 44 L 16 44 Z" fill="#0096D6" opacity="0.9"/>
-                                <!-- Magnet poles -->
-                                <rect x="16" y="40" width="6" height="8" fill="#ff4444" rx="1"/>
-                                <rect x="42" y="40" width="6" height="8" fill="#00B0A6" rx="1"/>
-                                <!-- Magnetic field lines -->
-                                <path d="M 12 28 Q 16 24 20 28" stroke="#0096D6" stroke-width="1.5" fill="none" opacity="0.5"/>
-                                <path d="M 44 28 Q 48 24 52 28" stroke="#0096D6" stroke-width="1.5" fill="none" opacity="0.5"/>
-                                <path d="M 12 36 Q 16 32 20 36" stroke="#0096D6" stroke-width="1.5" fill="none" opacity="0.5"/>
-                                <path d="M 44 36 Q 48 32 52 36" stroke="#0096D6" stroke-width="1.5" fill="none" opacity="0.5"/>
-                                <!-- Shadow -->
-                                <ellipse cx="32" cy="54" rx="20" ry="3" fill="#0096D6" opacity="0.2"/>
-                            </g>
+    <!-- Desktop Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand/Logo -->
+            <a href="../index.html" class="header-brand">
+                <div class="brand-text">SFU Document Solutions</div>
+            </a>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="header-search">
+                    <input type="text" placeholder="Search products..." />
+                    <button type="submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
                         </svg>
-                    </div>
-                    <h3>Magnets</h3>
-                    <p>Custom refrigerator magnets, business card magnets, and promotional magnetic products</p>
-                </a>
-                
-                <a href="stickers.html" class="product-card">
-                    <div class="product-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-                            <g>
-                                <!-- Main sticker shape (circle with peeling corner) -->
-                                <circle cx="32" cy="30" r="18" fill="#ffffff" stroke="#0096D6" stroke-width="2"/>
-                                <!-- Peeling corner -->
-                                <path d="M 44 20 Q 50 14 56 20 Q 50 26 44 20" fill="#e3f2fd" stroke="#0096D6" stroke-width="1.5"/>
-                                <!-- Sticker design elements -->
-                                <circle cx="32" cy="30" r="12" fill="#0096D6" opacity="0.2"/>
-                                <path d="M 26 26 Q 32 22 38 26 Q 32 30 26 26" fill="#0096D6" opacity="0.4"/>
-                                <circle cx="32" cy="34" r="3" fill="#00B0A6"/>
-                                <!-- Additional small stickers -->
-                                <rect x="10" y="42" width="12" height="8" fill="#00B0A6" opacity="0.3" rx="2"/>
-                                <rect x="46" y="46" width="8" height="6" fill="#0096D6" opacity="0.3" rx="1"/>
-                                <!-- Shadow -->
-                                <ellipse cx="32" cy="54" rx="16" ry="2" fill="#0096D6" opacity="0.2"/>
-                            </g>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="header-user-menu">
+                    <button class="user-menu-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                         </svg>
+                        Account
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="signin.html" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                            </svg>
+                            Sign In
+                        </a>
                     </div>
-                    <h3>Stickers</h3>
-                    <p>Die-cut stickers, sheet stickers, labels, and custom vinyl decals in various shapes</p>
-                </a>
-                
-                <a href="apparel.html" class="product-card">
-                    <div class="product-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-                            <g>
-                                <!-- T-shirt shape -->
-                                <path d="M 20 18 L 20 12 Q 20 10 22 10 L 42 10 Q 44 10 44 12 L 44 18 L 50 22 L 50 28 L 46 28 L 46 52 Q 46 54 44 54 L 20 54 Q 18 54 18 52 L 18 28 L 14 28 L 14 22 Z" fill="#ffffff" stroke="#0096D6" stroke-width="2"/>
-                                <!-- Shirt details -->
-                                <line x1="32" y1="10" x2="32" y2="18" stroke="#0096D6" stroke-width="1" opacity="0.3"/>
-                                <!-- Design on shirt -->
-                                <rect x="24" y="22" width="16" height="8" fill="#0096D6" opacity="0.2" rx="2"/>
-                                <circle cx="32" cy="26" r="2" fill="#00B0A6"/>
-                                <!-- Sleeves -->
-                                <path d="M 14 22 Q 10 26 14 28" fill="#e3f2fd" stroke="#0096D6" stroke-width="1"/>
-                                <path d="M 50 22 Q 54 26 50 28" fill="#e3f2fd" stroke="#0096D6" stroke-width="1"/>
-                                <!-- Shadow -->
-                                <ellipse cx="32" cy="56" rx="18" ry="2" fill="#0096D6" opacity="0.2"/>
-                            </g>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="header-cart">
+                    <a href="cart.html" class="cart-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
                         </svg>
-                    </div>
-                    <h3>Apparel</h3>
-                    <p>Custom t-shirts, hoodies, polo shirts, and embroidered garments for teams and events</p>
-                </a>
-                
-                <a href="tote-bags.html" class="product-card">
-                    <div class="product-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-                            <g>
-                                <!-- Tote bag body -->
-                                <path d="M 16 24 L 48 24 L 46 50 Q 46 52 44 52 L 20 52 Q 18 52 18 50 Z" fill="#ffffff" stroke="#0096D6" stroke-width="2"/>
-                                <!-- Bag handles -->
-                                <path d="M 22 24 Q 22 16 26 16 Q 30 16 30 24" stroke="#0096D6" stroke-width="3" fill="none" stroke-linecap="round"/>
-                                <path d="M 34 24 Q 34 16 38 16 Q 42 16 42 24" stroke="#0096D6" stroke-width="3" fill="none" stroke-linecap="round"/>
-                                <!-- Design on bag -->
-                                <rect x="22" y="30" width="20" height="12" fill="#0096D6" opacity="0.2" rx="2"/>
-                                <circle cx="32" cy="36" r="3" fill="#00B0A6"/>
-                                <line x1="26" y1="40" x2="38" y2="40" stroke="#0096D6" stroke-width="2" stroke-linecap="round"/>
-                                <!-- Bag fold/seam -->
-                                <line x1="18" y1="50" x2="46" y2="50" stroke="#0096D6" stroke-width="1" opacity="0.3"/>
-                                <!-- Shadow -->
-                                <ellipse cx="32" cy="54" rx="16" ry="2" fill="#0096D6" opacity="0.2"/>
-                            </g>
-                        </svg>
-                    </div>
-                    <h3>Tote Bags</h3>
-                    <p>Custom printed tote bags, canvas bags, and promotional bags for events and retail</p>
-                </a>
+                        <span class="cart-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                </button>
             </div>
         </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item">
+                <a href="small-format.html" class="mobile-nav-link">Small Format Printing</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="large-format.html" class="mobile-nav-link">Large Format Printing</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="promo.html" class="mobile-nav-link">Promotional Products</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#about" class="mobile-nav-link">About</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="#contact" class="mobile-nav-link">Contact</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="cart.html" class="mobile-nav-link">Cart</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="signin.html" class="mobile-nav-link">Sign In</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Promotional Products</li>
+                </ol>
+            </div>
+        </nav>
+
+        <!-- Product Filter Section -->
+        <section class="product-filters">
+            <div class="container">
+                <div class="filter-header">
+                    <h3>Browse Products</h3>
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="grid">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                            </svg>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label>Quantity Range:</label>
+                        <select class="form-select" id="quantityFilter">
+                            <option value="">All Quantities</option>
+                            <option value="25-100">25-100 pieces</option>
+                            <option value="100-500">100-500 pieces</option>
+                            <option value="500-1000">500-1000 pieces</option>
+                            <option value="1000+">1000+ pieces</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Product Type:</label>
+                        <select class="form-select" id="productTypeFilter">
+                            <option value="">All Product Types</option>
+                            <option value="magnets">Magnets</option>
+                            <option value="stickers">Stickers</option>
+                            <option value="apparel">Apparel</option>
+                            <option value="bags">Bags</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Turnaround:</label>
+                        <select class="form-select" id="turnaroundFilter">
+                            <option value="">All Turnarounds</option>
+                            <option value="standard">Standard (7-10 days)</option>
+                            <option value="rush">Rush (3-5 days)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-outline-primary reset-filters">Reset Filters</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Grid -->
+        <section class="product-catalog">
+            <div class="container">
+                <div class="products-grid" id="productsGrid">
+                    <!-- Magnets Product Card -->
+                    <div class="product-card-enhanced" data-product="magnets" data-quantity="25-1000" data-type="magnets" data-turnaround="standard,rush">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <!-- Magnet horseshoe shape -->
+                                    <path d="M 16 32 Q 16 16 32 16 Q 48 16 48 32 L 48 44 L 42 44 L 42 32 Q 42 22 32 22 Q 22 22 22 32 L 22 44 L 16 44 Z" fill="#CC0633" opacity="0.9"/>
+                                    <!-- Magnet poles -->
+                                    <rect x="16" y="40" width="6" height="8" fill="#ff4444" rx="1"/>
+                                    <rect x="42" y="40" width="6" height="8" fill="#A6192E" rx="1"/>
+                                    <!-- Magnetic field lines -->
+                                    <path d="M 12 28 Q 16 24 20 28" stroke="#CC0633" stroke-width="1.5" fill="none" opacity="0.5"/>
+                                    <path d="M 44 28 Q 48 24 52 28" stroke="#CC0633" stroke-width="1.5" fill="none" opacity="0.5"/>
+                                    <path d="M 12 36 Q 16 32 20 36" stroke="#CC0633" stroke-width="1.5" fill="none" opacity="0.5"/>
+                                    <path d="M 44 36 Q 48 32 52 36" stroke="#CC0633" stroke-width="1.5" fill="none" opacity="0.5"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Magnets</h4>
+                            <p class="product-description">Custom refrigerator magnets, business card magnets, and promotional magnetic products perfect for branding campaigns.</p>
+                        </div>
+                        <div class="product-actions">
+                            <a href="magnets.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="templates.html" class="btn btn-outline-primary">View Templates</a>
+                        </div>
+                    </div>
+
+                    <!-- Stickers Product Card -->
+                    <div class="product-card-enhanced" data-product="stickers" data-quantity="25-1000" data-type="stickers" data-turnaround="standard,rush">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <!-- Main sticker shape (circle with peeling corner) -->
+                                    <circle cx="32" cy="30" r="18" fill="#ffffff" stroke="#CC0633" stroke-width="2"/>
+                                    <!-- Peeling corner -->
+                                    <path d="M 44 20 Q 50 14 56 20 Q 50 26 44 20" fill="#e3f2fd" stroke="#CC0633" stroke-width="1.5"/>
+                                    <!-- Sticker design elements -->
+                                    <circle cx="32" cy="30" r="12" fill="#CC0633" opacity="0.2"/>
+                                    <path d="M 26 26 Q 32 22 38 26 Q 32 30 26 26" fill="#CC0633" opacity="0.4"/>
+                                    <circle cx="32" cy="34" r="3" fill="#A6192E"/>
+                                    <!-- Additional small stickers -->
+                                    <rect x="10" y="42" width="12" height="8" fill="#A6192E" opacity="0.3" rx="2"/>
+                                    <rect x="46" y="46" width="8" height="6" fill="#CC0633" opacity="0.3" rx="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Stickers</h4>
+                            <p class="product-description">Die-cut stickers, sheet stickers, labels, and custom vinyl decals in various shapes and finishes.</p>
+                        </div>
+                        <div class="product-actions">
+                            <a href="stickers.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="templates.html" class="btn btn-outline-primary">View Templates</a>
+                        </div>
+                    </div>
+
+                    <!-- Apparel Product Card -->
+                    <div class="product-card-enhanced" data-product="apparel" data-quantity="25-500" data-type="apparel" data-turnaround="standard,rush">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <!-- T-shirt shape -->
+                                    <path d="M 20 18 L 20 12 Q 20 10 22 10 L 42 10 Q 44 10 44 12 L 44 18 L 50 22 L 50 28 L 46 28 L 46 52 Q 46 54 44 54 L 20 54 Q 18 54 18 52 L 18 28 L 14 28 L 14 22 Z" fill="#ffffff" stroke="#CC0633" stroke-width="2"/>
+                                    <!-- Shirt details -->
+                                    <line x1="32" y1="10" x2="32" y2="18" stroke="#CC0633" stroke-width="1" opacity="0.3"/>
+                                    <!-- Design on shirt -->
+                                    <rect x="24" y="22" width="16" height="8" fill="#CC0633" opacity="0.2" rx="2"/>
+                                    <circle cx="32" cy="26" r="2" fill="#A6192E"/>
+                                    <!-- Sleeves -->
+                                    <path d="M 14 22 Q 10 26 14 28" fill="#e3f2fd" stroke="#CC0633" stroke-width="1"/>
+                                    <path d="M 50 22 Q 54 26 50 28" fill="#e3f2fd" stroke="#CC0633" stroke-width="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Apparel</h4>
+                            <p class="product-description">Custom t-shirts, hoodies, polo shirts, and embroidered garments for teams, events, and corporate branding.</p>
+                        </div>
+                        <div class="product-actions">
+                            <a href="apparel.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="templates.html" class="btn btn-outline-primary">View Templates</a>
+                        </div>
+                    </div>
+
+                    <!-- Tote Bags Product Card -->
+                    <div class="product-card-enhanced" data-product="tote-bags" data-quantity="25-1000" data-type="bags" data-turnaround="standard,rush">
+                        <div class="product-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="80" height="80">
+                                <g>
+                                    <!-- Tote bag body -->
+                                    <path d="M 16 24 L 48 24 L 46 50 Q 46 52 44 52 L 20 52 Q 18 52 18 50 Z" fill="#ffffff" stroke="#CC0633" stroke-width="2"/>
+                                    <!-- Bag handles -->
+                                    <path d="M 22 24 Q 22 16 26 16 Q 30 16 30 24" stroke="#CC0633" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                    <path d="M 34 24 Q 34 16 38 16 Q 42 16 42 24" stroke="#CC0633" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                    <!-- Design on bag -->
+                                    <rect x="22" y="30" width="20" height="12" fill="#CC0633" opacity="0.2" rx="2"/>
+                                    <circle cx="32" cy="36" r="3" fill="#A6192E"/>
+                                    <line x1="26" y1="40" x2="38" y2="40" stroke="#CC0633" stroke-width="2" stroke-linecap="round"/>
+                                    <!-- Bag fold/seam -->
+                                    <line x1="18" y1="50" x2="46" y2="50" stroke="#CC0633" stroke-width="1" opacity="0.3"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="product-info">
+                            <h4>Tote Bags</h4>
+                            <p class="product-description">Custom printed tote bags, canvas bags, and promotional bags perfect for events, retail, and eco-friendly marketing.</p>
+                        </div>
+                        <div class="product-actions">
+                            <a href="tote-bags.html" class="btn btn-primary">Configure & Quote</a>
+                            <a href="templates.html" class="btn btn-outline-primary">View Templates</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="no-results" id="noResults" style="display: none;">
+                    <h4>No products match your filters</h4>
+                    <p>Try adjusting your filter criteria or <button class="btn btn-link p-0" onclick="resetFilters()">reset all filters</button>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Features -->
+        <section class="category-features">
+            <div class="container">
+                <h3>Why Choose Our Promotional Products?</h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <h4>Premium Quality</h4>
+                        <p>High-quality promotional products sourced from trusted suppliers with excellent durability and finish.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
+                        <h4>Fast Turnaround</h4>
+                        <p>Standard 7-10 business days or rush 3-5 business days for urgent promotional campaigns.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <h4>Bulk Discounts</h4>
+                        <p>Volume pricing with significant per-unit savings. Larger quantities mean better value for your campaigns.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <h4>Custom Options</h4>
+                        <p>Multiple sizes, finishes, and customization options to perfectly match your brand and marketing needs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
     
-    
     <script src="../js/sw-register.js"></script>
-    <script src="../js/cart.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="../js/promo-filters.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

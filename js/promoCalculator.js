@@ -243,7 +243,7 @@ async function calculateMagnetPrice(formData) {
     markup: product.markupPercentage,
     priceAfterMarkup: priceAfterMarkup,
     rushMultiplier: rushMultiplier,
-    totalPrice: finalPrice,
+    totalCost: finalPrice,
     unitPrice: unitPrice,
     rushType: rushType
   };
@@ -332,7 +332,7 @@ async function calculateStickerPrice(formData) {
     markup: product.markupPercentage,
     priceAfterMarkup: priceAfterMarkup,
     rushMultiplier: rushMultiplier,
-    totalPrice: finalPrice,
+    totalCost: finalPrice,
     unitPrice: unitPrice,
     rushType: rushType
   };
@@ -458,7 +458,7 @@ async function calculateApparelPrice(formData) {
     markup: 0,
     priceAfterMarkup: priceAfterMarkup,
     rushMultiplier: rushMultiplier,
-    totalPrice: finalPrice,
+    totalCost: finalPrice,
     unitPrice: unitPrice,
     rushType: rushType
   };
@@ -536,7 +536,7 @@ async function calculateToteBagPrice(formData) {
     setupFee: setupFee,
     totalBeforeRush: totalBeforeRush,
     rushMultiplier: rushMultiplier,
-    totalPrice: finalPrice,
+    totalCost: finalPrice,
     unitPrice: unitPrice,
     rushType: rushType
   };
@@ -772,7 +772,7 @@ function displayPromoResults(result, formId) {
       document.getElementById('subtotal').textContent = `$${result.rawSubtotal.toFixed(2)}`;
       
       document.getElementById('unitPrice').textContent = `$${result.unitPrice.toFixed(2)}`;
-      document.getElementById('totalPrice').textContent = `$${result.totalPrice.toFixed(2)}`;
+      document.getElementById('totalPrice').textContent = `$${result.totalCost.toFixed(2)}`;
       
       // Update descriptive fields
       document.getElementById('garmentDescription').textContent = getGarmentDescription(result.specifications.garmentType);
@@ -848,7 +848,7 @@ function createPromoCartItem(result, formId) {
     description: description,
     quantity: result.quantity,
     unitPrice: result.unitPrice,
-    totalPrice: result.totalPrice,
+    totalPrice: result.totalCost,
     details: {
       specifications: result.specifications,
       rushType: result.rushType,
