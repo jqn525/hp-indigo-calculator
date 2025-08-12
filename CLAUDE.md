@@ -8,7 +8,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Live URL**: https://docsol.ca
 
-### ⭐ **Latest Updates (2025-08-08)**
+### ⭐ **Latest Updates (2025-08-12)**
+- **PROFESSIONAL BORDER RADIUS SYSTEM**: Implemented tiered border radius hierarchy for visual consistency
+- **SELF COVER BOOKLETS**: Added self-cover option for booklets (all text weight, no cover stock)
+- **BOOKLET CAPACITY INCREASED**: Raised booklet maximum from 500 to 1000 units
+- **ROUNDED BUTTON DESIGN**: Service card buttons now use professional 8px rounded corners
+- **UI CONSISTENCY**: All product cards, option cards, and interactive elements follow consistent radius standards
+- **SERVICE WORKER**: Updated to v134 with comprehensive UI improvements
+
+### Previous Updates (2025-08-11)
+- **POSTER CONFIGURATOR COMPLETE**: New large format poster calculator with square-footage pricing
+- **LARGE FORMAT MATERIALS**: Added Rite-Media paper ($6/sqft) and fabric material ($9/sqft)
+- **NAVIGATION INTEGRATION**: Poster configurator accessible from large format product grid
+
+### Previous Updates (2025-08-08)
 - **CLEAN ARCHITECTURE COMPLETE**: Complete migration to static-first pricing system
 - **DATABASE STREAMLINED**: Removed all pricing tables (paper_stocks, pricing_configs, products)
 - **STATIC FILES AUTHORITATIVE**: All pricing now comes from `/js/paperStocks.js` and `/js/pricingConfig.js`
@@ -60,6 +73,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Product Flyers** (`/pages/product-flyers.html`) - Flyer options and specifications
 - **Product Bookmarks** (`/pages/product-bookmarks.html`) - Bookmark details and uses
 
+#### Large Format Products:
+- **Posters** (18x24, 22x28, 24x36, 36x48) - 1-20 units, square-footage pricing
+  - Rite-Media Paper: $6/sqft (9mil matte)
+  - Fabric Material: $9/sqft (8mil matte coated)
+
 #### Promotional Products:
 - **Magnets** (2x2, 3x3, 4x4, 5x5) - 25-1000 units, linear interpolation pricing
 - **Stickers** (various sizes) - Quantity-based pricing
@@ -67,7 +85,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Tote Bags** (standard canvas) - Bulk pricing tiers
 
 #### Coming Soon:
-- **Large Format** (banners, posters) - Placeholder page
+- **Large Format** (banners, signage, vehicle graphics) - Additional large format products
 
 ### New Product Pages (Latest Architecture)
 
@@ -169,6 +187,7 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Flyers**: qty 25-2500, 4 sizes, text + cover stock subset, e=0.70
 - **Bookmarks**: qty 100-2500, 3 sizes (2x6, 2x7, 2x8), 130# Cover Uncoated/Silk, e=0.65
 - **Name Tags**: qty 50-5000, 3 sizes (2.33x3, 3x4, 4x6), optimized pricing, e=0.65
+- **Posters**: qty 1-20, 4 sizes (18x24 to 36x48), square-footage pricing ($6-9/sqft)
 
 ### Cart System (NEW)
 - **localStorage Persistence**: Cart items saved across browser sessions
@@ -254,10 +273,15 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Responsive Design**: Optimized for iPhone 14 Pro Max and all mobile devices
 - **Color Scheme**: SFU Light Red (#CC0633), SFU Dark Red (#A6192E), consistent SFU branding
 - **Button Styling**: All buttons use SFU red colors including outline buttons (btn-outline-primary)
+- **Professional Border Radius System**: Tiered radius hierarchy for visual consistency
+  - `--radius-sm: 4px` - Small elements (badges, tags)
+  - `--radius-md: 8px` - Interactive elements (buttons, inputs)
+  - `--radius-lg: 12px` - Content containers (cards, panels)
+  - `--radius-xl: 16px` - Large containers (modals, hero sections)
 
 ### Cache Busting
 To force users to get updated files:
-1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v110`)
+1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v134`)
 2. This triggers service worker update cycle and clears old cache
 3. Always increment version when deploying CSS/JS changes
 
@@ -534,6 +558,7 @@ Successfully integrated Supabase for cloud storage and user management:
 │   ├── promoCalculator.js    # Promotional product pricing
 │   ├── promoConfig.js        # Promotional product configurations
 │   ├── small-format-filters.js # NEW: Product filtering system
+│   ├── large-format-filters.js # NEW: Large format filtering system
 │   ├── supabase.js           # Supabase client configuration
 │   └── sw-register.js        # Service worker registration
 ```
@@ -546,11 +571,12 @@ Successfully integrated Supabase for cloud storage and user management:
 │   ├── postcards.html        # Postcard calculator
 │   ├── flyers.html           # Flyer calculator
 │   ├── bookmarks.html        # Bookmark calculator
+│   ├── posters.html          # NEW: Poster calculator (large format)
 │   ├── magnets.html          # Magnet calculator
 │   ├── stickers.html         # Sticker calculator
 │   ├── apparel.html          # Apparel calculator
 │   ├── tote-bags.html        # Tote bag calculator
-│   └── large-format.html     # Large format placeholder
+│   └── large-format.html     # Large format product hub
 ```
 
 ### Product Information Pages (NEW)

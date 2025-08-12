@@ -10,7 +10,7 @@
     
     <link rel="manifest" href="../manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/styles.css?v=62">
+    <link rel="stylesheet" href="../css/styles.css?v=134">
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -327,6 +327,14 @@
                                 </button>
                             </div>
                             <div class="option-grid">
+                                <label class="option-card" data-option="coverPaper" data-value="SELF_COVER">
+                                    <input type="radio" name="coverPaperType" value="SELF_COVER" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Self Cover</div>
+                                        <div class="option-subtitle">Same paper throughout</div>
+                                        <div class="option-badge">Most economical</div>
+                                    </div>
+                                </label>
                                 <label class="option-card" data-option="coverPaper" data-value="LYNOC76FSC">
                                     <input type="radio" name="coverPaperType" value="LYNOC76FSC" hidden>
                                     <div class="option-content">
@@ -467,7 +475,7 @@
                                            id="quantity" 
                                            name="quantity" 
                                            min="10" 
-                                           max="500" 
+                                           max="1000" 
                                            value="100" 
                                            step="10">
                                     <button type="button" class="quantity-btn plus" data-target="quantity">+</button>
@@ -478,8 +486,9 @@
                                     <button type="button" class="qty-suggestion active" data-qty="100">100</button>
                                     <button type="button" class="qty-suggestion" data-qty="250">250</button>
                                     <button type="button" class="qty-suggestion" data-qty="500">500</button>
+                                    <button type="button" class="qty-suggestion" data-qty="1000">1000</button>
                                 </div>
-                                <div class="quantity-range">Minimum: 10 • Maximum: 500</div>
+                                <div class="quantity-range">Minimum: 10 • Maximum: 1000</div>
                             </div>
                         </div>
                     </form>
@@ -541,11 +550,11 @@
     <script src="../js/app.js"></script>
     <script src="../js/cart.js"></script>
     <script src="../js/paperStocks.js"></script>
-    <script src="../js/pricingConfig.js"></script>
+    <script src="../js/pricingConfig.js?v=130"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/db.js"></script>
-    <script src="../js/calculator.js"></script>
-    <script src="../js/configurator.js"></script>
+    <script src="../js/calculator.js?v=130"></script>
+    <script src="../js/configurator.js?v=130"></script>
     <script src="../js/header.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 

@@ -61,7 +61,14 @@ Updated: 2025-07-24
   --bg-light: #f5f5f5;
   --bg-white: #ffffff;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --border-radius: 8px;
+  
+  /* Tiered Border Radius System */
+  --radius-sm: 4px;    /* small elements: badges, tags */
+  --radius-md: 8px;    /* interactive: buttons, inputs */
+  --radius-lg: 12px;   /* containers: cards, panels */
+  --radius-xl: 16px;   /* large: modals, hero sections */
+  --border-radius: 8px; /* legacy support */
+  --border-radius-lg: var(--radius-lg); /* backward compatibility */
   --spacing-unit: 1rem;
 }
 
@@ -336,7 +343,7 @@ DESKTOP HEADER NAVIGATION SYSTEM
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   min-width: 1.5rem;
   text-align: center;
   transform: translate(25%, -25%);
@@ -604,7 +611,7 @@ HOMEPAGE SECTIONS - HERO AND SERVICES
 .service-card {
   background: var(--bg-white);
   border: 2px solid #e9ecef;
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--radius-md);
   padding: 2rem;
   text-align: center;
   transition: all 0.3s ease;
@@ -654,6 +661,30 @@ HOMEPAGE SECTIONS - HERO AND SERVICES
 .service-link:hover {
   color: var(--secondary-color);
   text-decoration: none;
+}
+
+/* Service Card Rounded Buttons */
+.service-card .btn-rounded {
+  display: inline-block;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border: 2px solid var(--primary-color);
+  margin-top: 1rem;
+}
+
+.service-card .btn-rounded:hover {
+  background: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(204, 6, 51, 0.3);
 }
 
 /* Company Credentials Section */
@@ -1706,7 +1737,7 @@ footer {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   margin-top: 0.5rem;
   display: inline-block;
 }
@@ -2124,7 +2155,7 @@ footer {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   text-align: center;
   background-color: var(--card-bg);
@@ -2139,7 +2170,7 @@ footer {
 .total-quantity {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 1rem;
   text-align: center;
   font-weight: 600;
@@ -2248,7 +2279,7 @@ footer {
 }
 
 #recalculationModal .alert {
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 }
 
 #recalculationModal .text-danger {
@@ -2297,7 +2328,7 @@ footer {
 
 .login-card {
   background: var(--bg-white);
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   animation: slideUp 0.6s ease-out;
@@ -2358,7 +2389,7 @@ footer {
 .login-form .form-control {
   font-family: 'Lava', sans-serif;
   border: 2px solid #e9ecef;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
   font-size: 1rem;
   transition: all 0.3s ease;
@@ -2382,7 +2413,7 @@ footer {
 .login-form .btn-primary {
   background: linear-gradient(135deg, #CC0633 0%, #A6192E 100%);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.875rem 1.5rem;
   font-family: 'November Condensed', sans-serif;
   font-weight: 700;
@@ -2425,7 +2456,7 @@ footer {
 }
 
 .user-info .dropdown-menu {
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: none;
 }
@@ -2498,7 +2529,7 @@ footer {
 /* Product Preview Section */
 .product-preview-section {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 2rem;
   box-shadow: var(--shadow);
   height: fit-content;
@@ -2525,7 +2556,7 @@ footer {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
   padding: 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin-bottom: 1.5rem;
 }
 
@@ -2598,7 +2629,7 @@ footer {
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.85rem;
   font-weight: 600;
   display: flex;
@@ -2632,7 +2663,7 @@ footer {
 /* Red Cell Breakdown Styles */
 .red-cell-breakdown {
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 0.75rem;
   font-size: 0.9rem;
 }
@@ -2705,7 +2736,7 @@ footer {
 
 .quick-actions .btn {
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
@@ -2726,7 +2757,7 @@ footer {
 /* Configuration Panel */
 .configuration-panel {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   box-shadow: var(--shadow);
 }
@@ -2782,7 +2813,7 @@ footer {
   border: none;
   color: var(--text-light);
   padding: 0.25rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -2816,7 +2847,7 @@ footer {
 .option-card {
   background: white;
   border: 2px solid #e0e0e0;
-  border-radius: 6px;
+  border-radius: var(--radius-lg);
   padding: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2873,7 +2904,7 @@ footer {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -2898,7 +2929,7 @@ footer {
   align-items: center;
   background: white;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   margin-bottom: 1rem;
 }
@@ -2949,7 +2980,7 @@ footer {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
   padding: 0.5rem 1rem;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
@@ -2972,7 +3003,7 @@ footer {
 .config-summary {
   background: #f8f9fa;
   padding: 1.25rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -3030,7 +3061,7 @@ footer {
 .breakdown-content {
   background: white;
   padding: 1.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow);
 }
 
@@ -3080,7 +3111,7 @@ footer {
   padding: 1rem;
   background: #fff3cd;
   border: 1px solid #ffeaa7;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: #856404;
 }
 
@@ -3176,5 +3207,99 @@ main {
 main .breadcrumb-nav {
     order: -1;
     flex-shrink: 0;
+}
+
+/* Custom Size Inputs for Posters */
+.custom-size-inputs {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: var(--radius-md);
+    border: 1px solid #dee2e6;
+}
+
+.custom-size-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.custom-dimension {
+    flex: 1;
+}
+
+.custom-dimension label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.custom-dimension .input-group {
+    margin-bottom: 0.25rem;
+}
+
+.custom-dimension .text-muted {
+    font-size: 0.875rem;
+}
+
+.custom-size-preview {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.75rem;
+    background-color: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e9ecef;
+    margin-bottom: 0.5rem;
+}
+
+.size-calculation,
+.sqft-calculation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.calc-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.calc-value {
+    font-weight: 700;
+    color: #CC0633;
+    font-size: 1rem;
+}
+
+.validation-message {
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.validation-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.validation-message.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+@media (max-width: 768px) {
+    .custom-size-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .custom-size-preview {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
 

@@ -115,6 +115,28 @@ const paperStocks = {
     "weight": "Adhesive",
     "costPerSheet": 3.705,
     "displayName": "Adhesive Stock"
+  },
+  
+  // Large Format Materials
+  "RMPS002": {
+    "brand": "Rite-Media",
+    "type": "large_format_paper",
+    "finish": "Matte",
+    "size": "54\"x150ft",
+    "thickness": "9mil",
+    "costPerRoll": 162.65,
+    "chargeRate": 6.00, // per sqft
+    "displayName": "Paper - 9mil Matte"
+  },
+  "QMPFL501503": {
+    "brand": "Generic",
+    "type": "large_format_fabric",
+    "finish": "Matte Coated Fabric",
+    "size": "50\"x150ft", 
+    "thickness": "8mil",
+    "costPerRoll": 259.95,
+    "chargeRate": 9.00, // per sqft
+    "displayName": "Fabric - 8mil Matte Coated"
   }
 };
 

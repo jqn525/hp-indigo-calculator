@@ -35,10 +35,14 @@ const pricingConfig = {
     },
     booklets: {
       minQuantity: 10,
-      maxQuantity: 500,
+      maxQuantity: 1000,
       minPages: 8,
       maxPages: 48,
       pageMultiple: 4
+    },
+    posters: {
+      minQuantity: 1,
+      maxQuantity: 20
     },
     // Future products can be added here
     businessCards: {
@@ -53,6 +57,13 @@ const pricingConfig = {
       '8.5x11': 2,
       '8.5x14': 1,
       '11x17': 1
+    },
+    posters: {
+      // Large format - charged per square foot, not per sheet
+      '18x24': { sqft: 3.0 },
+      '22x28': { sqft: 4.3 },
+      '24x36': { sqft: 6.0 },
+      '36x48': { sqft: 12.0 }
     },
     // Future products
     businessCards: {

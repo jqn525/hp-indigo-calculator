@@ -599,9 +599,9 @@ function calculateFlyerPrice(formData) {
   
   // Get configuration values
   const config = pricingConfig.formula;
-  const S = config.setupFee;               // $30.00 (printing setup)
+  const S = 15.00;                         // $15.00 (printing setup - reduced for flyers)
   const k = config.baseProductionRate;     // $1.50
-  const e = 0.70;                          // 0.70 for flyers (better volume discount)
+  const e = 0.65;                          // 0.65 for flyers (excellent bulk discount)
   const clicks = config.clicksCost;        // $0.10
   
   // Get paper and imposition data
@@ -893,24 +893,45 @@ async function calculateBookletPrice(formData) {
     return { error: validation.message };
   }
   
-  // Get paper data
-  const coverPaper = data.paperStocks[coverPaperCode];
-  const textPaper = data.paperStocks[textPaperCode];
+  // Check if using self cover option
+  const isSelfCover = coverPaperCode === 'SELF_COVER';
   
-  if (!coverPaper || !textPaper) {
-    return { error: 'Invalid paper selection' };
+  // Get paper data
+  let coverPaper, textPaper;
+  
+  if (isSelfCover) {
+    // For self cover, entire booklet uses text paper
+    textPaper = data.paperStocks[textPaperCode];
+    coverPaper = textPaper; // Cover is same as text paper
+    
+    if (!textPaper) {
+      return { error: 'Invalid text paper selection' };
+    }
+  } else {
+    // Regular booklet with separate cover stock
+    coverPaper = data.paperStocks[coverPaperCode];
+    textPaper = data.paperStocks[textPaperCode];
+    
+    if (!coverPaper || !textPaper) {
+      return { error: 'Invalid paper selection' };
+    }
   }
   
-  // Calculate text sheets (pages - 4 for cover) / 4
-  const textSheets = (pages - 4) / 4;
+  // Calculate sheets based on cover type
+  let coverSheetsPerBooklet, textSheetsPerBooklet;
+  
+  if (isSelfCover) {
+    // Self cover: all sheets are text weight
+    coverSheetsPerBooklet = 0;
+    textSheetsPerBooklet = pages / 4;  // Total pages / 4 pages per sheet
+  } else {
+    // Regular cover: 1 cover sheet + remaining text sheets
+    coverSheetsPerBooklet = 1;
+    textSheetsPerBooklet = (pages - 4) / 4;  // (pages - cover) / 4
+  }
   
   // Get imposition
   const imposition = data.pricingConfigs.imposition_data.booklets['8.5x11'] || 4;
-  
-  // Calculate materials cost per booklet
-  // Calculate sheets per booklet
-  const coverSheetsPerBooklet = 1;  // Always 1 cover sheet per booklet
-  const textSheetsPerBooklet = textSheets;  // Already calculated as (pages-4)/4
 
   // Get click cost from config
   const clicksCost = data.pricingConfigs.formula.clicksCost || 0.10;
@@ -924,7 +945,10 @@ async function calculateBookletPrice(formData) {
   
   // Get finishing costs
   const bookletFinishing = data.pricingConfigs.finishing_costs.bookletFinishing;
-  const finishingPerUnit = bookletFinishing.coverCreasing + (bookletFinishing.bindingPerSheet * textSheets);
+  
+  // Self cover doesn't need cover creasing (text weight doesn't require it)
+  const coverCreasing = isSelfCover ? 0 : bookletFinishing.coverCreasing;
+  const finishingPerUnit = coverCreasing + (bookletFinishing.bindingPerSheet * textSheetsPerBooklet);
   
   // Apply formula: C(Q) = S_base + S_pages + P(Q) + M(Q) + F_base + F_variable
   // Where M(Q) includes paper costs + click charges
@@ -943,8 +967,8 @@ async function calculateBookletPrice(formData) {
   const unitPrice = totalCost / quantity;
   
   // Calculate sheets required
-  const coverSheetsRequired = Math.ceil((quantity * 1) / imposition);  // 1 sheet per booklet
-  const textSheetsRequired = Math.ceil((quantity * textSheets) / imposition);  // textSheets per booklet
+  const coverSheetsRequired = Math.ceil((quantity * coverSheetsPerBooklet) / imposition);
+  const textSheetsRequired = Math.ceil((quantity * textSheetsPerBooklet) / imposition);
   const totalSheetsRequired = coverSheetsRequired + textSheetsRequired;
   
   
@@ -961,10 +985,10 @@ async function calculateBookletPrice(formData) {
     totalCost: totalCost.toFixed(2),
     unitPrice: unitPrice.toFixed(3),
     sheetsRequired: totalSheetsRequired,
-    coverPaperUsed: coverPaper.displayName || coverPaper.display_name,
+    coverPaperUsed: isSelfCover ? 'Self Cover' : (coverPaper.displayName || coverPaper.display_name),
     textPaperUsed: textPaper.displayName || textPaper.display_name,
     pages: pages,
-    textSheets: textSheets,
+    textSheets: textSheetsPerBooklet,
     imposition: imposition,
     // Additional breakdown data for configurator compatibility
     breakdown: {
@@ -1198,6 +1222,107 @@ class CardSelection {
       }
     });
   }
+}
+
+// Poster Price Calculator (Large Format)
+async function calculatePosterPrice(formData) {
+  // Initialize pricing data if not already loaded
+  const data = await initializePricingData();
+  
+  const size = formData.get('size');
+  const material = formData.get('material');
+  const quantity = parseInt(formData.get('quantity')) || 1;
+  const rushType = formData.get('rushType') || 'standard';
+  
+  // Validate inputs
+  const posterConstraints = data.pricingConfigs.product_constraints?.posters;
+  if (posterConstraints && (quantity < posterConstraints.minQuantity || quantity > posterConstraints.maxQuantity)) {
+    throw new Error(`Quantity must be between ${posterConstraints.minQuantity} and ${posterConstraints.maxQuantity}`);
+  }
+  
+  // Get material data
+  const materialData = data.paperStocks[material];
+  if (!materialData) {
+    throw new Error(`Material ${material} not found`);
+  }
+  
+  // Get size data and calculate square footage
+  let squareFootage;
+  
+  if (size === 'custom') {
+    // Handle custom size - get dimensions from form data
+    const customWidth = parseFloat(formData.get('customWidth')) || 0;
+    const customHeight = parseFloat(formData.get('customHeight')) || 0;
+    
+    if (customWidth < 6 || customHeight < 6) {
+      throw new Error('Custom dimensions must be at least 6 inches');
+    }
+    
+    // Validate width constraints based on material
+    const maxWidth = material === 'QMPFL501503' ? 48 : 52; // fabric vs paper
+    if (customWidth > maxWidth) {
+      const materialName = material === 'QMPFL501503' ? 'fabric' : 'paper';
+      throw new Error(`Width cannot exceed ${maxWidth} inches for ${materialName}`);
+    }
+    
+    if (customHeight > 120) {
+      throw new Error('Height cannot exceed 120 inches');
+    }
+    
+    // Calculate square footage from custom dimensions
+    squareFootage = (customWidth * customHeight) / 144; // Convert sq inches to sq feet
+    
+    // Practical area limit
+    if (squareFootage > 50) {
+      throw new Error('Total area cannot exceed 50 square feet');
+    }
+  } else {
+    // Handle preset sizes
+    const sizeData = data.pricingConfigs.imposition_data?.posters?.[size];
+    if (!sizeData) {
+      throw new Error(`Size ${size} not found for posters`);
+    }
+    squareFootage = sizeData.sqft;
+  }
+  const chargeRate = materialData.chargeRate; // per sqft
+  
+  // Calculate costs
+  const setupFee = 30.00; // Standard setup fee
+  const materialCostPerPoster = squareFootage * chargeRate;
+  const totalMaterialCost = materialCostPerPoster * quantity;
+  
+  // Get rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  
+  // Calculate totals
+  const subtotal = setupFee + totalMaterialCost;
+  const totalCost = subtotal * rushMultiplier;
+  const unitPrice = totalCost / quantity;
+  
+  return {
+    printingSetupCost: setupFee.toFixed(2),
+    finishingSetupCost: "0.00",
+    needsFinishing: false,
+    productionCost: "0.00",
+    materialCost: totalMaterialCost.toFixed(2),
+    finishingCost: "0.00",
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(2),
+    squareFootage: squareFootage.toFixed(1),
+    materialRate: chargeRate.toFixed(2),
+    materialUsed: materialData.displayName,
+    // Additional breakdown data for configurator compatibility
+    setupCost: setupFee,
+    productionCost_numeric: 0,
+    materialCost_numeric: totalMaterialCost,
+    finishingCost_numeric: 0,
+    subtotal_numeric: subtotal,
+    totalCost_numeric: totalCost,
+    unitPrice_numeric: unitPrice
+  };
 }
 
 // Initialize card selection when DOM is loaded

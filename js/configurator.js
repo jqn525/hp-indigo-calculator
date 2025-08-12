@@ -43,6 +43,13 @@ class ProductConfigurator {
                 rushType: 'standard',
                 quantity: 15
             };
+        } else if (this.productType === 'posters') {
+            this.currentConfig = {
+                size: '18x24',
+                material: 'RMPS002', // Default to paper
+                rushType: 'standard',
+                quantity: 1
+            };
         } else {
             this.currentConfig = {
                 size: '8.5x11',
@@ -87,6 +94,8 @@ class ProductConfigurator {
             return 'apparel';
         } else if (document.getElementById('toteBagForm')) {
             return 'tote-bags';
+        } else if (document.getElementById('posterForm')) {
+            return 'posters';
         }
         return 'brochures'; // Default fallback
     }
@@ -155,6 +164,8 @@ class ProductConfigurator {
                 return typeof calculateApparelPrice === 'function' ? calculateApparelPrice : null;
             case 'tote-bags':
                 return typeof calculateToteBagPrice === 'function' ? calculateToteBagPrice : null;
+            case 'posters':
+                return typeof calculatePosterPrice === 'function' ? calculatePosterPrice : null;
             default:
                 return null;
         }
@@ -236,6 +247,26 @@ class ProductConfigurator {
                 });
             });
         }
+
+        // Poster custom size listeners
+        if (this.productType === 'posters') {
+            const customWidthInput = document.getElementById('customWidth');
+            const customHeightInput = document.getElementById('customHeight');
+            
+            if (customWidthInput && customHeightInput) {
+                customWidthInput.addEventListener('input', () => {
+                    this.updateCustomSizeDisplay();
+                    this.validateCustomSize();
+                    this.debouncedCalculation();
+                });
+                
+                customHeightInput.addEventListener('input', () => {
+                    this.updateCustomSizeDisplay();
+                    this.validateCustomSize();
+                    this.debouncedCalculation();
+                });
+            }
+        }
     }
 
     selectOption(option, value, cardElement) {
@@ -254,6 +285,15 @@ class ProductConfigurator {
 
         // Update configuration
         this.currentConfig[this.getConfigKey(option)] = value;
+
+        // Handle poster-specific logic
+        if (this.productType === 'posters') {
+            if (option === 'size') {
+                this.handlePosterSizeSelection(value);
+            } else if (option === 'material') {
+                this.updateMaterialConstraints(value);
+            }
+        }
 
         // For apparel products, also handle size breakdown updates
         if (this.productType === 'apparel') {
@@ -385,7 +425,13 @@ class ProductConfigurator {
                 '2x2': '2" × 2"',
                 '3x3': '3" × 3"',
                 '4x4': '4" × 4"',
-                '5x5': '5" × 5"'
+                '5x5': '5" × 5"',
+                // Poster sizes
+                '18x24': '18" × 24"',
+                '22x28': '22" × 28"',
+                '24x36': '24" × 36"',
+                '36x48': '36" × 48"',
+                'custom': 'Custom Size'
             },
             foldType: {
                 'trifold': 'Tri-Fold',
@@ -398,6 +444,7 @@ class ProductConfigurator {
                 'PACDISC7613FSC': '80# Cover Silk'
             },
             coverPaperType: {
+                'SELF_COVER': 'Self Cover',
                 'LYNOC76FSC': '80# Cover Uncoated',
                 'PACDISC7613FSC': '80# Cover Silk',
                 'LYNOC95FSC': '100# Cover Uncoated',
@@ -430,8 +477,12 @@ class ProductConfigurator {
             bagType: {
                 'canvas-tote': 'Canvas Tote'
             },
+            material: {
+                'RMPS002': 'Paper - 9mil Matte',
+                'QMPFL501503': 'Fabric - 8mil Matte Coated'
+            },
             rushType: {
-                'standard': 'Standard (3-5 days)',
+                'standard': 'Standard (7-10 days)',
                 '2-day': '2-Day Rush',
                 'next-day': 'Next-Day Rush',
                 'same-day': 'Same-Day Rush',
@@ -463,11 +514,24 @@ class ProductConfigurator {
             if (summarySize) {
                 if (this.productType === 'apparel') {
                     summarySize.textContent = summaryMapping.garmentType[this.currentConfig.garmentType];
+                } else if (this.productType === 'posters' && this.currentConfig.size === 'custom') {
+                    // Show custom dimensions for posters
+                    const width = this.currentConfig.customWidth || 0;
+                    const height = this.currentConfig.customHeight || 0;
+                    summarySize.textContent = `${width}" × ${height}"`;
                 } else {
                     summarySize.textContent = summaryMapping.size[this.currentConfig.size];
                 }
             }
             if (summaryFold) summaryFold.textContent = summaryMapping.foldType[this.currentConfig.foldType];
+            
+            // Handle poster material field separately
+            if (this.productType === 'posters') {
+                const summaryMaterial = document.getElementById('summaryMaterial');
+                if (summaryMaterial) {
+                    summaryMaterial.textContent = summaryMapping.material[this.currentConfig.material];
+                }
+            }
             
             // Handle paper/type/decoration depending on product
             if (summaryPaper) {
@@ -488,6 +552,9 @@ class ProductConfigurator {
             if (summaryQuantity) {
                 if (this.productType === 'apparel') {
                     summaryQuantity.textContent = `${this.currentConfig.totalQuantity} pieces`;
+                } else if (this.productType === 'posters') {
+                    const qty = this.currentConfig.quantity;
+                    summaryQuantity.textContent = `${qty} poster${qty === 1 ? '' : 's'}`;
                 } else {
                     summaryQuantity.textContent = `${this.currentConfig.quantity} pieces`;
                 }
@@ -623,6 +690,16 @@ class ProductConfigurator {
             formData.append('size', config.size);
             formData.append('bagType', config.bagType);
             formData.append('decorationType', config.decorationType);
+        } else if (this.productType === 'posters') {
+            // Poster-specific fields
+            formData.append('size', config.size);
+            formData.append('material', config.material);
+            
+            // Add custom dimensions if custom size is selected
+            if (config.size === 'custom') {
+                formData.append('customWidth', config.customWidth || 0);
+                formData.append('customHeight', config.customHeight || 0);
+            }
         } else {
             // Standard product fields
             formData.append('size', config.size);
@@ -879,6 +956,151 @@ class ProductConfigurator {
         // For now, show a modal or redirect to quote form
         // This could be enhanced to integrate with a quote management system
         alert('Quote request functionality would be implemented here. For now, please use the Add to Cart feature.');
+    }
+
+    // Poster-specific methods
+    handlePosterSizeSelection(sizeValue) {
+        const customSizeInputs = document.getElementById('customSizeInputs');
+        
+        if (sizeValue === 'custom') {
+            // Show custom size inputs
+            if (customSizeInputs) {
+                customSizeInputs.style.display = 'block';
+                // Initialize with default values if empty
+                const widthInput = document.getElementById('customWidth');
+                const heightInput = document.getElementById('customHeight');
+                if (widthInput && !widthInput.value) widthInput.value = '24';
+                if (heightInput && !heightInput.value) heightInput.value = '18';
+                this.updateCustomSizeDisplay();
+                this.validateCustomSize();
+            }
+        } else {
+            // Hide custom size inputs
+            if (customSizeInputs) {
+                customSizeInputs.style.display = 'none';
+            }
+        }
+    }
+
+    updateMaterialConstraints(materialValue) {
+        const widthInput = document.getElementById('customWidth');
+        const widthConstraint = document.getElementById('widthConstraint');
+        
+        if (widthInput && widthConstraint) {
+            let maxWidth;
+            let materialName;
+            
+            if (materialValue === 'RMPS002') {
+                maxWidth = 52;
+                materialName = 'paper';
+            } else if (materialValue === 'QMPFL501503') {
+                maxWidth = 48;
+                materialName = 'fabric';
+            } else {
+                maxWidth = 52; // default
+                materialName = 'material';
+            }
+            
+            // Update input max attribute
+            widthInput.max = maxWidth;
+            
+            // Update constraint text
+            widthConstraint.textContent = `Max: ${maxWidth}" (${materialName})`;
+            
+            // Validate current width against new constraint
+            const currentWidth = parseFloat(widthInput.value);
+            if (currentWidth > maxWidth) {
+                widthInput.value = maxWidth;
+                this.updateCustomSizeDisplay();
+                this.showValidationMessage(`Width adjusted to ${maxWidth}" maximum for ${materialName}`, 'warning');
+            }
+            
+            this.validateCustomSize();
+        }
+    }
+
+    updateCustomSizeDisplay() {
+        const widthInput = document.getElementById('customWidth');
+        const heightInput = document.getElementById('customHeight');
+        const sizeDisplay = document.getElementById('customSizeDisplay');
+        const sqftDisplay = document.getElementById('customSqftDisplay');
+        
+        if (widthInput && heightInput && sizeDisplay && sqftDisplay) {
+            const width = parseFloat(widthInput.value) || 0;
+            const height = parseFloat(heightInput.value) || 0;
+            
+            // Update size display
+            sizeDisplay.textContent = `${width}"W × ${height}"H`;
+            
+            // Calculate and display square footage
+            const sqft = (width * height) / 144; // Convert square inches to square feet
+            sqftDisplay.textContent = `${sqft.toFixed(1)} sq ft`;
+            
+            // Update current config for pricing calculation
+            if (this.currentConfig.size === 'custom') {
+                this.currentConfig.customWidth = width;
+                this.currentConfig.customHeight = height;
+                this.currentConfig.customSqft = sqft;
+            }
+        }
+    }
+
+    validateCustomSize() {
+        const widthInput = document.getElementById('customWidth');
+        const heightInput = document.getElementById('customHeight');
+        
+        if (!widthInput || !heightInput) return;
+        
+        const width = parseFloat(widthInput.value);
+        const height = parseFloat(heightInput.value);
+        const material = this.currentConfig.material || 'RMPS002';
+        
+        let errors = [];
+        
+        // Width validation based on material
+        const maxWidth = material === 'QMPFL501503' ? 48 : 52;
+        if (width < 6) {
+            errors.push('Width must be at least 6 inches');
+        } else if (width > maxWidth) {
+            errors.push(`Width cannot exceed ${maxWidth} inches for this material`);
+        }
+        
+        // Height validation
+        if (height < 6) {
+            errors.push('Height must be at least 6 inches');
+        } else if (height > 120) {
+            errors.push('Height cannot exceed 120 inches');
+        }
+        
+        // Area validation (optional, for practical limits)
+        const sqft = (width * height) / 144;
+        if (sqft > 50) {
+            errors.push('Total area cannot exceed 50 square feet');
+        }
+        
+        if (errors.length > 0) {
+            this.showValidationMessage(errors.join('. '), 'error');
+            return false;
+        } else {
+            this.hideValidationMessage();
+            return true;
+        }
+    }
+
+    showValidationMessage(message, type = 'error') {
+        const validationDiv = document.getElementById('customSizeValidation');
+        if (validationDiv) {
+            validationDiv.textContent = message;
+            validationDiv.className = `validation-message ${type}`;
+            validationDiv.style.display = 'block';
+        }
+    }
+
+    hideValidationMessage() {
+        const validationDiv = document.getElementById('customSizeValidation');
+        if (validationDiv) {
+            validationDiv.style.display = 'none';
+        }
     }
 
     initializeTooltips() {
