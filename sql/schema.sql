@@ -1,4 +1,4 @@
--- Supabase Database Schema for HP Indigo Pricing Calculator
+-- Supabase Database Schema for SFU Document Solutions
 -- Run this in your Supabase SQL editor to create the required tables
 
 -- Enable UUID extension

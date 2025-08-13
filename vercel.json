@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "hp-indigo-pricing-calculator",
+  "name": "sfu-pricing-calculator",
   "rewrites": [
     {
       "source": "/(.*)",

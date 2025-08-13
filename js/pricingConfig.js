@@ -1,4 +1,4 @@
-// Pricing Configuration for HP Indigo Calculator
+// Pricing Configuration for SFU Document Solutions
 // All pricing rules, constraints, and multipliers
 
 const pricingConfig = {

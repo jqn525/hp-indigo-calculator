@@ -10,7 +10,7 @@ if ('serviceWorker' in navigator) {
       swPath = '/sw.js';
     } else {
       // For GitHub Pages or other hosting
-      swPath = '/hp-indigo-calculator/sw.js';
+      swPath = '/pricing-calculator/sw.js';
     }
     
     console.log('Registering service worker at:', swPath);

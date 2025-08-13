@@ -1,4 +1,4 @@
-// Authentication Management for HP Indigo Calculator
+// Authentication Management for SFU Document Solutions
 // Handles user sign in, sign up, and session management
 
 class AuthManager {
@@ -174,10 +174,10 @@ class AuthManager {
 
   // Generate session ID for anonymous users
   getSessionId() {
-    let sessionId = localStorage.getItem('hp_indigo_session_id');
+    let sessionId = localStorage.getItem('sfu_session_id');
     if (!sessionId) {
       sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('hp_indigo_session_id', sessionId);
+      localStorage.setItem('sfu_session_id', sessionId);
     }
     return sessionId;
   }

@@ -1,5 +1,5 @@
 // Admin Panel JavaScript
-// Handles administrative functions for the HP Indigo Calculator
+// Handles administrative functions for SFU Document Solutions
 
 class AdminPanel {
   constructor() {
@@ -319,7 +319,7 @@ class StaticFileGenerator {
 
   // Generate pricingConfig.js content from database data
   static generatePricingConfigFile(pricingConfigData) {
-    let content = `// Pricing Configuration for HP Indigo Calculator\n`;
+    let content = `// Pricing Configuration for SFU Document Solutions\n`;
     content += `// All pricing rules, constraints, and multipliers\n\n`;
     content += `const pricingConfig = {\n`;
     

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**SFU Document Solutions Pricing Calculator** - A Progressive Web App (PWA) for calculating pricing for HP Indigo digital press products. Built as a vanilla JavaScript application with no framework dependencies, designed for SFU Document Solutions staff using tablets and mobile devices.
+**SFU Document Solutions Pricing Calculator** - A Progressive Web App (PWA) for calculating pricing for digital printing services. Built as a vanilla JavaScript application with no framework dependencies, designed for SFU Document Solutions staff using tablets and mobile devices.
 
 **Live URL**: https://docsol.ca
 
@@ -236,7 +236,7 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Product Integration**: Seamless Add to Cart from all calculators
 
 ### Service Worker Strategy
-- Cache name: `indigo-calc-v107` (increment version to force cache update)
+- Cache name: `sfu-calc-v136` (increment version to force cache update)
 - Environment detection for localhost vs GitHub Pages paths
 - Pre-caches all static assets on install
 - Cache-first strategy for all requests
@@ -322,7 +322,7 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 
 ### Cache Busting
 To force users to get updated files:
-1. Change `CACHE_NAME` in `sw.js` (current version: `indigo-calc-v134`)
+1. Change `CACHE_NAME` in `sw.js` (current version: `sfu-calc-v136`)
 2. This triggers service worker update cycle and clears old cache
 3. Always increment version when deploying CSS/JS changes
 

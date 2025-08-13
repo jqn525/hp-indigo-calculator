@@ -1,5 +1,5 @@
 // Supabase Configuration
-// This file initializes the Supabase client for the HP Indigo Calculator
+// This file initializes the Supabase client for SFU Document Solutions
 
 // Supabase credentials - these are public keys safe to include in client-side code
 // Anonymous keys are designed to be public and don't expose sensitive data

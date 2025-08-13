@@ -1,7 +1,7 @@
 // Cart Management System with Supabase Integration
 class CartManager {
   constructor() {
-    this.storageKey = 'hp-indigo-cart';
+    this.storageKey = 'sfu-cart';
     this.items = [];
     this.useCloud = false;
     this.initialized = false;
@@ -490,7 +490,7 @@ class CartManager {
     }
 
     // Generate quote text
-    let quoteText = 'HP INDIGO PRICING QUOTE\n';
+    let quoteText = 'SFU DOCUMENT SOLUTIONS QUOTE\n';
     quoteText += '========================\n\n';
     quoteText += `Generated: ${new Date().toLocaleString()}\n`;
     quoteText += `Total Items: ${this.items.length}\n\n`;
@@ -516,7 +516,7 @@ class CartManager {
     
     const a = document.createElement('a');
     a.href = url;
-    a.download = `hp-indigo-quote-${Date.now()}.txt`;
+    a.download = `sfu-quote-${Date.now()}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

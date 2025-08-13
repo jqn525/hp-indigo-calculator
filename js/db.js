@@ -1,4 +1,4 @@
-// Database Operations for HP Indigo Calculator
+// Database Operations for SFU Document Solutions
 // Handles all Supabase database interactions
 
 class DatabaseManager {

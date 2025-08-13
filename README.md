@@ -1,6 +1,6 @@
 # SFU Document Solutions Pricing Calculator
 
-A Progressive Web App for calculating pricing for HP Indigo digital press products, designed for SFU Document Solutions staff using tablets and mobile devices.
+A Progressive Web App for calculating pricing for digital printing services, designed for SFU Document Solutions staff using tablets and mobile devices.
 
 ## ✨ Features
 
@@ -51,8 +51,8 @@ A Progressive Web App for calculating pricing for HP Indigo digital press produc
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/jqn525/hp-indigo-calculator.git
-   cd hp-indigo-calculator
+   git clone https://github.com/jqn525/sfu-pricing-calculator.git
+   cd sfu-pricing-calculator
    ```
 
 2. **Start a local server**

@@ -1,8 +1,8 @@
 {
-  "name": "HP Indigo Pricing Calculator",
-  "short_name": "Indigo Calc",
-  "description": "Professional pricing calculator for HP Indigo digital press products",
-  "start_url": "/hp-indigo-calculator/",
+  "name": "SFU Document Solutions Pricing Calculator",
+  "short_name": "SFU Calc",
+  "description": "Professional pricing calculator for digital printing services",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#0096D6",
   "background_color": "#ffffff",
