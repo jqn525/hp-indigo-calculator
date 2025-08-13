@@ -44,6 +44,16 @@ const pricingConfig = {
       minQuantity: 1,
       maxQuantity: 20
     },
+    // Notebooks - Coil/Wire-O/Perfect bound
+    notebooks: {
+      minQuantity: 10,
+      maxQuantity: 500
+    },
+    // Notepads - Glue-bound tear-away
+    notepads: {
+      minQuantity: 25,
+      maxQuantity: 1000
+    },
     // Future products can be added here
     businessCards: {
       minQuantity: 100,  // Higher min due to high imposition
@@ -93,6 +103,16 @@ const pricingConfig = {
     },
     booklets: {
       '8.5x11': 4  // 4-up imposition for standard booklet size
+    },
+    notebooks: {
+      '5.5x8.5': 4,  // 4-up imposition
+      '8.5x11': 2    // 2-up imposition
+    },
+    notepads: {
+      '4x6': 8,      // 8-up on 13×19
+      '5x7': 4,      // 4-up on 13×19
+      '5.5x8.5': 4,  // 4-up on 13×19
+      '8.5x11': 2    // 2-up on 13×19
     }
   },
 
@@ -107,7 +127,20 @@ const pricingConfig = {
     bookletFinishing: {
       coverCreasing: 0.10,
       bindingPerSheet: 0.05
-    }
+    },
+    // Notebook binding costs
+    notebookBinding: {
+      plasticCoil: 0.31,    // Hardware cost for plastic coil (rounded from 0.25 * 1.25)
+      wireO: 0.35,          // Hardware cost for wire-o (premium option)
+      perfectBinding: 0     // No hardware cost for perfect binding
+    },
+    notebookLabor: {
+      plasticCoil: 2.50,    // Labor for plastic coil binding
+      wireO: 3.00,          // Labor for wire-o binding (more intensive)
+      perfectBinding: 3.00  // Labor for perfect binding
+    },
+    // Notepad finishing costs
+    notepadPadding: 1.50    // Glue padding labor per notepad
   },
 
   // Rush order multipliers

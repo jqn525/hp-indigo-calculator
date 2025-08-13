@@ -1,0 +1,244 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-08-13",
+  "description": "Complete paper stock database for SFU Document Solutions pricing calculations",
+  
+  "paperStocks": {
+    "LYNODI312FSC": {
+      "code": "LYNODI312FSC",
+      "brand": "Lynx",
+      "type": "text_stock",
+      "finish": "Uncoated",
+      "size": "13x19",
+      "weight": "60#",
+      "costPerSheet": 0.08548,
+      "displayName": "60# Text Uncoated",
+      "category": "economy_text",
+      "notes": "Basic text weight for simple documents"
+    },
+    "LYNO416FSC": {
+      "code": "LYNO416FSC",
+      "brand": "Lynx",
+      "type": "text_stock",
+      "finish": "Uncoated",
+      "size": "13x19",
+      "weight": "80#",
+      "costPerSheet": 0.11397,
+      "displayName": "80# Text Uncoated",
+      "category": "standard_text",
+      "notes": "Most popular text weight"
+    },
+    "LYNO52FSC": {
+      "code": "LYNO52FSC",
+      "brand": "Lynx",
+      "type": "text_stock",
+      "finish": "Uncoated",
+      "size": "13x19",
+      "weight": "100#",
+      "costPerSheet": 0.1425,
+      "displayName": "100# Text Uncoated",
+      "category": "premium_text",
+      "notes": "Heavy text weight for substantial feel"
+    },
+    "LYNOC76FSC": {
+      "code": "LYNOC76FSC",
+      "brand": "Lynx",
+      "type": "cover_stock",
+      "finish": "Uncoated",
+      "size": "13x19",
+      "weight": "80#",
+      "costPerSheet": 0.22408,
+      "displayName": "80# Cover Uncoated",
+      "category": "light_cover",
+      "notes": "Lightweight cover stock"
+    },
+    "LYNOC95FSC": {
+      "code": "LYNOC95FSC",
+      "brand": "Lynx",
+      "type": "cover_stock",
+      "finish": "Uncoated",
+      "size": "13x19",
+      "weight": "100#",
+      "costPerSheet": 0.28010,
+      "displayName": "100# Cover Uncoated",
+      "category": "standard_cover",
+      "notes": "Most popular cover weight - postcards, name tags"
+    },
+    "LYNODIC11413FSC": {
+      "code": "LYNODIC11413FSC",
+      "brand": "Lynx",
+      "type": "cover_stock",
+      "finish": "Uncoated",
+      "size": "13x19",
+      "weight": "120#",
+      "costPerSheet": 0.38147,
+      "displayName": "120# Cover Uncoated",
+      "category": "heavy_cover",
+      "notes": "Heavy cover stock for premium applications"
+    },
+    "COUDCCDIC123513FSC": {
+      "code": "COUDCCDIC123513FSC",
+      "brand": "Cougar",
+      "type": "cover_stock",
+      "finish": "Uncoated",
+      "size": "13x19",
+      "weight": "130#",
+      "costPerSheet": 0.538,
+      "displayName": "130# Cover Uncoated",
+      "category": "premium_cover",
+      "notes": "Premium cover stock - bookmarks only"
+    },
+    "PACDIS42FSC": {
+      "code": "PACDIS42FSC",
+      "brand": "Pacesetter",
+      "type": "text_stock",
+      "finish": "Silk",
+      "size": "13x19",
+      "weight": "80#",
+      "costPerSheet": 0.07702,
+      "displayName": "80# Text Silk",
+      "category": "standard_silk_text",
+      "notes": "Smooth silk finish text"
+    },
+    "PACDIS52FSC": {
+      "code": "PACDIS52FSC",
+      "brand": "Pacesetter",
+      "type": "text_stock",
+      "finish": "Silk",
+      "size": "13x19",
+      "weight": "100#",
+      "costPerSheet": 0.09536,
+      "displayName": "100# Text Silk",
+      "category": "premium_silk_text",
+      "notes": "Premium silk finish text"
+    },
+    "PACDISC7613FSC": {
+      "code": "PACDISC7613FSC",
+      "brand": "Pacesetter",
+      "type": "cover_stock",
+      "finish": "Silk",
+      "size": "13x19",
+      "weight": "80#",
+      "costPerSheet": 0.14204,
+      "displayName": "80# Cover Silk",
+      "category": "light_silk_cover",
+      "notes": "Lightweight silk cover"
+    },
+    "PACDISC9513FSC": {
+      "code": "PACDISC9513FSC",
+      "brand": "Pacesetter",
+      "type": "cover_stock",
+      "finish": "Silk",
+      "size": "13x19",
+      "weight": "100#",
+      "costPerSheet": 0.17756,
+      "displayName": "100# Cover Silk",
+      "category": "standard_silk_cover",
+      "notes": "Popular silk cover weight"
+    },
+    "PACDISC12413FSC": {
+      "code": "PACDISC12413FSC",
+      "brand": "Pacesetter",
+      "type": "cover_stock",
+      "finish": "Silk",
+      "size": "13x19",
+      "weight": "130#",
+      "costPerSheet": 0.23176,
+      "displayName": "130# Cover Silk",
+      "category": "premium_silk_cover",
+      "notes": "Premium silk cover - bookmarks"
+    },
+    "PAC51319WP": {
+      "code": "PAC51319WP",
+      "brand": "Pacesetter",
+      "type": "adhesive_stock",
+      "finish": "Adhesive",
+      "size": "13x19",
+      "weight": "Adhesive",
+      "costPerSheet": 3.705,
+      "displayName": "Adhesive Stock",
+      "category": "specialty",
+      "notes": "Self-adhesive material for name tags only"
+    },
+    "RMPS002": {
+      "code": "RMPS002",
+      "brand": "Rite-Media",
+      "type": "large_format_paper",
+      "finish": "Matte",
+      "size": "54\"x150ft",
+      "thickness": "9mil",
+      "costPerRoll": 162.65,
+      "chargeRate": 6.0,
+      "displayName": "Paper - 9mil Matte",
+      "category": "large_format",
+      "notes": "Large format paper - charged per square foot"
+    },
+    "QMPFL501503": {
+      "code": "QMPFL501503",
+      "brand": "Generic",
+      "type": "large_format_fabric",
+      "finish": "Matte Coated Fabric",
+      "size": "50\"x150ft",
+      "thickness": "8mil",
+      "costPerRoll": 259.95,
+      "chargeRate": 9.0,
+      "displayName": "Fabric - 8mil Matte Coated",
+      "category": "large_format_premium",
+      "notes": "Premium fabric material - charged per square foot"
+    }
+  },
+  
+  "paperCategories": {
+    "economy_text": {
+      "description": "Basic text weight papers for simple documents",
+      "weightRange": "60#-70#",
+      "applications": ["simple flyers", "internal documents"]
+    },
+    "standard_text": {
+      "description": "Popular text weight papers for most applications",
+      "weightRange": "80#",
+      "applications": ["brochures", "flyers", "booklets"]
+    },
+    "premium_text": {
+      "description": "Heavy text weight papers for substantial feel",
+      "weightRange": "100#+",
+      "applications": ["premium brochures", "booklets"]
+    },
+    "light_cover": {
+      "description": "Lightweight cover stocks",
+      "weightRange": "80#",
+      "applications": ["light postcards", "simple covers"]
+    },
+    "standard_cover": {
+      "description": "Most popular cover weight for postcards and name tags",
+      "weightRange": "100#",
+      "applications": ["postcards", "name tags", "covers"]
+    },
+    "heavy_cover": {
+      "description": "Heavy cover stock for premium applications",
+      "weightRange": "120#",
+      "applications": ["premium postcards", "business cards"]
+    },
+    "premium_cover": {
+      "description": "Premium cover stock for special applications",
+      "weightRange": "130#+",
+      "applications": ["bookmarks", "premium business cards"]
+    },
+    "specialty": {
+      "description": "Specialty materials for specific applications",
+      "applications": ["adhesive name tags", "specialty products"]
+    },
+    "large_format": {
+      "description": "Large format materials charged per square foot",
+      "applications": ["posters", "banners", "signage"]
+    }
+  },
+  
+  "usageNotes": {
+    "costCalculation": "All costs are per 13x19 inch sheet unless specified otherwise",
+    "largeFormat": "Large format materials use chargeRate per square foot",
+    "markup": "Small format products typically use 25-50% markup on material costs",
+    "clickCost": "Add $0.10 per double-sided impression (clicks cost)",
+    "imposition": "Divide by imposition number to get per-piece material cost"
+  }
+}

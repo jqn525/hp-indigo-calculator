@@ -1,0 +1,226 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-08-13",
+  "description": "Product constraints and business rules for SFU Document Solutions",
+  
+  "productConstraints": {
+    "brochures": {
+      "productName": "Tri-fold and Bi-fold Brochures",
+      "minQuantity": 25,
+      "maxQuantity": 2500,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.75,
+      "setupFee": 30.0,
+      "finishingSetup": 15.0,
+      "allowedSizes": ["8.5x11", "8.5x14", "11x17"],
+      "allowedFolding": ["none", "bifold", "trifold"],
+      "paperTypes": ["text_stock", "cover_stock"],
+      "finishingRequired": "conditional",
+      "notes": "Finishing required only for folding options"
+    },
+    "postcards": {
+      "productName": "Promotional Postcards",
+      "minQuantity": 100,
+      "maxQuantity": 5000,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.7,
+      "setupFee": 30.0,
+      "finishingSetup": 0,
+      "allowedSizes": ["4x6", "5x7", "5.5x8.5", "6x9"],
+      "allowedFolding": ["none"],
+      "paperTypes": ["cover_stock"],
+      "finishingRequired": false,
+      "notes": "No finishing options available"
+    },
+    "name-tags": {
+      "productName": "Professional Name Tags",
+      "minQuantity": 50,
+      "maxQuantity": 5000,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.65,
+      "setupFee": 15.0,
+      "finishingSetup": 0,
+      "allowedSizes": ["2.33x3", "3x4", "4x6"],
+      "allowedFolding": ["none"],
+      "paperTypes": ["cover_stock", "adhesive_stock"],
+      "finishingRequired": "optional",
+      "finishingOptions": ["hole_punch", "lanyard"],
+      "notes": "Optimized pricing with reduced setup fee"
+    },
+    "flyers": {
+      "productName": "Single-sided Flyers",
+      "minQuantity": 25,
+      "maxQuantity": 2500,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.65,
+      "setupFee": 15.0,
+      "finishingSetup": 0,
+      "allowedSizes": ["5.5x8.5", "8.5x11", "8.5x14", "11x17"],
+      "allowedFolding": ["none"],
+      "paperTypes": ["text_stock", "cover_stock"],
+      "finishingRequired": false,
+      "notes": "Simplified product with reduced setup fee"
+    },
+    "bookmarks": {
+      "productName": "Professional Bookmarks",
+      "minQuantity": 100,
+      "maxQuantity": 2500,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.65,
+      "setupFee": 30.0,
+      "finishingSetup": 0,
+      "allowedSizes": ["2x6", "2x7", "2x8"],
+      "allowedFolding": ["none"],
+      "paperTypes": ["premium_cover"],
+      "paperCodes": ["COUDCCDIC123513FSC", "PACDISC12413FSC"],
+      "finishingRequired": false,
+      "notes": "Restricted to premium 130# cover stocks only"
+    },
+    "booklets": {
+      "productName": "Saddle-stitched Booklets",
+      "minQuantity": 10,
+      "maxQuantity": 1000,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.75,
+      "setupFee": "calculated",
+      "setupFormula": "30 + (2 × pages)",
+      "finishingSetup": 30.0,
+      "allowedSizes": ["8.5x11"],
+      "minPages": 8,
+      "maxPages": 48,
+      "pageMultiple": 4,
+      "paperTypes": ["text_stock", "cover_stock"],
+      "coverOptions": ["separate_cover", "self_cover"],
+      "finishingRequired": true,
+      "notes": "Pages must be multiples of 4, self-cover option available"
+    },
+    "notebooks": {
+      "productName": "Coil/Wire-O/Perfect Bound Notebooks",
+      "minQuantity": 10,
+      "maxQuantity": 500,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.8,
+      "setupFee": "conditional",
+      "setupRules": {
+        "blank": 0,
+        "lined": 15,
+        "custom": 30
+      },
+      "finishingSetup": 15.0,
+      "allowedSizes": ["5.5x8.5", "8.5x11"],
+      "allowedPages": [50, 100],
+      "bindingTypes": ["plasticCoil", "wireO", "perfectBinding"],
+      "pageContent": ["blank", "lined", "custom"],
+      "paperTypes": ["text_stock", "cover_stock"],
+      "finishingRequired": true,
+      "notes": "Setup fee waived for blank pages as discount"
+    },
+    "notepads": {
+      "productName": "Glue-bound Tear-away Notepads",
+      "minQuantity": 25,
+      "maxQuantity": 1000,
+      "stepQuantity": 1,
+      "efficiencyExponent": 0.65,
+      "setupFee": "conditional",
+      "setupRules": {
+        "blank": 0,
+        "lined": 15,
+        "custom": 30
+      },
+      "finishingSetup": 15.0,
+      "allowedSizes": ["4x6", "5x7", "5.5x8.5", "8.5x11"],
+      "allowedSheets": [25, 50, 75, 100],
+      "pageContent": ["blank", "lined", "custom"],
+      "paperTypes": ["text_stock"],
+      "backingPaper": "cover_stock",
+      "finishingRequired": true,
+      "notes": "Single-sided printing only, cardstock backing included"
+    },
+    "posters": {
+      "productName": "Large Format Posters",
+      "minQuantity": 1,
+      "maxQuantity": 20,
+      "stepQuantity": 1,
+      "pricingMethod": "square_footage",
+      "setupFee": 30.0,
+      "allowedSizes": ["18x24", "22x28", "24x36", "36x48", "custom"],
+      "customSizeRules": {
+        "minDimension": 6,
+        "maxWidth": {
+          "paper": 52,
+          "fabric": 48
+        },
+        "maxHeight": 120,
+        "maxArea": 50
+      },
+      "materials": ["large_format_paper", "large_format_fabric"],
+      "finishingRequired": false,
+      "notes": "Charged per square foot, custom sizes supported"
+    }
+  },
+  
+  "rushMultipliers": {
+    "standard": {
+      "multiplier": 1.0,
+      "description": "Standard (3-5 business days)",
+      "note": ""
+    },
+    "2-day": {
+      "multiplier": 1.25,
+      "description": "2-Day Rush (+25%)",
+      "note": "Subject to current capacity"
+    },
+    "next-day": {
+      "multiplier": 1.5,
+      "description": "Next-Day Rush (+50%)",
+      "note": "Subject to current capacity"
+    },
+    "same-day": {
+      "multiplier": 2.0,
+      "description": "Same-Day Rush (+100%)",
+      "note": "Subject to current capacity - Call to confirm"
+    }
+  },
+  
+  "businessRules": {
+    "quantityValidation": {
+      "description": "All products have minimum and maximum quantity constraints",
+      "enforcement": "Hard limit - orders outside range are rejected"
+    },
+    "pageValidation": {
+      "description": "Booklets require page counts in multiples of 4",
+      "enforcement": "System validation prevents invalid page counts"
+    },
+    "paperRestrictions": {
+      "description": "Some products are restricted to specific paper types",
+      "examples": {
+        "bookmarks": "Only premium 130# cover stocks",
+        "name-tags": "Cover stock or adhesive only",
+        "postcards": "Cover stock only"
+      }
+    },
+    "finishingLogic": {
+      "description": "Finishing setup fees only apply when finishing is required",
+      "conditional": "Brochures with folding, all bound products"
+    }
+  },
+  
+  "validationRules": {
+    "quantity": "Must be within min/max range for product type",
+    "pages": "Booklets: 8-48 pages in multiples of 4; Notebooks: 50 or 100 only",
+    "size": "Must be from allowed sizes list for product",
+    "paper": "Must be compatible with product constraints",
+    "finishing": "Must be available for product type",
+    "rush": "Must be valid rush type"
+  },
+  
+  "efficiencyExponents": {
+    "explanation": "Lower exponent = better volume discounts",
+    "values": {
+      "0.65": "Excellent volume discounts (flyers, name-tags, bookmarks, notepads)",
+      "0.70": "Good volume discounts (postcards)",
+      "0.75": "Standard volume discounts (brochures, booklets)",
+      "0.80": "Limited volume discounts (notebooks - complex binding)"
+    }
+  }
+}

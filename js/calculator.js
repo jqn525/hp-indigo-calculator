@@ -1009,6 +1009,216 @@ async function calculateBookletPrice(formData) {
   };
 }
 
+async function calculateNotebookPrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const pages = parseInt(formData.get('pages'));
+  const bindingType = formData.get('bindingType');
+  const coverPaperCode = formData.get('coverPaper');
+  const textPaperCode = formData.get('textPaper');
+  const pageContent = formData.get('pageContent');
+  const rushType = formData.get('rushType') || 'standard';
+  
+  // Validate quantity constraints
+  const validation = validateQuantity(quantity, 'notebooks', data.pricingConfigs.product_constraints);
+  if (!validation.valid) {
+    return { error: validation.message };
+  }
+  
+  // Get paper data
+  const coverPaper = data.paperStocks[coverPaperCode];
+  const textPaper = data.paperStocks[textPaperCode];
+  
+  if (!coverPaper || !textPaper) {
+    return { error: 'Invalid paper selection' };
+  }
+  
+  // Setup costs - waive setup for blank pages as discount
+  const baseSetup = pageContent === 'blank' ? 0 : 15;
+  const finishingSetup = 15;  // Always applied
+  const totalSetup = baseSetup + finishingSetup;
+  
+  // Get imposition based on size
+  const imposition = data.pricingConfigs.imposition_data.notebooks[size] || 2;
+  
+  // Calculate sheets needed per notebook
+  const coverSheetsPerNotebook = 1 / imposition;
+  const textSheetsPerNotebook = pages / (imposition * 2);  // Pages per sheet (both sides)
+  
+  // Click calculations - all pages go through HP (including blank)
+  const coverClicks = 1;
+  const textClicks = Math.round(textSheetsPerNotebook * 2);  // Sheets × 2 sides, rounded
+  const totalClicks = coverClicks + textClicks;
+  
+  // Material costs per notebook
+  const coverCost = coverSheetsPerNotebook * coverPaper.costPerSheet;
+  const textCost = textSheetsPerNotebook * textPaper.costPerSheet;
+  const clickCost = totalClicks * (data.pricingConfigs.formula.clicksCost || 0.10);
+  const materialsCostPerUnit = (coverCost + textCost + clickCost) * 1.25; // 25% markup
+  
+  // Binding costs based on type
+  const bindingHardware = data.pricingConfigs.finishing_costs.notebookBinding[bindingType] || 0;
+  const laborCost = data.pricingConfigs.finishing_costs.notebookLabor[bindingType] || 2.50;
+  
+  // Apply formula: C(Q) = S + F_setup + Q^0.80 × 1.50 + Q × (M + L + B)
+  const productionCost = Math.pow(quantity, 0.80) * 1.50;
+  const materialsCostTotal = quantity * materialsCostPerUnit;
+  const laborCostTotal = quantity * laborCost;
+  const bindingCostTotal = quantity * bindingHardware;
+  
+  const subtotal = totalSetup + productionCost + materialsCostTotal + laborCostTotal + bindingCostTotal;
+  
+  // Rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  const total = subtotal * rushMultiplier;
+  
+  return {
+    quantity: quantity,
+    size: size,
+    pages: pages,
+    bindingType: bindingType,
+    coverPaper: coverPaper.displayName,
+    textPaper: textPaper.displayName,
+    pageContent: pageContent,
+    unitPrice: (total / quantity).toFixed(2),
+    totalCost: total.toFixed(2),
+    printingSetupCost: baseSetup.toFixed(2),
+    finishingSetupCost: finishingSetup.toFixed(2),
+    totalSetupCost: totalSetup.toFixed(2),
+    productionCost: productionCost.toFixed(2),
+    materialCost: materialsCostTotal.toFixed(2),
+    laborCost: laborCostTotal.toFixed(2),
+    bindingCost: bindingCostTotal.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    // Detailed breakdown for display
+    coverCost: coverCost.toFixed(4),
+    textCost: textCost.toFixed(4),
+    clickCost: clickCost.toFixed(4),
+    materialsCostPerUnit: materialsCostPerUnit.toFixed(4),
+    coverSheetsPerNotebook: coverSheetsPerNotebook.toFixed(2),
+    textSheetsPerNotebook: textSheetsPerNotebook.toFixed(2),
+    totalClicks: totalClicks,
+    imposition: imposition
+  };
+}
+
+async function calculateNotepadPrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const sheets = parseInt(formData.get('sheets'));
+  const paperCode = formData.get('textPaper');
+  const backingPaperCode = formData.get('backingPaper') || 'LYNOC95FSC'; // Default to 100# Cover Uncoated
+  const pageContent = formData.get('pageContent');
+  const rushType = formData.get('rushType') || 'standard';
+  
+  // Validate quantity constraints
+  const validation = validateQuantity(quantity, 'notepads', data.pricingConfigs.product_constraints);
+  if (!validation.valid) {
+    return { error: validation.message };
+  }
+  
+  // Get paper data
+  const textPaper = data.paperStocks[paperCode];
+  const backingPaper = data.paperStocks[backingPaperCode];
+  
+  if (!textPaper || !backingPaper) {
+    return { error: 'Invalid paper selection' };
+  }
+  
+  // Setup costs based on content type
+  let baseSetup = 0;
+  if (pageContent === 'custom') {
+    baseSetup = 30; // Custom design setup
+  } else if (pageContent === 'lined') {
+    baseSetup = 15; // Standard lined template
+  } else {
+    baseSetup = 0;  // Blank pages (no setup needed)
+  }
+  
+  const finishingSetup = 15;  // Always applied for padding
+  const totalSetup = baseSetup + finishingSetup;
+  
+  // Get imposition based on size
+  const imposition = data.pricingConfigs.imposition_data.notepads[size] || 2;
+  
+  // Calculate sheets needed per notepad (SINGLE-SIDED PRINTING)
+  // Each notepad has 'sheets' number of physical sheets
+  const textSheetsPerPad = sheets;  // Physical sheets per notepad
+  const backingSheetsPerPad = 1 / imposition;  // Backing sheet (cardstock)
+  
+  // Calculate 13x19" press sheets needed for production
+  const pressSheetsNeeded = (quantity * sheets) / imposition;  // Total press sheets for all notepads
+  
+  // Click calculations - based on press sheets (all notepads run through press)
+  // Blank pages still incur clicks, they just save the $15 setup fee
+  const totalClicksForProduction = pressSheetsNeeded;  // All pages need clicks
+  // Backing is not printed, so no clicks for backing
+  const totalClicks = totalClicksForProduction;
+  
+  // Material costs per notepad
+  // Text paper cost: based on press sheets needed divided by quantity
+  const textCostPerUnit = (pressSheetsNeeded * textPaper.costPerSheet) / quantity;
+  const backingCost = backingSheetsPerPad * backingPaper.costPerSheet;
+  const clickCostPerUnit = (totalClicks * (data.pricingConfigs.formula.clicksCost || 0.10)) / quantity;
+  const materialsCostPerUnit = (textCostPerUnit + backingCost + clickCostPerUnit) * 1.25; // 25% markup
+  
+  // Padding labor cost - $0.01 per sheet
+  const paddingLaborPerSheet = 0.01;
+  const paddingLabor = sheets * paddingLaborPerSheet;  // $0.01 per sheet per notepad
+  
+  // Apply formula: C(Q) = S + F_setup + Q^0.65 × 1.50 + Q × (M + L)
+  const productionCost = Math.pow(quantity, 0.65) * 1.50;
+  const materialsCostTotal = quantity * materialsCostPerUnit;
+  const laborCostTotal = quantity * paddingLabor;
+  
+  const subtotal = totalSetup + productionCost + materialsCostTotal + laborCostTotal;
+  
+  // Rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  const total = subtotal * rushMultiplier;
+  
+  return {
+    quantity: quantity,
+    size: size,
+    sheets: sheets,
+    textPaper: textPaper.displayName,
+    backingPaper: backingPaper.displayName,
+    pageContent: pageContent,
+    unitPrice: (total / quantity).toFixed(2),
+    totalCost: total.toFixed(2),
+    printingSetupCost: baseSetup.toFixed(2),
+    finishingSetupCost: finishingSetup.toFixed(2),
+    totalSetupCost: totalSetup.toFixed(2),
+    productionCost: productionCost.toFixed(2),
+    materialCost: materialsCostTotal.toFixed(2),
+    laborCost: laborCostTotal.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    // Detailed breakdown for display
+    textCost: textCostPerUnit.toFixed(4),
+    backingCost: backingCost.toFixed(4),
+    clickCost: clickCostPerUnit.toFixed(4),
+    materialsCostPerUnit: materialsCostPerUnit.toFixed(4),
+    textSheetsPerPad: textSheetsPerPad.toFixed(2),
+    backingSheetsPerPad: backingSheetsPerPad.toFixed(2),
+    totalClicks: totalClicks,
+    imposition: imposition
+  };
+}
+
 // Handle booklet form
 const bookletForm = document.getElementById('bookletCalculator');
 const bookletResults = document.getElementById('resultsSection');

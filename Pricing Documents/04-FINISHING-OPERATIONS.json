@@ -1,0 +1,241 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-08-13",
+  "description": "Finishing operations and costs for SFU Document Solutions products",
+  
+  "finishingSetupFees": {
+    "standard": {
+      "cost": 15.0,
+      "description": "Standard finishing setup fee",
+      "applicableProducts": ["brochures", "notebooks", "notepads"],
+      "when": "Applied when finishing operations are required"
+    },
+    "booklets": {
+      "cost": 30.0,
+      "description": "Booklet finishing setup (higher due to complexity)",
+      "applicableProducts": ["booklets"],
+      "when": "Always applied for booklets"
+    },
+    "none": {
+      "cost": 0.0,
+      "description": "No finishing setup required",
+      "applicableProducts": ["postcards", "flyers", "name-tags", "bookmarks", "posters"],
+      "when": "Products with no finishing operations"
+    }
+  },
+  
+  "finishingOperations": {
+    "folding": {
+      "description": "Paper folding operations for brochures",
+      "setupFee": 15.0,
+      "operations": {
+        "bifold": {
+          "costPerPiece": 0.10,
+          "description": "Single fold creating 4 panels",
+          "applicableProducts": ["brochures"],
+          "notes": "Half-fold along longest dimension"
+        },
+        "trifold": {
+          "costPerPiece": 0.10,
+          "description": "Two folds creating 6 panels",
+          "applicableProducts": ["brochures"],
+          "notes": "Standard tri-fold brochure"
+        }
+      }
+    },
+    "cutting": {
+      "description": "Precision cutting operations",
+      "setupFee": 0.0,
+      "operations": {
+        "standard": {
+          "costPerPiece": 0.05,
+          "description": "Standard cutting to final size",
+          "applicableProducts": ["postcards"],
+          "notes": "Cutting postcards to final dimensions"
+        }
+      }
+    },
+    "nameTagFinishing": {
+      "description": "Name tag specific finishing options",
+      "setupFee": 0.0,
+      "operations": {
+        "holePunch": {
+          "costPerPiece": 0.05,
+          "description": "Single hole punch for lanyard attachment",
+          "applicableProducts": ["name-tags"],
+          "restrictions": "Not available for adhesive stock",
+          "notes": "Standard 1/8 inch hole"
+        },
+        "lanyard": {
+          "costPerPiece": 1.25,
+          "description": "Basic lanyard included",
+          "applicableProducts": ["name-tags"],
+          "restrictions": "Not available for adhesive stock",
+          "notes": "Standard neck lanyard with clip"
+        }
+      }
+    },
+    "notebookBinding": {
+      "description": "Notebook binding operations",
+      "setupFee": 15.0,
+      "bindingTypes": {
+        "plasticCoil": {
+          "hardwareCost": 0.31,
+          "laborCost": 2.50,
+          "totalCostPerUnit": 2.81,
+          "description": "Plastic coil binding with rounded hardware cost",
+          "notes": "Hardware cost includes 25% markup (0.25 × 1.25 = 0.31)"
+        },
+        "wireO": {
+          "hardwareCost": 0.35,
+          "laborCost": 3.00,
+          "totalCostPerUnit": 3.35,
+          "description": "Wire-O binding (premium option)",
+          "notes": "More intensive labor and premium hardware"
+        },
+        "perfectBinding": {
+          "hardwareCost": 0.0,
+          "laborCost": 3.00,
+          "totalCostPerUnit": 3.00,
+          "description": "Perfect binding (glued spine)",
+          "notes": "No hardware cost, adhesive binding only"
+        }
+      },
+      "applicableProducts": ["notebooks"]
+    },
+    "bookletFinishing": {
+      "description": "Booklet specific finishing operations",
+      "setupFee": 30.0,
+      "operations": {
+        "coverCreasing": {
+          "costPerPiece": 0.10,
+          "description": "Cover creasing for proper folding",
+          "applicableProducts": ["booklets"],
+          "when": "Applied for separate cover stock only",
+          "notes": "Not required for self-cover booklets (text weight)"
+        },
+        "bindingPerSheet": {
+          "costPerPiece": 0.05,
+          "description": "Binding cost per text sheet",
+          "applicableProducts": ["booklets"],
+          "calculation": "multiplied by number of text sheets per booklet",
+          "notes": "Saddle-stitching cost"
+        }
+      }
+    },
+    "notepadPadding": {
+      "description": "Notepad glue padding operations",
+      "setupFee": 15.0,
+      "operations": {
+        "gluePadding": {
+          "costPerPad": 1.50,
+          "description": "Glue padding for tear-away functionality",
+          "applicableProducts": ["notepads"],
+          "notes": "Applied once per notepad regardless of sheet count"
+        },
+        "paddingLabor": {
+          "costPerSheet": 0.01,
+          "description": "Labor cost per sheet for padding",
+          "applicableProducts": ["notepads"],
+          "calculation": "sheets × $0.01 per notepad",
+          "notes": "Additional labor based on sheet count"
+        }
+      }
+    }
+  },
+  
+  "finishingLogic": {
+    "brochures": {
+      "finishingRequired": "conditional",
+      "condition": "foldType !== 'none' && foldType exists",
+      "setupFee": "15.0 if finishing required, 0 otherwise",
+      "costCalculation": "quantity × folding.costPerPiece"
+    },
+    "postcards": {
+      "finishingRequired": false,
+      "setupFee": 0.0,
+      "costCalculation": "No finishing costs"
+    },
+    "nameags": {
+      "finishingRequired": "optional",
+      "condition": "holePunch or lanyard selected",
+      "setupFee": 0.0,
+      "costCalculation": "quantity × (holePunch + lanyard costs)",
+      "restrictions": "finishing not available for adhesive stock"
+    },
+    "flyers": {
+      "finishingRequired": false,
+      "setupFee": 0.0,
+      "costCalculation": "No finishing costs"
+    },
+    "bookmarks": {
+      "finishingRequired": false,
+      "setupFee": 0.0,
+      "costCalculation": "No finishing costs"
+    },
+    "booklets": {
+      "finishingRequired": true,
+      "setupFee": 30.0,
+      "costCalculation": "coverCreasing + (bindingPerSheet × textSheets) per booklet",
+      "specialRules": "coverCreasing not applied for self-cover booklets"
+    },
+    "notebooks": {
+      "finishingRequired": true,
+      "setupFee": 15.0,
+      "costCalculation": "bindingType.hardwareCost + bindingType.laborCost per notebook"
+    },
+    "notepads": {
+      "finishingRequired": true,
+      "setupFee": 15.0,
+      "costCalculation": "gluePadding + (sheets × paddingLabor) per notepad"
+    },
+    "posters": {
+      "finishingRequired": false,
+      "setupFee": 0.0,
+      "costCalculation": "No finishing costs"
+    }
+  },
+  
+  "finishingCalculationExamples": {
+    "trifoldBrochure": {
+      "product": "brochures",
+      "quantity": 100,
+      "foldType": "trifold",
+      "finishingSetup": 15.0,
+      "finishingCostPerPiece": 0.10,
+      "totalFinishingCost": "15.0 + (100 × 0.10) = $25.00"
+    },
+    "nameTagWithLanyard": {
+      "product": "name-tags",
+      "quantity": 50,
+      "options": ["holePunch", "lanyard"],
+      "finishingSetup": 0.0,
+      "finishingCostPerPiece": "0.05 + 1.25 = 1.30",
+      "totalFinishingCost": "0 + (50 × 1.30) = $65.00"
+    },
+    "plasticCoilNotebook": {
+      "product": "notebooks",
+      "quantity": 25,
+      "bindingType": "plasticCoil",
+      "finishingSetup": 15.0,
+      "finishingCostPerPiece": "0.31 + 2.50 = 2.81",
+      "totalFinishingCost": "15.0 + (25 × 2.81) = $85.25"
+    },
+    "100SheetNotepad": {
+      "product": "notepads",
+      "quantity": 50,
+      "sheets": 100,
+      "finishingSetup": 15.0,
+      "finishingCostPerPiece": "1.50 + (100 × 0.01) = 2.50",
+      "totalFinishingCost": "15.0 + (50 × 2.50) = $140.00"
+    }
+  },
+  
+  "usageInstructions": {
+    "setupFees": "Apply finishing setup fee only when finishing is required",
+    "perPieceCosts": "Multiply finishing cost per piece by quantity",
+    "conditionalFinishing": "Check product logic to determine if finishing applies",
+    "restrictions": "Verify finishing options are available for selected materials",
+    "totalFinishing": "finishingSetup + (quantity × finishingCostPerPiece)"
+  }
+}

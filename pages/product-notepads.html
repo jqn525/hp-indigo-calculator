@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Custom tear-away notepads perfect for marketing and branding. Glue-bound with cardstock backing and custom printing options.">
+    <meta name="theme-color" content="#CC0633">
+    
+    <title>Custom Notepads | SFU Document Solutions</title>
+    
+    <link rel="manifest" href="../manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/styles.css?v=135">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Indigo Calc">
+    
+    <!-- Authentication Guard -->
+    <script src="../js/auth-guard.js"></script>
+</head>
+<body>
+    <!-- Desktop Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand/Logo -->
+            <a href="../index.html" class="header-brand">
+                <div class="brand-text">SFU Document Solutions</div>
+            </a>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="header-search">
+                    <input type="text" placeholder="Search products..." />
+                    <button type="submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="header-user-menu">
+                    <button class="user-menu-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Account
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="signin.html" class="dropdown-item">Sign In</a>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="header-cart">
+                    <a href="cart.html" class="cart-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,18C8.1,18 9,18.9 9,20S8.1,22 7,22 5,21.1 5,20 5.9,18 7,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M17,18C18.1,18 19,18.9 19,20S18.1,22 17,22 15,21.1 15,20 15.9,18 17,18Z"/>
+                        </svg>
+                        <span class="cart-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-list">
+            <li class="mobile-nav-item">
+                <a href="small-format.html" class="mobile-nav-link">Small Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="large-format.html" class="mobile-nav-link">Large Format</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="promo.html" class="mobile-nav-link">Promotional</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="cart.html" class="mobile-nav-link">Cart</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="signin.html" class="mobile-nav-link">Sign In</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="small-format.html">Small Format Printing</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Notepads</li>
+                </ol>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="container">
+            <div class="product-hero">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1>Custom Notepads</h1>
+                        <p class="lead">Professional tear-away notepads perfect for marketing, branding, and promotional use. Glue-bound at the top with sturdy cardstock backing.</p>
+                        <div class="hero-actions">
+                            <a href="notepads.html" class="btn btn-primary btn-lg">Get Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Examples -->
+        <div class="container">
+            <section class="product-section">
+                <h2>Marketing Examples</h2>
+                <p class="section-subtitle">See how businesses use custom notepads for effective marketing and brand awareness.</p>
+                
+                <div class="examples-grid">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="example-card">
+                                <h4>Real Estate</h4>
+                                <p>Agent contact information, "Things To Do" lists, and property viewing reminders.</p>
+                                <ul class="example-features">
+                                    <li>Agent photo and contact</li>
+                                    <li>Company branding</li>
+                                    <li>Practical daily use</li>
+                                    <li>Desktop presence</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="example-card">
+                                <h4>Insurance</h4>
+                                <p>Policy reminders, emergency contacts, and appointment scheduling.</p>
+                                <ul class="example-features">
+                                    <li>Emergency numbers</li>
+                                    <li>Policy information</li>
+                                    <li>Monthly calendars</li>
+                                    <li>Contact reminders</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="example-card">
+                                <h4>Medical/Dental</h4>
+                                <p>Appointment reminders, health tips, and practice information.</p>
+                                <ul class="example-features">
+                                    <li>Appointment scheduling</li>
+                                    <li>Health reminders</li>
+                                    <li>Office information</li>
+                                    <li>Prescription notes</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="example-card">
+                                <h4>Restaurants</h4>
+                                <p>Order tracking, weekly specials, and catering information.</p>
+                                <ul class="example-features">
+                                    <li>Menu highlights</li>
+                                    <li>Special offers</li>
+                                    <li>Order numbers</li>
+                                    <li>Catering details</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <section class="product-section">
+                        <h2>Size Options</h2>
+                        <div class="size-grid">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="size-option">
+                                        <h4>4" × 6"</h4>
+                                        <p><strong>Compact Desktop</strong></p>
+                                        <ul>
+                                            <li>Perfect for phone message pads</li>
+                                            <li>8-up imposition (most economical)</li>
+                                            <li>Fits standard desk areas</li>
+                                            <li>Quick note-taking</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="size-option">
+                                        <h4>5" × 7" <span class="badge bg-success">Popular</span></h4>
+                                        <p><strong>Standard Marketing Size</strong></p>
+                                        <ul>
+                                            <li>Most popular for promotional use</li>
+                                            <li>4-up imposition</li>
+                                            <li>Good balance of size and cost</li>
+                                            <li>Excellent brand visibility</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="size-option">
+                                        <h4>5.5" × 8.5"</h4>
+                                        <p><strong>Half-Letter Size</strong></p>
+                                        <ul>
+                                            <li>Professional appearance</li>
+                                            <li>4-up imposition</li>
+                                            <li>More writing space</li>
+                                            <li>Business applications</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="size-option">
+                                        <h4>8.5" × 11"</h4>
+                                        <p><strong>Full-Letter Size</strong></p>
+                                        <ul>
+                                            <li>Maximum writing space</li>
+                                            <li>2-up imposition</li>
+                                            <li>Professional documents</li>
+                                            <li>Detailed forms and lists</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="product-section">
+                        <h2>Content Options</h2>
+                        <div class="content-comparison">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="content-option">
+                                        <h4>Blank Pages <span class="badge bg-success">No Setup</span></h4>
+                                        <p>Completely blank pages for maximum flexibility.</p>
+                                        <ul>
+                                            <li>No design setup required</li>
+                                            <li>Lowest cost option</li>
+                                            <li>Complete creative freedom</li>
+                                            <li>Fast production</li>
+                                        </ul>
+                                        <div class="pricing-note">
+                                            <strong>Setup Cost:</strong> $0 (no template needed)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="content-option">
+                                        <h4>Lined Pages</h4>
+                                        <p>Standard ruled lines for organized writing.</p>
+                                        <ul>
+                                            <li>Professional appearance</li>
+                                            <li>Guides neat handwriting</li>
+                                            <li>Standard line template</li>
+                                            <li>Quick setup process</li>
+                                        </ul>
+                                        <div class="pricing-note">
+                                            <strong>Setup Cost:</strong> $15 (template setup)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="content-option">
+                                        <h4>Custom Printed</h4>
+                                        <p>Your logo, branding, and custom layouts.</p>
+                                        <ul>
+                                            <li>Full branding potential</li>
+                                            <li>Contact information</li>
+                                            <li>Custom forms and layouts</li>
+                                            <li>Professional design service</li>
+                                        </ul>
+                                        <div class="pricing-note">
+                                            <strong>Setup Cost:</strong> $30 (custom design)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="product-section">
+                        <h2>Paper & Construction</h2>
+                        <div class="paper-specs">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="paper-detail">
+                                        <h4>Sheet Paper Options</h4>
+                                        <div class="paper-option">
+                                            <strong>60# Text Uncoated</strong>
+                                            <p>Standard writing paper, excellent for everyday use. Most economical option with good ink adhesion.</p>
+                                        </div>
+                                        <div class="paper-option">
+                                            <strong>80# Text Uncoated</strong>
+                                            <p>Heavier weight paper for premium feel. Reduced show-through and improved durability.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="paper-detail">
+                                        <h4>Cardstock Backing</h4>
+                                        <div class="paper-option">
+                                            <strong>100# Cover Uncoated</strong>
+                                            <p>Sturdy cardstock backing provides support and stability. Non-printed for cost efficiency.</p>
+                                        </div>
+                                        <div class="construction-detail mt-3">
+                                            <h5>Glue-Bound Construction</h5>
+                                            <p>Professional padding process with strong adhesive binding at the top edge. Easy tear-away perforation.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="product-section">
+                        <h2>Custom Design Guidelines</h2>
+                        <div class="design-guidelines">
+                            <div class="alert alert-info">
+                                <h5>Design Requirements</h5>
+                                <p>For custom printed notepads, please provide:</p>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>File Specifications</h5>
+                                    <ul>
+                                        <li>High-resolution files (300 DPI minimum)</li>
+                                        <li>PDF, AI, or EPS format preferred</li>
+                                        <li>CMYK color mode for accurate printing</li>
+                                        <li>Include 0.125" bleed if printing to edges</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Design Elements</h5>
+                                    <ul>
+                                        <li>Company logo and branding</li>
+                                        <li>Contact information (phone, email, website)</li>
+                                        <li>Custom layouts (forms, calendars, lists)</li>
+                                        <li>Consider tear-away functionality in design</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="design-note mt-3">
+                                <p><strong>Note:</strong> Our design team can assist with layout optimization and branding placement. Additional design services may apply for complex custom layouts.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <div class="specs-sidebar">
+                        <div class="specs-card">
+                            <h3>Quick Specifications</h3>
+                            <div class="spec-item">
+                                <strong>Sizes Available:</strong>
+                                <span>4×6, 5×7, 5.5×8.5, 8.5×11</span>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Sheets per Pad:</strong>
+                                <span>50 or 100 sheets</span>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Binding:</strong>
+                                <span>Glue-bound at top edge</span>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Quantity Range:</strong>
+                                <span>25 - 1000 notepads</span>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Turnaround:</strong>
+                                <span>3-5 business days</span>
+                            </div>
+                            <div class="spec-item">
+                                <strong>Rush Options:</strong>
+                                <span>2-day (+25%), Next-day (+50%)</span>
+                            </div>
+                            
+                            <div class="cta-section">
+                                <a href="notepads.html" class="btn btn-primary btn-lg w-100 mb-3">Configure & Price</a>
+                                <p class="text-center">
+                                    <small class="text-muted">Custom design options available</small>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="uses-card">
+                            <h4>Perfect For</h4>
+                            <ul class="use-cases">
+                                <li>Real estate marketing</li>
+                                <li>Medical appointment reminders</li>
+                                <li>Insurance policy notes</li>
+                                <li>Restaurant order pads</li>
+                                <li>Phone message pads</li>
+                                <li>Trade show giveaways</li>
+                                <li>Reception desk supplies</li>
+                                <li>Customer service forms</li>
+                            </ul>
+                        </div>
+
+                        <div class="cost-savings-card">
+                            <h4>Cost-Saving Tips</h4>
+                            <ul>
+                                <li><strong>Choose 5×7 size</strong> - Most efficient imposition</li>
+                                <li><strong>Order blank pages</strong> - No setup cost</li>
+                                <li><strong>Bulk quantities</strong> - Better per-unit pricing</li>
+                                <li><strong>Standard turnaround</strong> - Avoid rush fees</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Core JavaScript -->
+    <script src="../js/cart.js"></script>
+    <script src="../js/header.js"></script>
+    
+    <!-- Authentication -->
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>

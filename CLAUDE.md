@@ -8,13 +8,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Live URL**: https://docsol.ca
 
-### ⭐ **Latest Updates (2025-08-12)**
+### ⭐ **Latest Updates (2025-08-13)**
+- **NOTEPAD PRICING OPTIMIZATION COMPLETE**: Major pricing formula improvements for competitive bulk pricing
+  - **Efficiency Exponent**: Improved from 0.80 to 0.65 for aggressive bulk discounts
+  - **Per-Sheet Labor Pricing**: Changed from flat $1.50/unit to $0.01 per sheet (scales with pad size)
+  - **Corrected Click Costs**: Fixed excessive materials pricing by properly calculating press sheet clicks
+  - **Universal Click Charges**: All notepads (blank, lined, custom) incur press clicks for accuracy
+  - **Real-Time UI Updates**: Fixed pricing updates when changing sheet count selections
+  - **Production Cost Formula**: Q^0.65 × $1.50 provides excellent volume economies
+- **NOTEBOOKS PRODUCT COMPLETE**: Added professional coil-bound, wire-o, and perfect-bound notebooks
+  - **Configuration Options**: 5.5×8.5" and 8.5×11" sizes, 50 or 100 pages
+  - **Binding Types**: Plastic coil, wire-o, and perfect binding with proper cost calculations
+  - **Paper Options**: Cover and interior paper selections with premium options
+  - **Content Types**: Lined or blank pages with setup cost logic
+  - **Quantity Range**: 10-500 units with preset buttons (25, 50, 100, 250, 500)
+- **NOTEPADS PRODUCT COMPLETE**: Added custom tear-away notepads with glue-bound construction
+  - **Size Options**: 4×6", 5×7", 5.5×8.5", 8.5×11" for marketing flexibility
+  - **Sheet Options**: 25, 50, 75, 100 sheets per pad for various use cases
+  - **Content Types**: Blank (no setup fee), lined, and custom printed options
+  - **Paper Selection**: Text paper and cardstock backing options
+  - **Quantity Range**: 25-1000 units with comprehensive preset buttons
+- **QUANTITY PRESET ENHANCEMENT**: Added clickable quantity suggestion buttons to both products
+- **PROFESSIONAL UI**: Both products match existing product page design patterns perfectly
+
+### Previous Updates (2025-08-12)
 - **PROFESSIONAL BORDER RADIUS SYSTEM**: Implemented tiered border radius hierarchy for visual consistency
 - **SELF COVER BOOKLETS**: Added self-cover option for booklets (all text weight, no cover stock)
 - **BOOKLET CAPACITY INCREASED**: Raised booklet maximum from 500 to 1000 units
 - **ROUNDED BUTTON DESIGN**: Service card buttons now use professional 8px rounded corners
 - **UI CONSISTENCY**: All product cards, option cards, and interactive elements follow consistent radius standards
-- **SERVICE WORKER**: Updated to v134 with comprehensive UI improvements
+- **SERVICE WORKER**: Updated to v135 with notepad pricing optimizations
 
 ### Previous Updates (2025-08-11)
 - **POSTER CONFIGURATOR COMPLETE**: New large format poster calculator with square-footage pricing
@@ -65,7 +88,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Flyers** (5.5x8.5, 8.5x11, 8.5x14, 11x17) - 25-2500 units, e=0.70
 - **Bookmarks** (2x6, 2x7, 2x8) - 100-2500 units, e=0.65
 - **Name Tags** (2.33x3, 3x4, 4x6) - 50-5000 units, e=0.65, optimized pricing
-- **Booklets** (8-48 pages, multiples of 4) - 10-500 units, e=0.75, dual paper selection
+- **Booklets** (8-48 pages, multiples of 4) - 10-1000 units, e=0.75, dual paper selection
+- **Notebooks** (5.5x8.5, 8.5x11) - 10-500 units, 50/100 pages, coil/wire-o/perfect binding
+- **Notepads** (4x6, 5x7, 5.5x8.5, 8.5x11) - 25-1000 units, 25/50/75/100 sheets, tear-away pads
 
 #### Product Information Pages:
 - **Product Brochures** (`/pages/product-brochures.html`) - Detailed brochure specifications
@@ -172,14 +197,25 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - `paperStocks` object in `/js/paperStocks.js` contains paper costs and specifications
 - **Database**: Used only for user data (accounts, carts, quotes) - NO pricing data
 - Core pricing formula: `C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r`
-  - S = Setup fee (varies by product: $30 standard, $15 for name tags)
+  - S = Setup fee (varies by product: $30 standard, $15 for name tags, $0-30 for notepads)
   - F_setup = Finishing setup fee ($15, if finishing required)
   - Q = Quantity
-  - e = Efficiency exponent (0.75 brochures, 0.70 postcards/flyers, 0.65 name tags/bookmarks)
+  - e = Efficiency exponent (0.75 brochures, 0.70 postcards/flyers, 0.65 name tags/bookmarks/notepads)
   - k = Base production rate ($1.50)
   - v = Variable cost per piece (paper + clicks × 1.5 / imposition)
   - f = Finishing cost per piece
   - r = Rush multiplier (1.0-2.0x)
+
+#### Notepad-Specific Pricing (Optimized 2025-08-13):
+- **Formula**: `C(Q) = S + F_setup + Q^0.65 × 1.50 + Q × (M + L)`
+- **Setup Fees**: Blank ($0), Lined ($15), Custom ($30) + $15 padding setup
+- **Materials (M)**: (Text + Backing + Clicks) × 1.25 markup per unit
+  - Text Cost: (Press Sheets × Paper Cost) / Quantity
+  - Backing Cost: (1/Imposition) × Cardstock Cost
+  - Click Cost: (Press Sheets × $0.10) / Quantity (all content types)
+- **Labor (L)**: $0.01 per sheet per notepad (scales with pad size)
+- **Production**: Q^0.65 × $1.50 (aggressive bulk discounts)
+- **Press Sheets**: (Quantity × Sheets per Pad) / Imposition
 
 ### Products Implemented
 - **Brochures**: qty 25-2500, 3 sizes, folding options, e=0.75
@@ -187,6 +223,9 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Flyers**: qty 25-2500, 4 sizes, text + cover stock subset, e=0.70
 - **Bookmarks**: qty 100-2500, 3 sizes (2x6, 2x7, 2x8), 130# Cover Uncoated/Silk, e=0.65
 - **Name Tags**: qty 50-5000, 3 sizes (2.33x3, 3x4, 4x6), optimized pricing, e=0.65
+- **Booklets**: qty 10-1000, 8-48 pages, saddle-stitched, dual paper selection, e=0.75
+- **Notebooks**: qty 10-500, 50/100 pages, coil/wire-o/perfect binding, premium options, e=0.80
+- **Notepads**: qty 25-1000, 25/50/75/100 sheets, glue-bound, optimized bulk pricing, e=0.65
 - **Posters**: qty 1-20, 4 sizes (18x24 to 36x48), square-footage pricing ($6-9/sqft)
 
 ### Cart System (NEW)
@@ -253,9 +292,11 @@ The pricing calculation logic is centralized in `/js/calculator.js`:
 - **Integration**: Powers the unified small format product selection page
 
 ### Adding New Product Calculators
+**IMPORTANT**: Always check existing functional pages (like `brochures.html` or `notebooks.html`) for HTML structure and CSS patterns when creating new product pages. Copy the approved/functional page structure first, then customize for the specific product. This approach ensures consistency and reduces debugging time.
+
 1. Add product constraints to `pricingConfig.js` (`productConstraints` object)
 2. Add imposition data to `pricingConfig.js` (`impositionData` object)
-3. Create new HTML file in `/pages/` with appropriate form fields
+3. Create new HTML file in `/pages/` using existing working page as template
 4. Add new pricing function to `calculator.js` (follow existing patterns)
 5. Add to service worker `urlsToCache` array
 6. Increment cache version in `sw.js`
@@ -799,3 +840,4 @@ This session focused on implementing the complete SFU Document Solutions brand i
 
 ### Startup Instructions
 - Always start up the application using this method.
+- can you remember to check the html and css code such as brochures for everytime i ask you to make a new product page. that way you can just replicate the approve/functional page before customizing it for the next product.
