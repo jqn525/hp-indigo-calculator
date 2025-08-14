@@ -171,6 +171,70 @@ class CartManager {
     this.updateCartBadge();
     this.renderCartItems();
   }
+  
+  editItem(itemId) {
+    // Find the item to edit
+    const item = this.items.find(i => i.id === itemId);
+    if (!item) {
+      console.warn('Item not found:', itemId);
+      return;
+    }
+    
+    // Store the item data for the product page to retrieve
+    sessionStorage.setItem('editingItem', JSON.stringify({
+      id: itemId,
+      productType: item.productType,
+      configuration: item.configuration,
+      pricing: item.pricing
+    }));
+    
+    // Redirect to the appropriate product page with edit parameter
+    const productPages = {
+      'brochures': 'brochures.html',
+      'postcards': 'postcards.html',
+      'flyers': 'flyers.html',
+      'bookmarks': 'bookmarks.html',
+      'booklets': 'booklets.html',
+      'notebooks': 'notebooks.html',
+      'notepads': 'notepads.html',
+      'name-tags': 'name-tags.html'
+    };
+    
+    const productPage = productPages[item.productType];
+    if (productPage) {
+      window.location.href = `${productPage}?edit=${itemId}`;
+    } else {
+      console.warn('No product page found for:', item.productType);
+    }
+  }
+  
+  updateItem(itemId, updatedConfiguration, updatedPricing) {
+    // Find the item to update
+    const itemIndex = this.items.findIndex(i => i.id === itemId);
+    if (itemIndex === -1) {
+      console.warn('Item not found for update:', itemId);
+      return false;
+    }
+    
+    // Update the item while preserving the original ID and timestamp
+    this.items[itemIndex] = {
+      ...this.items[itemIndex],
+      configuration: updatedConfiguration,
+      pricing: updatedPricing,
+      timestamp: new Date().toISOString() // Update timestamp to show when it was last modified
+    };
+    
+    // Save to storage and update UI
+    this.saveToStorage();
+    this.updateCartBadge();
+    this.renderCartItems();
+    
+    // Clear the editing session data
+    sessionStorage.removeItem('editingItem');
+    
+    console.log('Item updated successfully:', itemId);
+    return true;
+  }
 
   clearCart() {
     this.items = [];
@@ -275,6 +339,55 @@ class CartManager {
     emptyCartDiv.style.display = 'none';
     
     cartItemsContainer.innerHTML = this.items.map(item => this.renderCartItem(item)).join('');
+    
+    // Also update order summary
+    this.renderOrderSummary();
+  }
+  
+  renderOrderSummary() {
+    const summaryContainer = document.getElementById('orderSummaryItems');
+    
+    if (!summaryContainer) return; // Not on cart page
+    
+    if (this.items.length === 0) {
+      summaryContainer.innerHTML = '<p class="text-muted text-center">No items in cart</p>';
+      return;
+    }
+    
+    // Group items by product type for summary
+    const groupedItems = {};
+    let grandTotal = 0;
+    
+    this.items.forEach(item => {
+      const productType = item.productType || 'product';
+      const displayName = this.getProductDisplayName(productType);
+      const totalPrice = parseFloat(item.pricing.totalPrice || item.pricing.totalCost || 0);
+      
+      if (!groupedItems[displayName]) {
+        groupedItems[displayName] = 0;
+      }
+      
+      groupedItems[displayName] += totalPrice;
+      grandTotal += totalPrice;
+    });
+    
+    // Render summary items
+    const summaryHTML = Object.entries(groupedItems).map(([productName, total]) => {
+      return `
+        <div class="summary-item">
+          <span class="summary-product">${productName}</span>
+          <span class="summary-price">$${total.toFixed(2)}</span>
+        </div>
+      `;
+    }).join('');
+    
+    summaryContainer.innerHTML = summaryHTML;
+    
+    // Update total
+    const totalElement = document.getElementById('cartTotal');
+    if (totalElement) {
+      totalElement.textContent = `$${grandTotal.toFixed(2)}`;
+    }
   }
 
   renderCartItem(item) {
@@ -282,46 +395,374 @@ class CartManager {
     const pricing = item.pricing || {};
     const productType = item.productType || 'product';
     
-    // Get display name for product type
-    const productDisplayName = this.getProductDisplayName(productType);
-    
-    // Generate summary text
-    const summary = this.generateItemSummary(config, productType);
-    
-    // Format timestamp
-    const date = new Date(item.timestamp);
-    const timeString = date.toLocaleString();
+    // Get display name for product type (uppercase for header)
+    const productDisplayName = this.getProductDisplayName(productType).toUpperCase();
     
     // Get price with fallback
     const totalPrice = pricing.totalPrice || pricing.totalCost || 0;
     const unitPrice = pricing.unitPrice || 0;
     
-    // Check if this item was loaded from a quote
-    const isFromQuote = pricing.originalQuoteNumber;
-    const quoteIndicator = isFromQuote ? 
-      `<div class="quote-source-badge">
-        <span class="badge bg-info">From Quote ${pricing.originalQuoteNumber}</span>
-      </div>` : '';
+    // Get all configuration details for the collapsible section
+    const configDetails = this.getAllConfigurationDetails(config, productType);
+    
+    // Generate unique ID for collapse functionality
+    const collapseId = `config-${item.id}`;
 
     return `
-      <div class="cart-item" data-item-id="${item.id}">
-        <div class="cart-item-header">
-          <div class="cart-item-info">
-            <h3>${productDisplayName}</h3>
-            <div class="cart-item-summary">${summary}</div>
-            <div class="cart-item-price">Total: $${parseFloat(totalPrice).toFixed(2)}</div>
-            ${quoteIndicator}
+      <div class="cart-item-config-card" data-item-id="${item.id}">
+        <!-- Product Header -->
+        <div class="config-header">
+          <h3 class="config-title">${productDisplayName}</h3>
+          <div class="config-actions">
+            <button class="edit-item-btn" onclick="cartManager.editItem('${item.id}')" title="Edit Configuration">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3,17.25V21H6.75L17.81,9.94L14.06,6.19L3,17.25M20.71,7.04C21.1,6.65 21.1,6.02 20.71,5.63L18.37,3.29C17.98,2.9 17.35,2.9 16.96,3.29L15.13,5.12L18.88,8.87M17.81,9.94"/>
+              </svg>
+            </button>
+            <button class="remove-item-btn" onclick="cartManager.removeItem('${item.id}')" title="Remove Item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+              </svg>
+            </button>
           </div>
-          <button class="remove-item-btn" onclick="cartManager.removeItem('${item.id}')">
-            Remove
-          </button>
         </div>
         
-        <div class="cart-item-details">
-          ${this.renderItemDetails(config, pricing, productType)}
+        <!-- Red Pricing Box -->
+        <div class="pricing-display">
+          <div class="pricing-left">
+            <span class="pricing-label">Per unit:</span>
+            <span class="unit-price">$${parseFloat(unitPrice).toFixed(2)}</span>
+          </div>
+          <div class="pricing-right">
+            <span class="pricing-label">Total Price</span>
+            <span class="total-price">$${parseFloat(totalPrice).toFixed(2)}</span>
+          </div>
+        </div>
+        
+        <!-- Collapsible Configuration Section -->
+        <div class="config-section">
+          <button class="config-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="true" aria-controls="${collapseId}">
+            <span>YOUR CONFIGURATION</span>
+            <svg class="config-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7,10L12,15L17,10H7Z"/>
+            </svg>
+          </button>
+          
+          <div class="collapse show" id="${collapseId}">
+            <div class="config-details">
+              ${configDetails.map(detail => `
+                <div class="config-row">
+                  <span class="config-label">${detail.label}:</span>
+                  <span class="config-value">${detail.value}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
         </div>
       </div>
     `;
+  }
+
+  getItemSize(config, productType) {
+    if (!config) return 'N/A';
+    
+    // Handle different size formats based on product type
+    if (config.size) {
+      return config.size.replace('×', ' × ');
+    }
+    
+    // Handle specific product types with different size configurations
+    switch (productType) {
+      case 'booklets':
+        return config.bookletSize || 'N/A';
+      case 'notebooks':
+        return config.notebookSize || 'N/A';
+      case 'notepads':
+        return config.notepadSize || 'N/A';
+      default:
+        return config.dimensions || config.paperSize || 'N/A';
+    }
+  }
+  
+  getTurnaroundTime(config) {
+    if (!config) return 'Standard';
+    
+    const rushType = config.rushType || config.turnaround || 'standard';
+    
+    switch (rushType.toLowerCase()) {
+      case 'rush':
+      case 'rush (1-2 days)':
+        return '1-2 Business Days';
+      case 'standard':
+      case 'standard (3-5 days)':
+      default:
+        return '3-5 Business Days';
+    }
+  }
+  
+  getProductDetails(config, productType) {
+    const details = [];
+    
+    if (!config) return details;
+    
+    // Paper Stock Information
+    if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+      details.push({
+        label: 'Paper Stock',
+        value: window.paperStocks[config.paperType].displayName
+      });
+    }
+    
+    // Product-specific details
+    switch (productType) {
+      case 'brochures':
+        if (config.foldType && config.foldType !== 'none') {
+          const foldDisplay = config.foldType.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Fold Type', value: foldDisplay });
+        }
+        break;
+        
+      case 'booklets':
+        if (config.pages) {
+          details.push({ label: 'Pages', value: config.pages });
+        }
+        if (config.coverPaper && window.paperStocks && window.paperStocks[config.coverPaper]) {
+          details.push({ 
+            label: 'Cover Paper', 
+            value: window.paperStocks[config.coverPaper].displayName 
+          });
+        }
+        if (config.interiorPaper && window.paperStocks && window.paperStocks[config.interiorPaper]) {
+          details.push({ 
+            label: 'Interior Paper', 
+            value: window.paperStocks[config.interiorPaper].displayName 
+          });
+        }
+        break;
+        
+      case 'notebooks':
+        if (config.pages) {
+          details.push({ label: 'Pages', value: config.pages });
+        }
+        if (config.bindingType) {
+          const bindingDisplay = config.bindingType.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Binding', value: bindingDisplay });
+        }
+        if (config.coverPaper && window.paperStocks && window.paperStocks[config.coverPaper]) {
+          details.push({ 
+            label: 'Cover Paper', 
+            value: window.paperStocks[config.coverPaper].displayName 
+          });
+        }
+        if (config.interiorPaper && window.paperStocks && window.paperStocks[config.interiorPaper]) {
+          details.push({ 
+            label: 'Interior Paper', 
+            value: window.paperStocks[config.interiorPaper].displayName 
+          });
+        }
+        break;
+        
+      case 'notepads':
+        if (config.sheets) {
+          details.push({ label: 'Sheets per Pad', value: config.sheets });
+        }
+        if (config.contentType) {
+          const contentDisplay = config.contentType.charAt(0).toUpperCase() + 
+            config.contentType.slice(1);
+          details.push({ label: 'Content Type', value: contentDisplay });
+        }
+        if (config.backingPaper && window.paperStocks && window.paperStocks[config.backingPaper]) {
+          details.push({ 
+            label: 'Backing Paper', 
+            value: window.paperStocks[config.backingPaper].displayName 
+          });
+        }
+        break;
+        
+      case 'postcards':
+      case 'flyers':
+        if (config.coating && config.coating !== 'none') {
+          const coatingDisplay = config.coating.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Coating', value: coatingDisplay });
+        }
+        break;
+        
+      case 'bookmarks':
+        // Bookmarks typically just have paper and size
+        break;
+        
+      case 'name-tags':
+        if (config.finishing && config.finishing !== 'none') {
+          const finishingDisplay = config.finishing.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Finishing', value: finishingDisplay });
+        }
+        break;
+    }
+    
+    // Rush/Turnaround details
+    if (config.rushType && config.rushType !== 'standard') {
+      details.push({ 
+        label: 'Rush Order', 
+        value: 'Yes (' + this.getTurnaroundTime(config) + ')' 
+      });
+    }
+    
+    return details;
+  }
+  
+  getAllConfigurationDetails(config, productType) {
+    const details = [];
+    
+    if (!config) return details;
+    
+    // Get basic information first
+    const size = this.getItemSize(config, productType);
+    const turnaroundTime = this.getTurnaroundTime(config);
+    const quantity = config.quantity || 0;
+    
+    // Standard details that appear for all products
+    if (size !== 'N/A') {
+      details.push({ label: 'Size', value: size });
+    }
+    
+    // Product-specific details in logical order
+    switch (productType) {
+      case 'booklets':
+        if (config.pages) {
+          details.push({ label: 'Pages', value: config.pages });
+        }
+        if (config.coverPaper && window.paperStocks && window.paperStocks[config.coverPaper]) {
+          details.push({ 
+            label: 'Cover Paper', 
+            value: window.paperStocks[config.coverPaper].displayName 
+          });
+        }
+        if (config.interiorPaper && window.paperStocks && window.paperStocks[config.interiorPaper]) {
+          details.push({ 
+            label: 'Text Paper', 
+            value: window.paperStocks[config.interiorPaper].displayName 
+          });
+        }
+        break;
+        
+      case 'notebooks':
+        if (config.pages) {
+          details.push({ label: 'Pages', value: config.pages });
+        }
+        if (config.bindingType) {
+          const bindingDisplay = config.bindingType.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Binding', value: bindingDisplay });
+        }
+        if (config.coverPaper && window.paperStocks && window.paperStocks[config.coverPaper]) {
+          details.push({ 
+            label: 'Cover Paper', 
+            value: window.paperStocks[config.coverPaper].displayName 
+          });
+        }
+        if (config.interiorPaper && window.paperStocks && window.paperStocks[config.interiorPaper]) {
+          details.push({ 
+            label: 'Interior Paper', 
+            value: window.paperStocks[config.interiorPaper].displayName 
+          });
+        }
+        break;
+        
+      case 'notepads':
+        if (config.sheets) {
+          details.push({ label: 'Sheets per Pad', value: config.sheets });
+        }
+        if (config.contentType) {
+          const contentDisplay = config.contentType.charAt(0).toUpperCase() + 
+            config.contentType.slice(1);
+          details.push({ label: 'Content Type', value: contentDisplay });
+        }
+        if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+          details.push({ 
+            label: 'Paper Stock', 
+            value: window.paperStocks[config.paperType].displayName 
+          });
+        }
+        if (config.backingPaper && window.paperStocks && window.paperStocks[config.backingPaper]) {
+          details.push({ 
+            label: 'Backing Paper', 
+            value: window.paperStocks[config.backingPaper].displayName 
+          });
+        }
+        break;
+        
+      case 'brochures':
+        if (config.foldType && config.foldType !== 'none') {
+          const foldDisplay = config.foldType.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Fold Type', value: foldDisplay });
+        }
+        if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+          details.push({ 
+            label: 'Paper Stock', 
+            value: window.paperStocks[config.paperType].displayName 
+          });
+        }
+        break;
+        
+      case 'postcards':
+      case 'flyers':
+        if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+          details.push({ 
+            label: 'Paper Stock', 
+            value: window.paperStocks[config.paperType].displayName 
+          });
+        }
+        if (config.coating && config.coating !== 'none') {
+          const coatingDisplay = config.coating.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Coating', value: coatingDisplay });
+        }
+        break;
+        
+      case 'bookmarks':
+        if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+          details.push({ 
+            label: 'Paper Stock', 
+            value: window.paperStocks[config.paperType].displayName 
+          });
+        }
+        break;
+        
+      case 'name-tags':
+        if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+          details.push({ 
+            label: 'Paper Stock', 
+            value: window.paperStocks[config.paperType].displayName 
+          });
+        }
+        if (config.finishing && config.finishing !== 'none') {
+          const finishingDisplay = config.finishing.replace('-', ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+          details.push({ label: 'Finishing', value: finishingDisplay });
+        }
+        break;
+        
+      default:
+        // Generic paper stock for other products
+        if (config.paperType && window.paperStocks && window.paperStocks[config.paperType]) {
+          details.push({ 
+            label: 'Paper Stock', 
+            value: window.paperStocks[config.paperType].displayName 
+          });
+        }
+        break;
+    }
+    
+    // Add turnaround and quantity at the end
+    details.push({ label: 'Turnaround', value: turnaroundTime });
+    details.push({ label: 'Quantity', value: `${quantity} pieces` });
+    
+    return details;
   }
 
   generateItemSummary(config, productType) {

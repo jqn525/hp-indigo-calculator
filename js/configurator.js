@@ -1,6 +1,9 @@
 // Product Configurator - Enhanced UX with Real-time Pricing
 class ProductConfigurator {
     constructor() {
+        // Check for edit mode first
+        this.editMode = this.checkEditMode();
+        
         // Detect current product type
         this.productType = this.detectProductType();
         
@@ -99,6 +102,201 @@ class ProductConfigurator {
         }
         return 'brochures'; // Default fallback
     }
+    
+    checkEditMode() {
+        // Check URL for edit parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('edit');
+        
+        if (editId) {
+            // Retrieve the item data from sessionStorage
+            const editingItemData = sessionStorage.getItem('editingItem');
+            if (editingItemData) {
+                try {
+                    const itemData = JSON.parse(editingItemData);
+                    if (itemData.id === editId) {
+                        console.log('Edit mode detected for item:', editId);
+                        return itemData;
+                    }
+                } catch (error) {
+                    console.warn('Failed to parse editing item data:', error);
+                }
+            }
+        }
+        return null;
+    }
+    
+    populateFieldsFromConfig() {
+        if (!this.editMode || !this.editMode.configuration) return;
+        
+        const config = this.editMode.configuration;
+        console.log('Populating fields with configuration:', config);
+        
+        // Populate common fields across all product types
+        if (config.quantity) {
+            const quantityInput = document.getElementById('quantity');
+            if (quantityInput) {
+                quantityInput.value = config.quantity;
+            }
+        }
+        
+        if (config.rushType) {
+            const rushSelect = document.querySelector('select[name="rush"], #rushType');
+            if (rushSelect) {
+                rushSelect.value = config.rushType;
+            }
+        }
+        
+        // Product-specific field population
+        switch (this.productType) {
+            case 'brochures':
+                this.populateBrochureFields(config);
+                break;
+            case 'postcards':
+                this.populatePostcardFields(config);
+                break;
+            case 'flyers':
+                this.populateFlyerFields(config);
+                break;
+            case 'bookmarks':
+                this.populateBookmarkFields(config);
+                break;
+            case 'booklets':
+                this.populateBookletFields(config);
+                break;
+            case 'notebooks':
+                this.populateNotebookFields(config);
+                break;
+            case 'notepads':
+                this.populateNotepadFields(config);
+                break;
+            case 'name-tags':
+                this.populateNameTagFields(config);
+                break;
+            // Add other product types as needed
+        }
+        
+        // Trigger calculation update after populating fields
+        setTimeout(() => {
+            this.updateConfigurationSummary();
+            if (typeof window.calculatePricing === 'function') {
+                window.calculatePricing();
+            }
+        }, 100);
+    }
+    
+    setupEditMode() {
+        // Update page title
+        const titleElement = document.querySelector('h1, .preview-header h1');
+        if (titleElement && this.editMode) {
+            const productName = this.getProductDisplayName();
+            titleElement.textContent = `Edit ${productName}`;
+        }
+        
+        // Update button text and behavior
+        const addButton = document.querySelector('#addToCartBtn, .add-to-cart-btn, button[onclick*="addToCart"]');
+        if (addButton) {
+            // Clone and replace button to remove all existing event listeners
+            const newButton = addButton.cloneNode(true);
+            newButton.textContent = 'Update Cart Item';
+            newButton.classList.add('btn-warning');
+            newButton.classList.remove('btn-primary');
+            
+            // Remove any existing onclick handlers and set the new one
+            newButton.onclick = null;
+            newButton.onclick = () => this.updateCartItem();
+            
+            // Replace the button in the DOM
+            addButton.parentNode.replaceChild(newButton, addButton);
+        }
+    }
+    
+    async updateCartItem() {
+        try {
+            // Ensure pricing is calculated first
+            await this.calculatePricing();
+            
+            // Get current configuration and pricing
+            const currentConfig = this.currentConfig;
+            
+            // Get pricing from the calculated results
+            let currentPricing = {};
+            if (this.currentPricing && this.currentPricing.total > 0) {
+                // Use the pricing from the configurator's calculated results
+                currentPricing = {
+                    unitPrice: this.currentPricing.unitPrice,
+                    totalPrice: this.currentPricing.total,
+                    totalCost: this.currentPricing.total, // Include both for compatibility
+                    sheetsRequired: this.currentPricing.breakdown?.sheetsRequired || 0,
+                    printingSetupCost: this.currentPricing.breakdown?.setupFee || this.currentPricing.breakdown?.printingSetupCost || 0,
+                    finishingSetupCost: this.currentPricing.breakdown?.finishingSetupFee || 0,
+                    productionCost: this.currentPricing.breakdown?.productionCost || 0,
+                    materialCost: this.currentPricing.breakdown?.materialCost || 0,
+                    finishingCost: this.currentPricing.breakdown?.finishingCost || 0,
+                    subtotal: this.currentPricing.breakdown?.subtotal || 0,
+                    rushMultiplier: this.currentPricing.breakdown?.rushMultiplier || 1.0
+                };
+            } else {
+                // Fallback to getting pricing from display elements
+                currentPricing = this.getCurrentPricing();
+            }
+            
+            console.log('Update pricing data:', currentPricing);
+            
+            // Update the cart item
+            if (window.cartManager && this.editMode) {
+                const success = window.cartManager.updateItem(
+                    this.editMode.id,
+                    currentConfig,
+                    currentPricing
+                );
+                
+                if (success) {
+                    // Show success message
+                    alert('Item updated successfully!');
+                    // Redirect back to cart
+                    window.location.href = 'cart.html';
+                } else {
+                    alert('Failed to update item. Please try again.');
+                }
+            }
+        } catch (error) {
+            console.error('Error updating cart item:', error);
+            alert('Failed to update item. Please try again.');
+        }
+    }
+    
+    getCurrentPricing() {
+        // Extract pricing from the page elements
+        const pricing = {};
+        
+        const unitPriceElement = document.querySelector('.unit-price, #unitPrice');
+        if (unitPriceElement) {
+            pricing.unitPrice = parseFloat(unitPriceElement.textContent.replace('$', '')) || 0;
+        }
+        
+        const totalPriceElement = document.querySelector('.total-price, #totalPrice');
+        if (totalPriceElement) {
+            pricing.totalPrice = parseFloat(totalPriceElement.textContent.replace('$', '')) || 0;
+        }
+        
+        // Add any other pricing fields that might be relevant
+        return pricing;
+    }
+    
+    getProductDisplayName() {
+        const displayNames = {
+            'brochures': 'Brochure',
+            'postcards': 'Postcard',
+            'flyers': 'Flyer',
+            'bookmarks': 'Bookmark',
+            'booklets': 'Booklet',
+            'notebooks': 'Notebook',
+            'notepads': 'Notepad',
+            'name-tags': 'Name Tag'
+        };
+        return displayNames[this.productType] || 'Product';
+    }
 
     async init() {
         
@@ -109,6 +307,12 @@ class ProductConfigurator {
             
             // Wait a moment for any async dependencies to load
             await this.waitForDependencies();
+            
+            // Initialize edit mode if we're editing an item
+            if (this.editMode) {
+                this.populateFieldsFromConfig();
+                this.setupEditMode();
+            }
             
             // Initial calculation
             await this.calculatePricing();
@@ -224,7 +428,8 @@ class ProductConfigurator {
         const addToCartBtn = document.getElementById('addToCartBtn');
         const requestQuoteBtn = document.getElementById('requestQuoteBtn');
 
-        if (addToCartBtn) {
+        // Only add the addToCart listener if we're NOT in edit mode
+        if (addToCartBtn && !this.editMode) {
             addToCartBtn.addEventListener('click', () => {
                 this.addToCart();
             });
@@ -1109,6 +1314,198 @@ class ProductConfigurator {
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+    }
+    
+    // Product-specific field population methods
+    populateBrochureFields(config) {
+        if (config.size) {
+            const sizeCards = document.querySelectorAll('.size-card[data-size]');
+            sizeCards.forEach(card => {
+                if (card.dataset.size === config.size) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.foldType) {
+            const foldCards = document.querySelectorAll('.fold-card[data-fold]');
+            foldCards.forEach(card => {
+                if (card.dataset.fold === config.foldType) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.paperType) {
+            const paperCards = document.querySelectorAll('.paper-card[data-paper]');
+            paperCards.forEach(card => {
+                if (card.dataset.paper === config.paperType) {
+                    card.click();
+                }
+            });
+        }
+    }
+    
+    populatePostcardFields(config) {
+        if (config.size) {
+            const sizeCards = document.querySelectorAll('.size-card[data-size]');
+            sizeCards.forEach(card => {
+                if (card.dataset.size === config.size) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.paperType) {
+            const paperCards = document.querySelectorAll('.paper-card[data-paper]');
+            paperCards.forEach(card => {
+                if (card.dataset.paper === config.paperType) {
+                    card.click();
+                }
+            });
+        }
+    }
+    
+    populateFlyerFields(config) {
+        // Similar to postcards
+        this.populatePostcardFields(config);
+    }
+    
+    populateBookmarkFields(config) {
+        // Similar to postcards
+        this.populatePostcardFields(config);
+    }
+    
+    populateBookletFields(config) {
+        if (config.pages) {
+            const pagesInput = document.getElementById('pages');
+            if (pagesInput) {
+                pagesInput.value = config.pages;
+            }
+        }
+        
+        if (config.coverPaper) {
+            const coverPaperCards = document.querySelectorAll('.cover-paper-card[data-paper]');
+            coverPaperCards.forEach(card => {
+                if (card.dataset.paper === config.coverPaper) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.interiorPaper) {
+            const interiorPaperCards = document.querySelectorAll('.interior-paper-card[data-paper]');
+            interiorPaperCards.forEach(card => {
+                if (card.dataset.paper === config.interiorPaper) {
+                    card.click();
+                }
+            });
+        }
+    }
+    
+    populateNotebookFields(config) {
+        if (config.pages) {
+            const pagesCards = document.querySelectorAll('.pages-card[data-pages]');
+            pagesCards.forEach(card => {
+                if (card.dataset.pages === config.pages.toString()) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.bindingType) {
+            const bindingCards = document.querySelectorAll('.binding-card[data-binding]');
+            bindingCards.forEach(card => {
+                if (card.dataset.binding === config.bindingType) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.coverPaper) {
+            const coverPaperCards = document.querySelectorAll('.cover-paper-card[data-paper]');
+            coverPaperCards.forEach(card => {
+                if (card.dataset.paper === config.coverPaper) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.interiorPaper) {
+            const interiorPaperCards = document.querySelectorAll('.interior-paper-card[data-paper]');
+            interiorPaperCards.forEach(card => {
+                if (card.dataset.paper === config.interiorPaper) {
+                    card.click();
+                }
+            });
+        }
+    }
+    
+    populateNotepadFields(config) {
+        if (config.sheets) {
+            const sheetsCards = document.querySelectorAll('.sheets-card[data-sheets]');
+            sheetsCards.forEach(card => {
+                if (card.dataset.sheets === config.sheets.toString()) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.contentType) {
+            const contentCards = document.querySelectorAll('.content-card[data-content]');
+            contentCards.forEach(card => {
+                if (card.dataset.content === config.contentType) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.paperType) {
+            const paperCards = document.querySelectorAll('.paper-card[data-paper]');
+            paperCards.forEach(card => {
+                if (card.dataset.paper === config.paperType) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.backingPaper) {
+            const backingCards = document.querySelectorAll('.backing-card[data-backing]');
+            backingCards.forEach(card => {
+                if (card.dataset.backing === config.backingPaper) {
+                    card.click();
+                }
+            });
+        }
+    }
+    
+    populateNameTagFields(config) {
+        if (config.size) {
+            const sizeCards = document.querySelectorAll('.size-card[data-size]');
+            sizeCards.forEach(card => {
+                if (card.dataset.size === config.size) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.paperType) {
+            const paperCards = document.querySelectorAll('.paper-card[data-paper]');
+            paperCards.forEach(card => {
+                if (card.dataset.paper === config.paperType) {
+                    card.click();
+                }
+            });
+        }
+        
+        if (config.finishing) {
+            const finishingCards = document.querySelectorAll('.finishing-card[data-finishing]');
+            finishingCards.forEach(card => {
+                if (card.dataset.finishing === config.finishing) {
+                    card.click();
+                }
+            });
+        }
     }
 }
 
