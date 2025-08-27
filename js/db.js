@@ -220,6 +220,8 @@ class DatabaseManager {
       throw new Error('User not authenticated');
     }
     
+    console.log('Fetching quotes for user:', userId);
+    
     // Return quotes for this user only
     const { data, error } = await this.client
       .from('quotes')
@@ -230,11 +232,40 @@ class DatabaseManager {
     
     if (error) {
       console.error('Error fetching quotes:', error);
+      console.error('Error details:', error.message, error.details, error.hint);
+      throw error; // Re-throw to let caller handle the error
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('No quotes found for user');
       return [];
     }
     
-    console.log(`Loaded ${data?.length || 0} quotes from database`);
-    return data || [];
+    console.log(`Loaded ${data.length} quotes from database:`, data.map(q => ({ id: q.id, quote_number: q.quote_number, total: q.total })));
+    
+    // For each quote, get its items
+    const quotesWithItems = await Promise.all(data.map(async (quote) => {
+      try {
+        const { data: items, error: itemsError } = await this.client
+          .from('quote_items')
+          .select('*')
+          .eq('quote_id', quote.id)
+          .order('sort_order');
+        
+        if (itemsError) {
+          console.error(`Error fetching items for quote ${quote.id}:`, itemsError);
+          return { ...quote, items: [] };
+        }
+        
+        return { ...quote, items: items || [] };
+      } catch (error) {
+        console.error(`Failed to fetch items for quote ${quote.id}:`, error);
+        return { ...quote, items: [] };
+      }
+    }));
+    
+    console.log('Quotes with items loaded:', quotesWithItems.length);
+    return quotesWithItems;
   }
 
   // Delete quote and its items
@@ -270,6 +301,101 @@ class DatabaseManager {
     } catch (error) {
       console.error('Failed to delete quote:', error);
       return false;
+    }
+  }
+
+  // Update existing quote (requires authentication)
+  async updateQuote(quoteId, quoteData) {
+    if (!this.isAvailable()) return null;
+    
+    // Get authenticated user ID
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    
+    // Verify quote belongs to user
+    const existingQuote = await this.getQuote(quoteId);
+    if (!existingQuote) {
+      throw new Error('Quote not found or access denied');
+    }
+    
+    // Calculate new totals
+    const items = quoteData.items || [];
+    const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
+    const taxAmount = subtotal * (quoteData.tax_rate || existingQuote.tax_rate || 0);
+    const total = subtotal + taxAmount;
+    
+    // Update quote data (preserve original creation date and quote number)
+    const updatedQuote = {
+      customer_name: quoteData.customer_name || existingQuote.customer_name,
+      customer_email: quoteData.customer_email || existingQuote.customer_email,
+      customer_phone: quoteData.customer_phone || existingQuote.customer_phone,
+      department: quoteData.department || existingQuote.department,
+      assigned_by: quoteData.assigned_by || existingQuote.assigned_by,
+      notes: quoteData.notes !== undefined ? quoteData.notes : existingQuote.notes,
+      subtotal: subtotal,
+      tax_rate: quoteData.tax_rate || existingQuote.tax_rate || 0,
+      tax_amount: taxAmount,
+      total: total,
+      updated_at: new Date().toISOString()
+    };
+    
+    try {
+      // Update quote
+      const { data: quoteResult, error: quoteError } = await this.client
+        .from('quotes')
+        .update(updatedQuote)
+        .eq('id', quoteId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      
+      if (quoteError) {
+        console.error('Error updating quote:', quoteError);
+        throw quoteError;
+      }
+      
+      // Delete existing quote items
+      const { error: deleteError } = await this.client
+        .from('quote_items')
+        .delete()
+        .eq('quote_id', quoteId);
+      
+      if (deleteError) {
+        console.error('Error deleting old quote items:', deleteError);
+        throw deleteError;
+      }
+      
+      // Insert new quote items
+      if (items.length > 0) {
+        const quoteItems = items.map((item, index) => ({
+          quote_id: quoteId,
+          product_type: item.product_type,
+          configuration: item.configuration,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          total_price: item.total_price,
+          notes: item.notes,
+          sort_order: index
+        }));
+        
+        const { error: itemsError } = await this.client
+          .from('quote_items')
+          .insert(quoteItems);
+        
+        if (itemsError) {
+          console.error('Error creating new quote items:', itemsError);
+          throw itemsError;
+        }
+      }
+      
+      console.log('Quote updated successfully:', quoteResult.quote_number);
+      return quoteResult;
+      
+    } catch (error) {
+      console.error('Failed to update quote:', error);
+      throw error;
     }
   }
 
@@ -492,7 +618,25 @@ class DatabaseManager {
 
 // Initialize database manager
 const dbManager = new DatabaseManager();
-dbManager.init();
 
-// Make globally available
-window.dbManager = dbManager;
+// Initialize asynchronously and expose when ready
+(async function initializeDatabaseManager() {
+  try {
+    console.log('Initializing database manager...');
+    await dbManager.init();
+    
+    // Make globally available only after initialization
+    window.dbManager = dbManager;
+    console.log('✅ Database manager ready');
+    
+    // Dispatch event to notify other scripts
+    window.dispatchEvent(new Event('dbManagerReady'));
+    
+  } catch (error) {
+    console.error('❌ Database manager initialization failed:', error);
+    
+    // Still expose it but mark as unavailable
+    window.dbManager = dbManager;
+    window.dispatchEvent(new Event('dbManagerError'));
+  }
+})();

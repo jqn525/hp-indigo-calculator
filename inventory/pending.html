@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Requests - SFU Inventory</title>
+    <meta name="description" content="View your pending inventory requests">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- SFU Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#CC0633">
+</head>
+<body>
+    <!-- Authentication Guard -->
+    <script src="js/auth-guard.js"></script>
+    
+    <div class="container-fluid px-3 py-4">
+        <!-- Header -->
+        <div class="d-flex align-items-center mb-4">
+            <button onclick="window.history.back()" class="btn btn-link text-decoration-none p-0 me-3">
+                <span style="font-size: 1.5rem;">←</span>
+            </button>
+            <h1 class="h4 mb-0">My Requests</h1>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="mb-4">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" data-status="all" onclick="filterByStatus('all')">
+                    All Requests
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-status="pending" onclick="filterByStatus('pending')">
+                    Pending
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-status="approved" onclick="filterByStatus('approved')">
+                    Approved
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-status="rejected" onclick="filterByStatus('rejected')">
+                    Rejected
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Loading your requests...</p>
+        </div>
+
+        <!-- Requests List -->
+        <div id="requestsList" class="requests-list" style="display: none;">
+            <!-- This will be populated by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-5" style="display: none;">
+            <div class="text-muted">
+                <div style="font-size: 3rem; font-weight: bold;">LIST</div>
+                <h4 class="mt-3">No Requests Found</h4>
+                <p>You haven't submitted any inventory requests yet.</p>
+                <a href="request.html" class="btn btn-primary">
+                    Submit First Request
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Details Modal -->
+    <div class="request-modal" id="detailsModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Request Details</h3>
+                <button class="btn-close" onclick="closeDetailsModal()" aria-label="Close">×</button>
+            </div>
+            
+            <div id="modalBody">
+                <!-- This will be populated with request details -->
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        let allRequests = [];
+        let currentFilter = 'all';
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadRequests();
+        });
+
+        async function loadRequests() {
+            try {
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('requestsList').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+                
+                // Wait for app to initialize
+                if (!window.inventoryApp.initialized) {
+                    await window.inventoryApp.init();
+                }
+                
+                allRequests = await window.inventoryApp.getUserRequests();
+                displayRequests();
+                
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load requests. Please try refreshing the page.
+                    </div>
+                `;
+            }
+        }
+
+        function displayRequests() {
+            document.getElementById('loadingState').style.display = 'none';
+            
+            const filteredRequests = currentFilter === 'all' 
+                ? allRequests 
+                : allRequests.filter(req => req.status === currentFilter);
+            
+            if (filteredRequests.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('requestsList').style.display = 'none';
+                return;
+            }
+            
+            const listContainer = document.getElementById('requestsList');
+            listContainer.innerHTML = '';
+            
+            filteredRequests.forEach(request => {
+                const requestCard = createRequestCard(request);
+                listContainer.appendChild(requestCard);
+            });
+            
+            document.getElementById('requestsList').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function createRequestCard(request) {
+            const card = document.createElement('div');
+            card.className = 'card mb-3';
+            
+            const statusInfo = window.inventoryApp.formatStatus(request.status);
+            const priorityInfo = window.inventoryApp.formatPriority(request.priority);
+            
+            card.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="card-title mb-0">
+                            Request #${request.id.slice(-8)}
+                        </h6>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-${statusInfo.class.replace('badge-', '')}">${statusInfo.text}</span>
+                            <span class="badge bg-${priorityInfo.class.replace('badge-', '')}">${priorityInfo.text}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-muted small mb-2">
+                        Submitted: ${window.inventoryApp.formatDate(request.created_at)}
+                        ${request.processed_at ? `<br>Processed: ${window.inventoryApp.formatDate(request.processed_at)}` : ''}
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Items:</strong> ${request.items.length} item${request.items.length === 1 ? '' : 's'}
+                        <div class="small text-muted">
+                            ${request.items.slice(0, 2).map(item => `${item.name} (${item.quantity} ${item.unit})`).join(', ')}
+                            ${request.items.length > 2 ? ` and ${request.items.length - 2} more...` : ''}
+                        </div>
+                    </div>
+                    
+                    ${request.notes ? `
+                        <div class="mb-2">
+                            <strong>Notes:</strong> ${request.notes}
+                        </div>
+                    ` : ''}
+                    
+                    ${request.admin_notes ? `
+                        <div class="mb-2">
+                            <strong>Admin Notes:</strong> 
+                            <span class="text-${request.status === 'rejected' ? 'danger' : 'success'}">${request.admin_notes}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <button class="btn btn-outline-primary btn-sm" onclick="showRequestDetails('${request.id}')">
+                        View Details
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function filterByStatus(status) {
+            // Update active button
+            document.querySelectorAll('[data-status]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-status="${status}"]`).classList.add('active');
+            
+            currentFilter = status;
+            displayRequests();
+        }
+
+        function showRequestDetails(requestId) {
+            const request = allRequests.find(r => r.id === requestId);
+            if (!request) return;
+            
+            const modalBody = document.getElementById('modalBody');
+            const statusInfo = window.inventoryApp.formatStatus(request.status);
+            const priorityInfo = window.inventoryApp.formatPriority(request.priority);
+            
+            modalBody.innerHTML = `
+                <div class="mb-3">
+                    <strong>Request #${request.id.slice(-8)}</strong>
+                    <div class="d-flex gap-2 mt-1">
+                        <span class="badge bg-${statusInfo.class.replace('badge-', '')}">${statusInfo.text}</span>
+                        <span class="badge bg-${priorityInfo.class.replace('badge-', '')}">${priorityInfo.text}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">
+                        <strong>Submitted:</strong> ${window.inventoryApp.formatDate(request.created_at)}<br>
+                        ${request.processed_at ? `<strong>Processed:</strong> ${window.inventoryApp.formatDate(request.processed_at)}<br>` : ''}
+                        <strong>Submitted by:</strong> ${request.user_name || request.user_email}
+                    </small>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Requested Items:</strong>
+                    <div class="mt-2">
+                        ${request.items.map(item => `
+                            <div class="border-bottom pb-2 mb-2">
+                                <div><strong>${item.name}</strong></div>
+                                <div class="small text-muted">
+                                    SKU: ${item.sku} | Quantity: ${item.quantity} ${item.unit}<br>
+                                    Location: ${item.location}
+                                    ${item.category ? `<br>Category: ${item.category}` : ''}
+                                    ${item.notes ? `<br>Notes: ${item.notes}` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                ${request.notes ? `
+                    <div class="mb-3">
+                        <strong>Request Notes:</strong>
+                        <div class="text-muted">${request.notes}</div>
+                    </div>
+                ` : ''}
+                
+                ${request.admin_notes ? `
+                    <div class="mb-3">
+                        <strong>Admin Response:</strong>
+                        <div class="text-${request.status === 'rejected' ? 'danger' : 'success'}">${request.admin_notes}</div>
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        // Make functions globally available
+        window.filterByStatus = filterByStatus;
+        window.showRequestDetails = showRequestDetails;
+        window.closeDetailsModal = closeDetailsModal;
+    </script>
+</body>
+</html>

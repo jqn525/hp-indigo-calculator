@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Inventory - SFU</title>
+    <meta name="description" content="Request inventory items for SFU Document Solutions">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- SFU Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#CC0633">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+</head>
+<body>
+    <!-- Authentication Guard -->
+    <script src="js/auth-guard.js"></script>
+    
+    <div class="container-fluid px-3 py-4">
+        <!-- Header -->
+        <div class="d-flex align-items-center mb-4">
+            <button onclick="window.history.back()" class="btn btn-link text-decoration-none p-0 me-3">
+                <span style="font-size: 1.5rem;">←</span>
+            </button>
+            <h1 class="h4 mb-0">Request Inventory</h1>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-4">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search items by name, SKU, or category...">
+                <button class="btn btn-outline-primary" type="button" id="clearSearch">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Current Request Summary -->
+        <div id="requestSummary" class="alert alert-info" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span><strong>Current Request:</strong> <span id="requestCount">0</span> items</span>
+                <button class="btn btn-primary btn-sm" onclick="showRequestModal()">
+                    Review Request
+                </button>
+            </div>
+        </div>
+
+        <!-- Inventory Tree -->
+        <div class="inventory-tree" id="inventoryTree">
+            <!-- This will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Request Modal -->
+    <div class="request-modal" id="requestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Request Item</h3>
+                <button class="btn-close" onclick="closeRequestModal()" aria-label="Close">×</button>
+            </div>
+            
+            <div id="modalBody">
+                <!-- Single item request -->
+                <div id="singleItemForm" style="display: none;">
+                    <div class="mb-3">
+                        <strong id="itemName"></strong><br>
+                        <small class="text-muted">
+                            SKU: <span id="itemSku"></span><br>
+                            Location: <span id="itemLocation"></span>
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" id="quantity" class="form-control" min="1" value="1" required>
+                        <small class="text-muted">Unit: <span id="itemUnit"></span></small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemNotes" class="form-label">Notes (optional)</label>
+                        <textarea id="itemNotes" class="form-control" rows="2" placeholder="Any special instructions or notes..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Multiple items review -->
+                <div id="multipleItemsForm" style="display: none;">
+                    <div class="mb-3">
+                        <strong>Review Your Request</strong>
+                        <div id="requestItems"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="requestNotes" class="form-label">Additional Notes (optional)</label>
+                        <textarea id="requestNotes" class="form-control" rows="3" placeholder="Any general notes about this request..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeRequestModal()">Cancel</button>
+                <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">Add to Request</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script type="module" src="js/inventoryStructure.js"></script>
+    
+    <script type="module">
+        import { inventoryStructure, searchInventoryItems, getItemById } from './js/inventoryStructure.js';
+        
+        // Global variables
+        let currentRequest = []; // Array of items in current request
+        let currentItem = null; // Item being added/modified
+        let filteredStructure = null; // For search results
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            buildInventoryTree();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', handleSearch);
+            
+            document.getElementById('clearSearch').addEventListener('click', clearSearch);
+        }
+
+        function buildInventoryTree(structure = inventoryStructure) {
+            const container = document.getElementById('inventoryTree');
+            container.innerHTML = '';
+            
+            Object.entries(structure).forEach(([categoryName, category]) => {
+                const categoryElement = createCategoryElement(categoryName, category);
+                container.appendChild(categoryElement);
+            });
+        }
+
+        function createCategoryElement(name, data, level = 0) {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'tree-category';
+            
+            // Category header
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.style.paddingLeft = `${level * 1 + 1}rem`;
+            
+            const icon = document.createElement('span');
+            icon.className = 'category-icon';
+            icon.textContent = data.icon || 'CAT';
+            
+            const title = document.createElement('span');
+            title.className = 'category-title';
+            title.textContent = name;
+            
+            const toggle = document.createElement('span');
+            toggle.className = 'category-toggle';
+            toggle.textContent = '▼';
+            
+            header.appendChild(icon);
+            header.appendChild(title);
+            header.appendChild(toggle);
+            
+            categoryDiv.appendChild(header);
+            
+            // Content container
+            const content = document.createElement('div');
+            content.className = 'subcategory-list';
+            
+            // Add subcategories
+            if (data.subcategories) {
+                Object.entries(data.subcategories).forEach(([subName, subData]) => {
+                    const subElement = createCategoryElement(subName, subData, level + 1);
+                    content.appendChild(subElement);
+                });
+            }
+            
+            // Add direct items
+            if (data.items) {
+                data.items.forEach(item => {
+                    const itemElement = createItemElement(item, level + 1);
+                    content.appendChild(itemElement);
+                });
+            }
+            
+            categoryDiv.appendChild(content);
+            
+            // Toggle functionality
+            header.addEventListener('click', () => {
+                const isExpanded = content.classList.contains('expanded');
+                if (isExpanded) {
+                    content.classList.remove('expanded');
+                    toggle.classList.remove('expanded');
+                } else {
+                    content.classList.add('expanded');
+                    toggle.classList.add('expanded');
+                }
+            });
+            
+            return categoryDiv;
+        }
+
+        function createItemElement(item, level) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'inventory-item';
+            itemDiv.style.paddingLeft = `${level * 1 + 1}rem`;
+            
+            const info = document.createElement('div');
+            info.className = 'item-info';
+            
+            const name = document.createElement('div');
+            name.className = 'item-name';
+            name.textContent = item.name;
+            
+            const details = document.createElement('div');
+            details.className = 'item-details';
+            details.innerHTML = `SKU: ${item.sku} | Location: ${item.location} | Unit: ${item.unit}`;
+            
+            info.appendChild(name);
+            info.appendChild(details);
+            
+            const actions = document.createElement('div');
+            actions.className = 'item-actions';
+            
+            const requestBtn = document.createElement('button');
+            requestBtn.className = 'btn-request';
+            requestBtn.textContent = 'Request';
+            requestBtn.onclick = () => openRequestModal(item);
+            
+            actions.appendChild(requestBtn);
+            
+            itemDiv.appendChild(info);
+            itemDiv.appendChild(actions);
+            
+            return itemDiv;
+        }
+
+        function handleSearch(event) {
+            const query = event.target.value.trim();
+            
+            if (query.length === 0) {
+                clearSearch();
+                return;
+            }
+            
+            if (query.length < 2) {
+                return; // Wait for at least 2 characters
+            }
+            
+            const results = searchInventoryItems(query);
+            displaySearchResults(results);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            buildInventoryTree();
+        }
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('inventoryTree');
+            container.innerHTML = '';
+            
+            if (results.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-4">No items found</div>';
+                return;
+            }
+            
+            const resultsDiv = document.createElement('div');
+            resultsDiv.className = 'search-results';
+            
+            const header = document.createElement('div');
+            header.className = 'search-header p-3 bg-light';
+            header.innerHTML = `<strong>Search Results:</strong> ${results.length} items found`;
+            resultsDiv.appendChild(header);
+            
+            results.forEach(item => {
+                const itemElement = createSearchResultItem(item);
+                resultsDiv.appendChild(itemElement);
+            });
+            
+            container.appendChild(resultsDiv);
+        }
+
+        function createSearchResultItem(item) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'inventory-item search-result-item';
+            
+            const info = document.createElement('div');
+            info.className = 'item-info';
+            
+            const name = document.createElement('div');
+            name.className = 'item-name';
+            name.textContent = item.name;
+            
+            const details = document.createElement('div');
+            details.className = 'item-details';
+            details.innerHTML = `
+                SKU: ${item.sku} | Unit: ${item.unit}<br>
+                <small>Category: ${item.category} | Location: ${item.location}</small>
+            `;
+            
+            info.appendChild(name);
+            info.appendChild(details);
+            
+            const actions = document.createElement('div');
+            actions.className = 'item-actions';
+            
+            const requestBtn = document.createElement('button');
+            requestBtn.className = 'btn-request';
+            requestBtn.textContent = 'Request';
+            requestBtn.onclick = () => openRequestModal(item);
+            
+            actions.appendChild(requestBtn);
+            
+            itemDiv.appendChild(info);
+            itemDiv.appendChild(actions);
+            
+            return itemDiv;
+        }
+
+        function openRequestModal(item) {
+            currentItem = item;
+            
+            // Update modal content
+            document.getElementById('modalTitle').textContent = 'Request Item';
+            document.getElementById('itemName').textContent = item.name;
+            document.getElementById('itemSku').textContent = item.sku;
+            document.getElementById('itemLocation').textContent = item.location;
+            document.getElementById('itemUnit').textContent = item.unit;
+            
+            // Reset form
+            document.getElementById('quantity').value = '1';
+            document.getElementById('itemNotes').value = '';
+            
+            // Show single item form
+            document.getElementById('singleItemForm').style.display = 'block';
+            document.getElementById('multipleItemsForm').style.display = 'none';
+            document.getElementById('submitBtn').textContent = 'Add to Request';
+            
+            // Show modal
+            document.getElementById('requestModal').classList.add('show');
+        }
+
+        function showRequestModal() {
+            if (currentRequest.length === 0) return;
+            
+            // Update modal content for review
+            document.getElementById('modalTitle').textContent = 'Review Request';
+            
+            // Show multiple items form
+            document.getElementById('singleItemForm').style.display = 'none';
+            document.getElementById('multipleItemsForm').style.display = 'block';
+            document.getElementById('submitBtn').textContent = 'Submit Request';
+            
+            // Build request items list
+            const requestItemsDiv = document.getElementById('requestItems');
+            requestItemsDiv.innerHTML = '';
+            
+            currentRequest.forEach((requestItem, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'border-bottom pb-2 mb-2';
+                itemDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${requestItem.name}</strong><br>
+                            <small class="text-muted">SKU: ${requestItem.sku} | Qty: ${requestItem.quantity} ${requestItem.unit}</small>
+                            ${requestItem.notes ? `<br><small>Notes: ${requestItem.notes}</small>` : ''}
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromRequest(${index})">Remove</button>
+                    </div>
+                `;
+                requestItemsDiv.appendChild(itemDiv);
+            });
+            
+            // Show modal
+            document.getElementById('requestModal').classList.add('show');
+        }
+
+        function closeRequestModal() {
+            document.getElementById('requestModal').classList.remove('show');
+            currentItem = null;
+        }
+
+        async function handleSubmit() {
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (submitBtn.textContent === 'Add to Request') {
+                // Adding single item to request
+                const quantity = parseInt(document.getElementById('quantity').value);
+                const notes = document.getElementById('itemNotes').value.trim();
+                
+                if (!quantity || quantity < 1) {
+                    alert('Please enter a valid quantity');
+                    return;
+                }
+                
+                const requestItem = {
+                    id: currentItem.id,
+                    name: currentItem.name,
+                    sku: currentItem.sku,
+                    quantity: quantity,
+                    unit: currentItem.unit,
+                    location: currentItem.location,
+                    category: currentItem.category || '',
+                    notes: notes
+                };
+                
+                currentRequest.push(requestItem);
+                updateRequestSummary();
+                closeRequestModal();
+                
+            } else {
+                // Submitting entire request
+                if (currentRequest.length === 0) {
+                    alert('No items in request');
+                    return;
+                }
+                
+                const generalNotes = document.getElementById('requestNotes').value.trim();
+                
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Submitting...';
+                    
+                    await window.inventoryApp.submitRequest(currentRequest, generalNotes);
+                    
+                    alert('Request submitted successfully!');
+                    currentRequest = [];
+                    updateRequestSummary();
+                    closeRequestModal();
+                    
+                } catch (error) {
+                    console.error('Error submitting request:', error);
+                    alert('Failed to submit request. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Request';
+                }
+            }
+        }
+
+        function removeFromRequest(index) {
+            currentRequest.splice(index, 1);
+            updateRequestSummary();
+            
+            // If no items left, close modal
+            if (currentRequest.length === 0) {
+                closeRequestModal();
+            } else {
+                // Refresh the modal display
+                showRequestModal();
+            }
+        }
+
+        function updateRequestSummary() {
+            const summaryDiv = document.getElementById('requestSummary');
+            const countSpan = document.getElementById('requestCount');
+            
+            countSpan.textContent = currentRequest.length;
+            
+            if (currentRequest.length > 0) {
+                summaryDiv.style.display = 'block';
+            } else {
+                summaryDiv.style.display = 'none';
+            }
+        }
+
+        // Make functions globally available
+        window.openRequestModal = openRequestModal;
+        window.showRequestModal = showRequestModal;
+        window.closeRequestModal = closeRequestModal;
+        window.handleSubmit = handleSubmit;
+        window.removeFromRequest = removeFromRequest;
+    </script>
+</body>
+</html>

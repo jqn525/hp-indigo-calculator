@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFU Inventory Management</title>
+    <meta name="description" content="SFU Document Solutions Inventory Management System">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- SFU Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#CC0633">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+</head>
+<body>
+    <!-- Authentication Guard -->
+    <script src="js/auth-guard.js"></script>
+    
+    <div class="container-fluid px-3 py-4">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="h3 text-dark mb-1">SFU Inventory Management</h1>
+            <p class="text-muted small">Document Solutions Team</p>
+        </div>
+
+        <!-- Quick Search -->
+        <div class="mb-4">
+            <div class="input-group">
+                <input type="text" id="quickSearch" class="form-control" placeholder="Quick search by SKU, name, or brand...">
+                <button class="btn btn-outline-primary" type="button" id="searchBtn">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Action Grid -->
+        <div class="action-grid mb-4">
+            <div class="action-card" onclick="navigateTo('request.html')">
+                <div class="action-icon">REQ</div>
+                <div class="action-label">Request Inventory</div>
+                <div class="action-desc">Submit new inventory requests</div>
+            </div>
+            
+            <div class="action-card" onclick="navigateTo('search.html')">
+                <div class="action-icon">FIND</div>
+                <div class="action-label">Search Inventory</div>
+                <div class="action-desc">Browse available items</div>
+            </div>
+            
+            <div class="action-card" onclick="navigateTo('receive.html')">
+                <div class="action-icon">RCV</div>
+                <div class="action-label">Receive Inventory</div>
+                <div class="action-desc">Process received items</div>
+            </div>
+            
+            <div class="action-card" onclick="navigateTo('pending.html')">
+                <div class="action-icon">LIST</div>
+                <div class="action-label">Pending Requests</div>
+                <div class="action-desc">View your submissions</div>
+                <div class="badge-indicator" id="pendingBadge" style="display: none;">0</div>
+            </div>
+        </div>
+
+        <!-- Admin Link (only for admins) -->
+        <div class="text-center" id="adminSection" style="display: none;">
+            <a href="admin.html" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-gear"></i> Admin Panel
+            </a>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted small" id="userEmail">Loading...</span>
+                <button class="btn btn-link btn-sm text-muted" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('❌ ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+    
+    <script>
+        // Navigation function
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        // Quick search functionality
+        document.getElementById('quickSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performQuickSearch();
+            }
+        });
+
+        document.getElementById('searchBtn').addEventListener('click', performQuickSearch);
+
+        function performQuickSearch() {
+            const query = document.getElementById('quickSearch').value.trim();
+            if (query) {
+                window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+            }
+        }
+
+        // Sign out function
+        function signOut() {
+            if (window.authGuard) {
+                window.authGuard.signOut();
+            }
+        }
+
+        // Load user info and pending count
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait for auth to initialize
+            await new Promise(resolve => {
+                if (window.currentUser) {
+                    resolve();
+                } else {
+                    window.addEventListener('userAuthenticated', resolve);
+                }
+            });
+
+            // Display user email
+            if (window.currentUser) {
+                document.getElementById('userEmail').textContent = window.currentUser.email;
+                
+                // Check if user is admin
+                if (window.currentUser.is_admin) {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
+            }
+
+            // Load pending requests count
+            loadPendingCount();
+        });
+
+        async function loadPendingCount() {
+            try {
+                if (window.dbManager && window.dbManager.isAvailable()) {
+                    // This will be implemented when we add the requests functionality
+                    const pendingCount = 0; // Placeholder
+                    
+                    const badge = document.getElementById('pendingBadge');
+                    if (pendingCount > 0) {
+                        badge.textContent = pendingCount;
+                        badge.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading pending count:', error);
+            }
+        }
+    </script>
+</body>
+</html>

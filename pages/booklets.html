@@ -134,6 +134,10 @@
                             <h4>Your Configuration</h4>
                             <div class="summary-grid">
                                 <div class="summary-item">
+                                    <span class="summary-label">Size:</span>
+                                    <span class="summary-value" id="summarySize">8.5×11"</span>
+                                </div>
+                                <div class="summary-item">
                                     <span class="summary-label">Pages:</span>
                                     <span class="summary-value" id="summaryPages">8 pages</span>
                                 </div>
@@ -223,6 +227,36 @@
                 <!-- Configuration Panel -->
                 <div class="configuration-panel">
                     <form id="bookletCalculator" class="configurator-form">
+                        <!-- Size Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Size</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" title="Choose booklet finished size">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card" data-option="size" data-value="5.5x8.5">
+                                    <input type="radio" name="size" value="5.5x8.5" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">5.5×8.5"</div>
+                                        <div class="option-subtitle">Half Letter</div>
+                                        <div class="option-badge">Compact</div>
+                                    </div>
+                                </label>
+                                <label class="option-card selected" data-option="size" data-value="8.5x11">
+                                    <input type="radio" name="size" value="8.5x11" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">8.5×11"</div>
+                                        <div class="option-subtitle">Letter</div>
+                                        <div class="option-badge recommended">Recommended</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- Page Count Configuration -->
                         <div class="config-section">
                             <div class="section-header">
@@ -313,7 +347,6 @@
                                     </div>
                                 </label>
                             </div>
-                            <input type="hidden" id="pages" name="pages" value="8">
                         </div>
 
                         <!-- Cover Paper Configuration -->
@@ -365,7 +398,6 @@
                                     </div>
                                 </label>
                             </div>
-                            <input type="hidden" id="coverPaperType" name="coverPaperType" value="LYNOC95FSC">
                         </div>
 
                         <!-- Text Paper Configuration -->
@@ -416,7 +448,6 @@
                                     </div>
                                 </label>
                             </div>
-                            <input type="hidden" id="textPaperType" name="textPaperType" value="LYNO416FSC">
                         </div>
 
                         <!-- Turnaround Time Configuration -->
@@ -567,29 +598,14 @@
                 
                 // Set default selections based on configurator defaults
                 if (window.productConfigurator) {
-                    // Select default cover paper (100# Cover Uncoated)
-                    const defaultCoverCard = document.querySelector(`.selection-card[data-value="${window.productConfigurator.currentConfig.coverPaperType}"]`);
-                    if (defaultCoverCard) {
-                        defaultCoverCard.classList.add('selected');
-                        document.getElementById('coverPaperType').value = window.productConfigurator.currentConfig.coverPaperType;
-                    }
-                    
-                    // Select default text paper (80# Text Uncoated)
-                    const defaultTextCard = document.querySelector(`.selection-card[data-value="${window.productConfigurator.currentConfig.textPaperType}"]`);
-                    if (defaultTextCard) {
-                        defaultTextCard.classList.add('selected');
-                        document.getElementById('textPaperType').value = window.productConfigurator.currentConfig.textPaperType;
-                    }
-                    
                     // Initialize configurator with current form values
-                    window.productConfigurator.currentConfig.pages = parseInt(document.getElementById('pages').value);
+                    window.productConfigurator.currentConfig.size = document.querySelector('input[name="size"]:checked')?.value || '8.5x11';
+                    window.productConfigurator.currentConfig.pages = parseInt(document.querySelector('input[name="pages"]:checked')?.value || '8');
                     window.productConfigurator.currentConfig.quantity = parseInt(document.getElementById('quantity').value);
                     window.productConfigurator.currentConfig.rushType = document.querySelector('input[name="rushType"]:checked').value;
                     
-                    // Update summary
-                    updateSummary();
-                    
-                    // Trigger initial calculation
+                    // Update summary and trigger initial calculation
+                    window.productConfigurator.updateConfigurationSummary();
                     window.productConfigurator.debouncedCalculation();
                 }
             }

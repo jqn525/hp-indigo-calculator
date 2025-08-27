@@ -20,7 +20,7 @@ Updated: 2025-07-24
 /* SFU Custom Fonts */
 @font-face {
   font-family: 'November Condensed';
-  src: url('../fonts/NovemberCondensedFNI-Heavy.otf') format('opentype');
+  src: url('../../fonts/NovemberCondensedFNI-Heavy.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -28,7 +28,7 @@ Updated: 2025-07-24
 
 @font-face {
   font-family: 'Lava';
-  src: url('../fonts/LavaFNI-Regular.otf') format('opentype');
+  src: url('../../fonts/LavaFNI-Regular.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -3652,176 +3652,392 @@ main .breadcrumb-nav {
     }
 }
 
-/* ===========================
-   UNIVERSAL CONFIGURATOR STYLES
-   =========================== */
 
-/* Dimension inputs layout */
-.dimensions-input-group {
-    display: flex;
-    align-items: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
+/* =============================================================================
+INVENTORY MANAGEMENT SPECIFIC STYLES
+============================================================================= */
+
+/* Action Grid - Using Option Card Styling */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.dimension-input {
-    flex: 1;
+.action-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
 }
 
-.dimension-multiply {
-    font-size: 1.5rem;
-    font-weight: 600;
-    padding-bottom: 0.375rem;
-    color: #6c757d;
-    user-select: none;
+.action-card:hover {
+  background: rgba(204, 6, 51, 0.05);
+  border-color: rgba(204, 6, 51, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: inherit;
 }
 
-.dimension-info {
-    margin-top: 0.75rem;
-    text-align: center;
+.action-card:active {
+  transform: translateY(0) scale(0.98);
 }
 
-/* Paper dropdowns */
-.paper-dropdowns {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+.action-card.selected {
+  background: #c7c8ca;
+  border-color: #A6192E;
+  color: white;
 }
 
-.paper-dropdowns .form-group {
-    margin-bottom: 0;
+.action-card.selected:hover {
+  background: #c7c8ca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Imposition display */
-.imposition-info {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: var(--radius-lg, 12px);
-    padding: 1rem;
-    margin: 1rem 0;
+.action-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
-.imposition-display {
-    text-align: center;
+.action-label {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
 }
 
-.efficiency-rating {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+.action-card.selected .action-label {
+  color: white;
 }
 
-.rating-icon {
-    font-size: 1.3rem;
+.action-desc {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  line-height: 1.2;
 }
 
-.rating-text {
-    flex: 1;
+.action-card.selected .action-desc {
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.rating-percentage {
-    font-weight: 700;
+.badge-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
 }
 
-.imposition-details {
-    text-align: center;
-    color: #6c757d;
-    font-size: 0.9rem;
-    line-height: 1.4;
+/* User Info */
+.user-info {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
 }
 
-/* Quantity input styling */
-.quantity-limits {
-    margin-top: 0.5rem;
-    text-align: center;
-    color: #6c757d;
-    font-size: 0.875rem;
+/* Inventory Tree Styles */
+.inventory-tree {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
-/* Form styling improvements for universal configurator */
-.config-section .form-select {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border-radius: var(--radius-md, 8px);
-    border: 1px solid #dee2e6;
-    background-color: #ffffff;
+.tree-category {
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.config-section .form-control {
-    padding: 0.75rem;
-    font-size: 1rem;
-    border-radius: var(--radius-md, 8px);
-    border: 1px solid #dee2e6;
+.tree-category:last-child {
+  border-bottom: none;
 }
 
-.config-section .form-control:focus,
-.config-section .form-select:focus {
-    border-color: #CC0633;
-    box-shadow: 0 0 0 0.2rem rgba(204, 6, 51, 0.25);
+.category-header {
+  padding: 1rem;
+  background: #f8f9fa;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s;
 }
 
-/* Product type dropdown styling */
-.config-section select[id="productType"] {
-    font-size: 1.1rem;
-    font-weight: 500;
-    padding: 1rem 0.75rem;
+.category-header:hover {
+  background: #e9ecef;
 }
 
-/* Make form labels more prominent */
-.config-section .form-label {
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.5rem;
+.category-icon {
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
 }
 
-/* Responsive adjustments for universal configurator */
+.category-title {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.category-toggle {
+  color: var(--text-light);
+  font-size: 1.2rem;
+  transition: transform 0.2s;
+}
+
+.category-toggle.expanded {
+  transform: rotate(180deg);
+}
+
+.subcategory-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: none;
+}
+
+.subcategory-list.expanded {
+  display: block;
+}
+
+.subcategory-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.subcategory-header {
+  padding: 0.75rem 1rem 0.75rem 2rem;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.subcategory-header:hover {
+  background: #f8f9fa;
+}
+
+.item-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  background: #fafafa;
+  display: none;
+}
+
+.item-list.expanded {
+  display: block;
+}
+
+.inventory-item {
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inventory-item:last-child {
+  border-bottom: none;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: 0.25rem;
+}
+
+.item-details {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.item-actions {
+  margin-left: 1rem;
+}
+
+.btn-request {
+  background: var(--primary-color);
+  border: none;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-request:hover {
+  background: var(--secondary-color);
+}
+
+/* Request Modal */
+.request-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.request-modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(204, 6, 51, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.btn-submit {
+  flex: 1;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  flex: 1;
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Mobile Optimizations */
 @media (max-width: 768px) {
-    .dimensions-input-group {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-    
-    .dimension-multiply {
-        text-align: center;
-        padding-bottom: 0;
-        font-size: 1.2rem;
-    }
-    
-    .efficiency-rating {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .rating-text {
-        flex: none;
-    }
+  .action-grid {
+    gap: 0.75rem;
+  }
+  
+  .action-card {
+    padding: 1rem;
+    min-height: 100px;
+  }
+  
+  .action-icon {
+    font-size: 1.5rem;
+  }
+  
+  .action-label {
+    font-size: 0.85rem;
+  }
+  
+  .action-desc {
+    font-size: 0.7rem;
+  }
+  
+  .modal-content {
+    margin: 0.5rem;
+  }
+  
+  .inventory-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .item-actions {
+    margin-left: 0;
+    align-self: flex-end;
+  }
 }
-
-/* Alert styling for promotional product notices */
-.config-section .alert {
-    margin-top: 1rem;
-    border-radius: var(--radius-md, 8px);
-}
-
-.config-section .alert-info {
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
-    color: #0c5460;
-}
-
-.config-section .alert-link {
-    color: #0c5460;
-    font-weight: 600;
-    text-decoration: underline;
-}
-
-.config-section .alert-link:hover {
-    color: #062c33;
-}
-

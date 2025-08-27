@@ -75,6 +75,39 @@ function validateQuantity(quantity, productType, constraints) {
   return { valid: true };
 }
 
+// Dynamic imposition calculation helper functions
+function getDynamicImposition(width, height) {
+  // Use the ImpositionCalculator for accurate calculations
+  if (typeof ImpositionCalculator === 'undefined') {
+    console.warn('ImpositionCalculator not loaded, using static fallback');
+    return null;
+  }
+  
+  try {
+    const calc = new ImpositionCalculator();
+    const result = calc.calculateImposition(width, height);
+    
+    if (result.error) {
+      console.error('Imposition calculation error:', result.error);
+      return null;
+    }
+    
+    return result.copies || 1;
+  } catch (error) {
+    console.error('Error in getDynamicImposition:', error);
+    return null;
+  }
+}
+
+// Parse size strings like "4x6" or "8.5x11" 
+function parseSizeString(sizeStr) {
+  const parts = sizeStr.replace(/['"]/g, '').split('x');
+  return {
+    width: parseFloat(parts[0]),
+    height: parseFloat(parts[1])
+  };
+}
+
 async function calculateBrochurePrice(formData) {
   // Initialize pricing data
   const data = await initializePricingData();
@@ -111,10 +144,17 @@ async function calculateBrochurePrice(formData) {
   }
   
   const paperCost = selectedPaper.costPerSheet;
-  const imposition = data.pricingConfigs.imposition_data.brochures[size];
+  
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.brochures[size];
+  
   if (!imposition) {
     return { error: 'Invalid size selection' };
   }
+  
+  console.log(`Brochure ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.brochures[size]}, Using=${imposition}`);
   
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
   const v = (paperCost + clicks) * 1.5 / imposition;
@@ -197,10 +237,17 @@ async function calculatePostcardPrice(formData) {
   }
   
   const paperCost = selectedPaper.costPerSheet;
-  const imposition = data.pricingConfigs.imposition_data.postcards[size];
+  
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.postcards[size];
+  
   if (!imposition) {
     return { error: 'Invalid size selection' };
   }
+  
+  console.log(`Postcard ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.postcards[size]}, Using=${imposition}`);
   
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
   const v = (paperCost + clicks) * 1.5 / imposition;
@@ -208,6 +255,99 @@ async function calculatePostcardPrice(formData) {
   // Postcards have no finishing costs
   const f = 0;
   const needsFinishing = false;
+  
+  // Get rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  
+  // Calculate cost components
+  const printingSetupCost = S;
+  const finishingSetupCost = needsFinishing ? F_setup : 0;
+  const productionCost = Math.pow(quantity, e) * k;
+  const materialCost = quantity * v;
+  const finishingCost = quantity * f;
+  
+  // Calculate subtotal and apply rush multiplier
+  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
+  const totalCost = subtotal * rushMultiplier;
+  
+  // Calculate additional info
+  const sheetsRequired = Math.ceil(quantity / imposition);
+  const unitPrice = totalCost / quantity;
+  
+  
+  return {
+    printingSetupCost: printingSetupCost.toFixed(2),
+    finishingSetupCost: finishingSetupCost.toFixed(2),
+    needsFinishing: needsFinishing,
+    productionCost: productionCost.toFixed(2),
+    materialCost: materialCost.toFixed(2),
+    finishingCost: finishingCost.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(3),
+    sheetsRequired: sheetsRequired,
+    paperUsed: selectedPaper.displayName,
+    imposition: imposition
+  };
+}
+
+// Calculate Table Tent pricing (similar to postcards but with finishing)
+async function calculateTableTentPrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const paperCode = formData.get('paperType');
+  const rushType = formData.get('rushType') || 'standard';
+  
+  // Validate quantity constraints
+  const validation = validateQuantity(quantity, 'table-tents', data.pricingConfigs.product_constraints);
+  if (!validation.valid) {
+    return {
+      error: validation.message
+    };
+  }
+  
+  // Get configuration values
+  const config = data.pricingConfigs.formula;
+  const S = config.setupFee;               // $15.00 (printing setup)
+  const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
+  const k = config.baseProductionRate;     // $1.50
+  const e = 0.70;                          // 0.70 for table tents (same as postcards)
+  const clicks = config.clicksCost;        // $0.10
+  
+  // Get paper and imposition data
+  const selectedPaper = data.paperStocks[paperCode];
+  if (!selectedPaper) {
+    return { error: 'Invalid paper selection' };
+  }
+  
+  const paperCost = selectedPaper.costPerSheet;
+  
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || data.pricingConfigs.imposition_data['table-tents'][size];
+  
+  if (!imposition) {
+    return { error: 'Invalid size selection' };
+  }
+  
+  console.log(`Table Tent ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data['table-tents'][size]}, Using=${imposition}`);
+  
+  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
+  const v = (paperCost + clicks) * 1.5 / imposition;
+  
+  // Table tents require comprehensive finishing (delivered flat/unassembled)
+  // Scoring (2 scores): $0.10 + Folding: $0.10 + Double-sided tape + application: $0.30
+  const f = 0.50; // $0.50 per piece total finishing
+  const needsFinishing = true;
   
   // Get rush multiplier
   const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
@@ -270,7 +410,7 @@ async function calculateNameTagPrice(formData) {
   
   // Get configuration values
   const config = data.pricingConfigs.formula;
-  const S = 15.00;                         // $15.00 (printing setup - reduced for name tags)
+  const S = config.setupFee;               // $15.00 (printing setup)
   const F_setup = 0;                       // No setup fee for finishing (standalone unit)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.65;                          // 0.65 for name tags (better volume discounts)
@@ -283,10 +423,17 @@ async function calculateNameTagPrice(formData) {
   }
   
   const paperCost = selectedPaper.costPerSheet;
-  const imposition = data.pricingConfigs.imposition_data['name-tags'][size];
+  
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || data.pricingConfigs.imposition_data['name-tags'][size];
+  
   if (!imposition) {
     return { error: 'Invalid size selection' };
   }
+  
+  console.log(`Name Tag ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data['name-tags'][size]}, Using=${imposition}`);
   
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
   const v = (paperCost + clicks) * 1.5 / imposition;
@@ -599,7 +746,7 @@ function calculateFlyerPrice(formData) {
   
   // Get configuration values
   const config = pricingConfig.formula;
-  const S = 15.00;                         // $15.00 (printing setup - reduced for flyers)
+  const S = config.setupFee;               // $15.00 (printing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.65;                          // 0.65 for flyers (excellent bulk discount)
   const clicks = config.clicksCost;        // $0.10
@@ -611,7 +758,13 @@ function calculateFlyerPrice(formData) {
   }
   
   const paperCost = selectedPaper.costPerSheet;
-  const imposition = pricingConfig.impositionData.flyers[size];
+  
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || pricingConfig.impositionData.flyers[size];
+  console.log(`Flyers ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.flyers[size]}, Using=${imposition}`);
+  
   if (!imposition) {
     return { error: 'Invalid size selection' };
   }
@@ -751,7 +904,13 @@ function calculateBookmarkPrice(formData) {
   }
   
   const paperCost = selectedPaper.costPerSheet;
-  const imposition = pricingConfig.impositionData.bookmarks[size];
+  
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || pricingConfig.impositionData.bookmarks[size];
+  console.log(`Bookmarks ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.bookmarks[size]}, Using=${imposition}`);
+  
   if (!imposition) {
     return { error: 'Invalid size selection' };
   }
@@ -871,6 +1030,7 @@ async function calculateBookletPrice(formData) {
   }
 
   const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size') || '8.5x11';
   const pages = parseInt(formData.get('pages'));
   const coverPaperCode = formData.get('coverPaperType');
   const textPaperCode = formData.get('textPaperType');
@@ -930,16 +1090,24 @@ async function calculateBookletPrice(formData) {
     textSheetsPerBooklet = (pages - 4) / 4;  // (pages - cover) / 4
   }
   
-  // Get imposition
-  const imposition = data.pricingConfigs.imposition_data.booklets['8.5x11'] || 4;
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.booklets[size] || 4;
+  console.log(`Booklets ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.booklets[size]}, Using=${imposition}`);
+
+  // Calculate multi-up factor (how many booklets fit on 13x19 sheet)
+  // For 5.5x8.5: 2 booklets per sheet, for 8.5x11: 1 booklet per sheet
+  const multiUpFactor = (dimensions.width <= 6.5 && dimensions.height <= 9) ? 2 : 1;
+  console.log(`Booklets ${size}: Multi-up factor=${multiUpFactor} booklets per sheet set`);
 
   // Get click cost from config
   const clicksCost = data.pricingConfigs.formula.clicksCost || 0.10;
-  const clicksPerBooklet = pages / 2;  // Pages/2 = impressions (both sides)
+  const clicksPerBooklet = (pages / 2) / multiUpFactor;  // Pages/2 = impressions, divided by multi-up
 
-  // Calculate material cost per booklet
-  const coverCost = coverSheetsPerBooklet * coverPaper.costPerSheet;
-  const textCost = textSheetsPerBooklet * textPaper.costPerSheet;  
+  // Calculate material cost per booklet (account for multi-up production)
+  const coverCost = (coverSheetsPerBooklet * coverPaper.costPerSheet) / multiUpFactor;
+  const textCost = (textSheetsPerBooklet * textPaper.costPerSheet) / multiUpFactor;  
   const clickCost = clicksPerBooklet * clicksCost;
   const materialsCostPerUnit = (coverCost + textCost + clickCost) * 1.25;
   
@@ -971,7 +1139,6 @@ async function calculateBookletPrice(formData) {
   const textSheetsRequired = Math.ceil((quantity * textSheetsPerBooklet) / imposition);
   const totalSheetsRequired = coverSheetsRequired + textSheetsRequired;
   
-  
   return {
     printingSetupCost: baseSetup.toFixed(2),
     finishingSetupCost: finishingSetup.toFixed(2),
@@ -985,6 +1152,7 @@ async function calculateBookletPrice(formData) {
     totalCost: totalCost.toFixed(2),
     unitPrice: unitPrice.toFixed(3),
     sheetsRequired: totalSheetsRequired,
+    size: size,
     coverPaperUsed: isSelfCover ? 'Self Cover' : (coverPaper.displayName || coverPaper.display_name),
     textPaperUsed: textPaper.displayName || textPaper.display_name,
     pages: pages,
@@ -1044,8 +1212,11 @@ async function calculateNotebookPrice(formData) {
   const finishingSetup = 15;  // Always applied
   const totalSetup = baseSetup + finishingSetup;
   
-  // Get imposition based on size
-  const imposition = data.pricingConfigs.imposition_data.notebooks[size] || 2;
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.notebooks[size] || 2;
+  console.log(`Notebooks ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.notebooks[size]}, Using=${imposition}`);
   
   // Calculate sheets needed per notebook
   const coverSheetsPerNotebook = 1 / imposition;
@@ -1151,8 +1322,11 @@ async function calculateNotepadPrice(formData) {
   const finishingSetup = 15;  // Always applied for padding
   const totalSetup = baseSetup + finishingSetup;
   
-  // Get imposition based on size
-  const imposition = data.pricingConfigs.imposition_data.notepads[size] || 2;
+  // Use dynamic imposition calculation with static fallback
+  const dimensions = parseSizeString(size);
+  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.notepads[size] || 2;
+  console.log(`Notepads ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.notepads[size]}, Using=${imposition}`);
   
   // Calculate sheets needed per notepad (SINGLE-SIDED PRINTING)
   // Each notepad has 'sheets' number of physical sheets

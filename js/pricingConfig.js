@@ -4,7 +4,7 @@
 const pricingConfig = {
   // Fixed formula values
   formula: {
-    setupFee: 30.00,           // S = $30.00 (prepress and printing setup)
+    setupFee: 15.00,           // S = $15.00 (prepress and printing setup)
     finishingSetupFee: 15.00,  // F_setup = $15.00 (finishing setup when required)
     baseProductionRate: 1.50,  // k = $1.50
     efficiencyExponent: 0.75,  // e = 0.75
@@ -20,6 +20,10 @@ const pricingConfig = {
     postcards: {
       minQuantity: 100,
       maxQuantity: 5000
+    },
+    'table-tents': {
+      minQuantity: 10,
+      maxQuantity: 100
     },
     'name-tags': {
       minQuantity: 50,
@@ -90,6 +94,10 @@ const pricingConfig = {
       '5.5x8.5': 4,
       '6x9': 2
     },
+    'table-tents': {
+      '4x6': 2,
+      '5x7': 2
+    },
     'name-tags': {
       '2.33x3': 20,
       '3x4': 12,
@@ -102,7 +110,8 @@ const pricingConfig = {
       '11x17': 1
     },
     booklets: {
-      '8.5x11': 4  // 4-up imposition for standard booklet size
+      '5.5x8.5': 4,  // 4-up imposition for compact booklet size
+      '8.5x11': 4    // 4-up imposition for standard booklet size
     },
     notebooks: {
       '5.5x8.5': 4,  // 4-up imposition

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imposition Test</title>
+</head>
+<body>
+    <h1>Imposition Calculation Test</h1>
+    <div id="results"></div>
+
+    <script src="js/impositionCalculator.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calc = new ImpositionCalculator();
+            const results = document.getElementById('results');
+            
+            // Test cases from our pricingConfig
+            const tests = [
+                { size: '4x6', expected: 8 }, // Postcards
+                { size: '5x7', expected: 4 }, // Postcards
+                { size: '8.5x11', expected: 2 }, // Common size
+                { size: '2x6', expected: 10 }, // Bookmarks
+                { size: '5.5x8.5', expected: 4 } // Various products
+            ];
+            
+            let output = '<h2>Test Results:</h2>';
+            
+            tests.forEach(test => {
+                const dimensions = test.size.split('x').map(d => parseFloat(d));
+                const result = calc.calculateImposition(dimensions[0], dimensions[1]);
+                
+                output += `<p><strong>${test.size}"</strong>: `;
+                output += `Dynamic = ${result.copies}, `;
+                output += `Expected = ${test.expected}, `;
+                output += `Match = ${result.copies === test.expected ? '✅' : '❌'}</p>`;
+                
+                console.log(`${test.size}: Dynamic=${result.copies}, Expected=${test.expected}, Efficiency=${result.efficiency}%`);
+            });
+            
+            results.innerHTML = output;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - SFU Inventory</title>
+    <meta name="description" content="Inventory management admin panel">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- SFU Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#CC0633">
+</head>
+<body>
+    <!-- Authentication Guard -->
+    <script src="js/auth-guard.js"></script>
+    
+    <div class="container-fluid px-3 py-4">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center">
+                <button onclick="window.history.back()" class="btn btn-link text-decoration-none p-0 me-3">
+                    <span style="font-size: 1.5rem;">←</span>
+                </button>
+                <h1 class="h4 mb-0">Inventory Admin Panel</h1>
+            </div>
+            <button class="btn btn-outline-primary btn-sm" onclick="refreshRequests()">
+                Refresh
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning" id="pendingCount">0</h5>
+                        <p class="card-text small">Pending</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-success" id="approvedCount">0</h5>
+                        <p class="card-text small">Approved</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger" id="rejectedCount">0</h5>
+                        <p class="card-text small">Rejected</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-info" id="totalCount">0</h5>
+                        <p class="card-text small">Total</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="mb-4">
+            <div class="btn-group w-100" role="group">
+                <button type="button" class="btn btn-outline-primary active" data-status="pending" onclick="filterByStatus('pending')">
+                    Pending Review
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-status="all" onclick="filterByStatus('all')">
+                    All Requests
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-status="approved" onclick="filterByStatus('approved')">
+                    Approved
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-status="rejected" onclick="filterByStatus('rejected')">
+                    Rejected
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Loading requests...</p>
+        </div>
+
+        <!-- Requests List -->
+        <div id="requestsList" class="requests-list" style="display: none;">
+            <!-- This will be populated by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-5" style="display: none;">
+            <div class="text-muted">
+                <div style="font-size: 3rem; font-weight: bold;">ADMIN</div>
+                <h4 class="mt-3">No Requests Found</h4>
+                <p>No inventory requests match the current filter.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Modal -->
+    <div class="request-modal" id="actionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="actionModalTitle">Process Request</h3>
+                <button class="btn-close" onclick="closeActionModal()" aria-label="Close">×</button>
+            </div>
+            
+            <div id="actionModalBody">
+                <!-- This will be populated with request details -->
+            </div>
+            
+            <div class="form-group">
+                <label for="adminNotes" class="form-label">Admin Notes</label>
+                <textarea id="adminNotes" class="form-control" rows="3" placeholder="Add notes about this decision..."></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeActionModal()">Cancel</button>
+                <button class="btn btn-success" id="approveBtn" onclick="processRequest('approved')">Approve</button>
+                <button class="btn btn-danger" id="rejectBtn" onclick="processRequest('rejected')">Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        let allRequests = [];
+        let currentFilter = 'pending';
+        let currentRequest = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check admin access
+            if (!window.currentUser || !window.currentUser.is_admin) {
+                alert('Admin access required');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            await loadRequests();
+        });
+
+        async function loadRequests() {
+            try {
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('requestsList').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+                
+                // Wait for app to initialize
+                if (!window.inventoryApp.initialized) {
+                    await window.inventoryApp.init();
+                }
+                
+                allRequests = await window.inventoryApp.getAllRequests();
+                updateStats();
+                displayRequests();
+                
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load requests. Please try refreshing the page.
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats() {
+            const pending = allRequests.filter(r => r.status === 'pending').length;
+            const approved = allRequests.filter(r => r.status === 'approved').length;
+            const rejected = allRequests.filter(r => r.status === 'rejected').length;
+            const total = allRequests.length;
+            
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('approvedCount').textContent = approved;
+            document.getElementById('rejectedCount').textContent = rejected;
+            document.getElementById('totalCount').textContent = total;
+        }
+
+        function displayRequests() {
+            document.getElementById('loadingState').style.display = 'none';
+            
+            const filteredRequests = currentFilter === 'all' 
+                ? allRequests 
+                : allRequests.filter(req => req.status === currentFilter);
+            
+            if (filteredRequests.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('requestsList').style.display = 'none';
+                return;
+            }
+            
+            const listContainer = document.getElementById('requestsList');
+            listContainer.innerHTML = '';
+            
+            // Sort by created_at desc, with pending requests first
+            filteredRequests.sort((a, b) => {
+                if (a.status === 'pending' && b.status !== 'pending') return -1;
+                if (b.status === 'pending' && a.status !== 'pending') return 1;
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+            
+            filteredRequests.forEach(request => {
+                const requestCard = createRequestCard(request);
+                listContainer.appendChild(requestCard);
+            });
+            
+            document.getElementById('requestsList').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function createRequestCard(request) {
+            const card = document.createElement('div');
+            card.className = 'card mb-3';
+            
+            const statusInfo = window.inventoryApp.formatStatus(request.status);
+            const priorityInfo = window.inventoryApp.formatPriority(request.priority);
+            const isPending = request.status === 'pending';
+            
+            card.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="card-title mb-0">
+                            Request #${request.id.slice(-8)}
+                        </h6>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-${statusInfo.class.replace('badge-', '')}">${statusInfo.text}</span>
+                            <span class="badge bg-${priorityInfo.class.replace('badge-', '')}">${priorityInfo.text}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-muted small mb-2">
+                        <strong>Submitted by:</strong> ${request.user_name || request.user_email}<br>
+                        <strong>Date:</strong> ${window.inventoryApp.formatDate(request.created_at)}
+                        ${request.processed_at ? `<br><strong>Processed:</strong> ${window.inventoryApp.formatDate(request.processed_at)}` : ''}
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Items:</strong> ${request.items.length} item${request.items.length === 1 ? '' : 's'}
+                        <div class="small text-muted">
+                            ${request.items.slice(0, 2).map(item => `${item.name} (${item.quantity} ${item.unit})`).join(', ')}
+                            ${request.items.length > 2 ? ` and ${request.items.length - 2} more...` : ''}
+                        </div>
+                    </div>
+                    
+                    ${request.notes ? `
+                        <div class="mb-2">
+                            <strong>Request Notes:</strong> ${request.notes}
+                        </div>
+                    ` : ''}
+                    
+                    ${request.admin_notes ? `
+                        <div class="mb-2">
+                            <strong>Admin Notes:</strong> 
+                            <span class="text-${request.status === 'rejected' ? 'danger' : 'success'}">${request.admin_notes}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="d-flex gap-2">
+                        ${isPending ? `
+                            <button class="btn btn-success btn-sm" onclick="openActionModal('${request.id}', 'approve')">
+                                Approve
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="openActionModal('${request.id}', 'reject')">
+                                Reject
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-outline-primary btn-sm" onclick="openActionModal('${request.id}', 'view')">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function filterByStatus(status) {
+            // Update active button
+            document.querySelectorAll('[data-status]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-status="${status}"]`).classList.add('active');
+            
+            currentFilter = status;
+            displayRequests();
+        }
+
+        function openActionModal(requestId, action) {
+            const request = allRequests.find(r => r.id === requestId);
+            if (!request) return;
+            
+            currentRequest = request;
+            const modalBody = document.getElementById('actionModalBody');
+            const statusInfo = window.inventoryApp.formatStatus(request.status);
+            const priorityInfo = window.inventoryApp.formatPriority(request.priority);
+            
+            // Update modal title and buttons based on action
+            const modalTitle = document.getElementById('actionModalTitle');
+            const approveBtn = document.getElementById('approveBtn');
+            const rejectBtn = document.getElementById('rejectBtn');
+            const notesField = document.getElementById('adminNotes');
+            
+            if (action === 'view' || request.status !== 'pending') {
+                modalTitle.textContent = 'Request Details';
+                approveBtn.style.display = 'none';
+                rejectBtn.style.display = 'none';
+                notesField.disabled = true;
+                notesField.value = request.admin_notes || '';
+            } else {
+                modalTitle.textContent = action === 'approve' ? 'Approve Request' : 'Reject Request';
+                approveBtn.style.display = action === 'reject' ? 'none' : 'inline-block';
+                rejectBtn.style.display = action === 'approve' ? 'none' : 'inline-block';
+                notesField.disabled = false;
+                notesField.value = '';
+            }
+            
+            modalBody.innerHTML = `
+                <div class="mb-3">
+                    <strong>Request #${request.id.slice(-8)}</strong>
+                    <div class="d-flex gap-2 mt-1">
+                        <span class="badge bg-${statusInfo.class.replace('badge-', '')}">${statusInfo.text}</span>
+                        <span class="badge bg-${priorityInfo.class.replace('badge-', '')}">${priorityInfo.text}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">
+                        <strong>Submitted by:</strong> ${request.user_name || request.user_email} (${request.user_email})<br>
+                        <strong>Date:</strong> ${window.inventoryApp.formatDate(request.created_at)}
+                        ${request.processed_at ? `<br><strong>Processed:</strong> ${window.inventoryApp.formatDate(request.processed_at)}` : ''}
+                    </small>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Requested Items:</strong>
+                    <div class="mt-2">
+                        ${request.items.map(item => `
+                            <div class="border rounded p-2 mb-2 bg-light">
+                                <div><strong>${item.name}</strong></div>
+                                <div class="small text-muted">
+                                    SKU: ${item.sku} | Quantity: <strong>${item.quantity} ${item.unit}</strong><br>
+                                    Location: ${item.location}
+                                    ${item.category ? `<br>Category: ${item.category}` : ''}
+                                    ${item.notes ? `<br><em>Notes: ${item.notes}</em>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                ${request.notes ? `
+                    <div class="mb-3">
+                        <strong>Request Notes:</strong>
+                        <div class="bg-light p-2 rounded">${request.notes}</div>
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('actionModal').classList.add('show');
+        }
+
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.remove('show');
+            currentRequest = null;
+        }
+
+        async function processRequest(status) {
+            if (!currentRequest) return;
+            
+            const adminNotes = document.getElementById('adminNotes').value.trim();
+            const approveBtn = document.getElementById('approveBtn');
+            const rejectBtn = document.getElementById('rejectBtn');
+            
+            try {
+                // Disable buttons
+                approveBtn.disabled = true;
+                rejectBtn.disabled = true;
+                approveBtn.textContent = 'Processing...';
+                rejectBtn.textContent = 'Processing...';
+                
+                await window.inventoryApp.updateRequestStatus(currentRequest.id, status, adminNotes);
+                
+                // Refresh the requests list
+                await loadRequests();
+                closeActionModal();
+                
+                const action = status === 'approved' ? 'approved' : 'rejected';
+                alert(`Request successfully ${action}!`);
+                
+            } catch (error) {
+                console.error('Error processing request:', error);
+                alert('Failed to process request. Please try again.');
+            } finally {
+                // Re-enable buttons
+                approveBtn.disabled = false;
+                rejectBtn.disabled = false;
+                approveBtn.textContent = 'Approve';
+                rejectBtn.textContent = 'Reject';
+            }
+        }
+
+        async function refreshRequests() {
+            await loadRequests();
+        }
+
+        // Make functions globally available
+        window.filterByStatus = filterByStatus;
+        window.openActionModal = openActionModal;
+        window.closeActionModal = closeActionModal;
+        window.processRequest = processRequest;
+        window.refreshRequests = refreshRequests;
+    </script>
+</body>
+</html>

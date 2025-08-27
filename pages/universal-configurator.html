@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Configure and order professional bookmarks - real-time pricing">
+    <meta name="description" content="Universal product configurator - real-time pricing for all print products">
     <meta name="theme-color" content="#CC0633">
     
-    <title>Bookmark Configurator | SFU Document Solutions</title>
+    <title>Universal Configurator | SFU Document Solutions</title>
     
     <link rel="manifest" href="../manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -16,7 +16,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="SFU Calc">
     
-    <!-- Authentication Guard -->
+    <!-- Authentication Guard - Protects entire application -->
     <script src="../js/auth-guard.js"></script>
 </head>
 <body>
@@ -114,40 +114,64 @@
             <div class="container">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
-                    <li class="breadcrumb-item"><a href="small-format.html">Small Format Printing</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Bookmark Configurator</li>
+                    <li class="breadcrumb-item active" aria-current="page">Universal Configurator</li>
                 </ol>
             </div>
         </nav>
 
-        <!-- Product Configurator -->
+        <!-- Universal Product Configurator -->
         <div class="container">
             <div class="configurator-layout">
                 <!-- Product Preview Section -->
                 <div class="product-preview-section">
                     <div class="preview-header">
-                        <h1>Bookmarks</h1>
-                        <p class="preview-subtitle">Premium cover stock bookmarks perfect for libraries, educational institutions, events, and marketing campaigns.</p>
+                        <h1>Universal Configurator</h1>
+                        <p class="preview-subtitle">Configure any print product with custom dimensions, any paper stock, and flexible quantities. Perfect for customer service staff.</p>
                     </div>
                     
                     <div class="config-summary">
-                        <h4>Your Configuration</h4>
+                        <h4>Current Configuration</h4>
                         <div class="summary-grid">
                             <div class="summary-item">
+                                <span class="summary-label">Product:</span>
+                                <span class="summary-value" id="currentProduct">Select a product type</span>
+                            </div>
+                            <div class="summary-item">
                                 <span class="summary-label">Size:</span>
-                                <span class="summary-value" id="currentSize">2" × 7"</span>
+                                <span class="summary-value" id="currentSize">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Imposition:</span>
+                                <span class="summary-value" id="currentImposition">-</span>
                             </div>
                             <div class="summary-item">
                                 <span class="summary-label">Paper:</span>
-                                <span class="summary-value" id="currentPaper">130# Cover Uncoated</span>
+                                <span class="summary-value" id="currentPaper">-</span>
                             </div>
                             <div class="summary-item">
                                 <span class="summary-label">Quantity:</span>
-                                <span class="summary-value" id="currentQuantity">250</span>
+                                <span class="summary-value" id="currentQuantity">-</span>
                             </div>
                             <div class="summary-item">
                                 <span class="summary-label">Turnaround:</span>
                                 <span class="summary-value" id="currentTurnaround">Standard</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Imposition Efficiency Display -->
+                    <div class="imposition-info" id="impositionInfo" style="display: none;">
+                        <div class="imposition-display">
+                            <div class="efficiency-rating" id="efficiencyRating">
+                                <span class="rating-icon">✅</span>
+                                <span class="rating-text">Excellent sheet utilization</span>
+                                <span class="rating-percentage" id="efficiencyPercentage">75%</span>
+                            </div>
+                            <div class="imposition-details">
+                                <small>
+                                    <span id="impositionDetails">8 copies per 12×18" sheet</span><br>
+                                    <span id="bleedInfo">With bleed: 4.25" × 6.25"</span>
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -193,6 +217,10 @@
                                     <span>Finishing:</span>
                                     <span id="redFinishingCost">$0.00</span>
                                 </div>
+                                <div class="breakdown-row" id="redFinishingSetupItem" style="display: none;">
+                                    <span>Finishing Setup:</span>
+                                    <span id="redFinishingSetupCost">$0.00</span>
+                                </div>
                                 <div class="breakdown-row subtotal">
                                     <span>Subtotal:</span>
                                     <span id="redSubtotal">$0.00</span>
@@ -200,6 +228,10 @@
                                 <div class="breakdown-row" id="redRushMultiplierItem" style="display: none;">
                                     <span>Rush:</span>
                                     <span id="redRushMultiplier">1x</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span>Sheets Required:</span>
+                                    <span id="redSheetsRequired">0</span>
                                 </div>
                             </div>
                         </div>
@@ -216,80 +248,119 @@
 
                 <!-- Configuration Panel -->
                 <div class="configuration-panel">
-                    <form id="bookmarkForm" class="configurator-form">
-                        <!-- Size Configuration -->
+                    <form id="universalForm" class="configurator-form">
+                        <!-- Product Type Selection -->
                         <div class="config-section">
                             <div class="section-header">
-                                <h3>Size</h3>
+                                <h3>Product Type</h3>
                                 <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
-                                        title="Choose from standard bookmark sizes">
+                                        title="Select the type of product you want to configure">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
                                     </svg>
                                 </button>
                             </div>
-                            <div class="option-grid">
-                                <label class="option-card" data-option="size" data-value="2x6">
-                                    <input type="radio" name="size" value="2x6" hidden>
-                                    <div class="option-content">
-                                        <div class="option-title">2" × 6"</div>
-                                        <div class="option-subtitle">Compact</div>
-                                    </div>
-                                </label>
-                                <label class="option-card selected" data-option="size" data-value="2x7">
-                                    <input type="radio" name="size" value="2x7" checked hidden>
-                                    <div class="option-content">
-                                        <div class="option-title">2" × 7"</div>
-                                        <div class="option-subtitle">Standard</div>
-                                        <div class="option-badge recommended">Recommended</div>
-                                    </div>
-                                </label>
-                                <label class="option-card" data-option="size" data-value="2x8">
-                                    <input type="radio" name="size" value="2x8" hidden>
-                                    <div class="option-content">
-                                        <div class="option-title">2" × 8"</div>
-                                        <div class="option-subtitle">Extended</div>
-                                    </div>
-                                </label>
+                            <div class="form-group">
+                                <select class="form-select" id="productType" name="productType" required>
+                                    <option value="">Choose a product type...</option>
+                                    <optgroup label="Small Format Printing">
+                                        <option value="brochures">Brochures</option>
+                                        <option value="postcards">Postcards</option>
+                                        <option value="flyers">Flyers</option>
+                                        <option value="bookmarks">Bookmarks</option>
+                                        <option value="name-tags">Name Tags</option>
+                                        <option value="booklets">Booklets</option>
+                                        <option value="notebooks">Notebooks</option>
+                                        <option value="notepads">Notepads</option>
+                                        <option value="table-tents">Table Tents</option>
+                                    </optgroup>
+                                    <optgroup label="Large Format Printing">
+                                        <option value="posters">Posters</option>
+                                    </optgroup>
+                                    <optgroup label="Promotional Products">
+                                        <option value="magnets">Magnets</option>
+                                        <option value="stickers">Stickers</option>
+                                        <option value="apparel">Apparel</option>
+                                        <option value="tote-bags">Tote Bags</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Dimensions Configuration -->
+                        <div class="config-section" id="dimensionsSection" style="display: none;">
+                            <div class="section-header">
+                                <h3>Product Dimensions</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
+                                        title="Enter the finished trim size of your product (inches)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="dimensions-input-group">
+                                <div class="dimension-input">
+                                    <label for="customWidth" class="form-label">Width (inches)</label>
+                                    <input type="number" class="form-control" id="customWidth" name="customWidth" 
+                                           min="1" max="12.23" step="0.125" placeholder="4.0">
+                                </div>
+                                <div class="dimension-multiply">×</div>
+                                <div class="dimension-input">
+                                    <label for="customHeight" class="form-label">Height (inches)</label>
+                                    <input type="number" class="form-control" id="customHeight" name="customHeight" 
+                                           min="1" max="18.01" step="0.125" placeholder="6.0">
+                                </div>
+                            </div>
+                            <div class="dimension-info">
+                                <small class="text-muted">
+                                    Maximum trim size: 12.23" × 18.01" (0.125" bleed added automatically)
+                                </small>
                             </div>
                         </div>
 
                         <!-- Paper Configuration -->
-                        <div class="config-section">
+                        <div class="config-section" id="paperSection" style="display: none;">
                             <div class="section-header">
-                                <h3>Paper</h3>
-                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
-                                        title="Premium cover weight papers for durability">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
-                                    </svg>
-                                </button>
+                                <h3>Paper Selection</h3>
                             </div>
-                            <div class="option-grid">
-                                <label class="option-card selected" data-option="paper" data-value="COUDCCDIC123513FSC">
-                                    <input type="radio" name="paperType" value="COUDCCDIC123513FSC" checked hidden>
-                                    <div class="option-content">
-                                        <div class="option-title">130# Cover Uncoated</div>
-                                        <div class="option-subtitle">Premium Matte</div>
-                                        <div class="option-badge recommended">Recommended</div>
-                                    </div>
-                                </label>
-                                <label class="option-card" data-option="paper" data-value="PACDISC12413FSC">
-                                    <input type="radio" name="paperType" value="PACDISC12413FSC" hidden>
-                                    <div class="option-content">
-                                        <div class="option-title">130# Cover Silk</div>
-                                        <div class="option-subtitle">Smooth Finish</div>
-                                    </div>
-                                </label>
+                            <div class="paper-dropdowns">
+                                <div class="form-group">
+                                    <label for="textPaper" class="form-label">Text Weight Paper</label>
+                                    <select class="form-select" id="textPaper" name="textPaper">
+                                        <option value="">Select text paper...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="coverPaper" class="form-label">Cover Weight Paper</label>
+                                    <select class="form-select" id="coverPaper" name="coverPaper">
+                                        <option value="">Select cover paper...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="specialtyStock" class="form-label">Specialty Stock</label>
+                                    <select class="form-select" id="specialtyStock" name="specialtyStock">
+                                        <option value="">No specialty stock...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product-Specific Options -->
+                        <div class="config-section" id="specificOptionsSection" style="display: none;">
+                            <div class="section-header">
+                                <h3 id="specificOptionsTitle">Options</h3>
+                            </div>
+                            <div id="specificOptionsContent">
+                                <!-- Dynamic content based on product type -->
                             </div>
                         </div>
 
                         <!-- Quantity Configuration -->
-                        <div class="config-section">
+                        <div class="config-section" id="quantitySection" style="display: none;">
                             <div class="section-header">
                                 <h3>Quantity</h3>
                                 <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
-                                        title="Order from 100 to 2,500 bookmarks">
+                                        title="Enter any quantity from 1 to 10,000">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
                                     </svg>
@@ -297,23 +368,19 @@
                             </div>
                             <div class="quantity-input-group">
                                 <input type="number" class="form-control" id="quantity" name="quantity" 
-                                       value="250" min="100" max="2500" step="50" required>
-                                <div class="quantity-suggestions">
-                                    <button type="button" class="qty-suggestion" data-qty="100">100</button>
-                                    <button type="button" class="qty-suggestion active" data-qty="250">250</button>
-                                    <button type="button" class="qty-suggestion" data-qty="500">500</button>
-                                    <button type="button" class="qty-suggestion" data-qty="1000">1,000</button>
-                                    <button type="button" class="qty-suggestion" data-qty="2000">2,000</button>
+                                       min="1" max="10000" placeholder="Enter quantity" required>
+                                <div class="quantity-limits">
+                                    <small>Range: 1 to 10,000</small>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Turnaround Configuration -->
-                        <div class="config-section">
+                        <div class="config-section" id="turnaroundSection" style="display: none;">
                             <div class="section-header">
-                                <h3>Turnaround</h3>
+                                <h3>Turnaround Time</h3>
                             </div>
-                            <div class="option-grid">
+                            <div class="option-grid turnaround-grid">
                                 <label class="option-card selected" data-option="turnaround" data-value="standard">
                                     <input type="radio" name="rushType" value="standard" checked hidden>
                                     <div class="option-content">
@@ -327,15 +394,15 @@
                                     <div class="option-content">
                                         <div class="option-title">2-Day Rush</div>
                                         <div class="option-subtitle">2 business days</div>
-                                        <div class="option-price">+25%</div>
+                                        <div class="option-price">+50%</div>
                                     </div>
                                 </label>
                                 <label class="option-card" data-option="turnaround" data-value="next-day">
                                     <input type="radio" name="rushType" value="next-day" hidden>
                                     <div class="option-content">
-                                        <div class="option-title">Next Day Rush</div>
+                                        <div class="option-title">Next Day</div>
                                         <div class="option-subtitle">1 business day</div>
-                                        <div class="option-price">+50%</div>
+                                        <div class="option-price">+100%</div>
                                     </div>
                                 </label>
                                 <label class="option-card" data-option="turnaround" data-value="same-day">
@@ -343,84 +410,24 @@
                                     <div class="option-content">
                                         <div class="option-title">Same Day</div>
                                         <div class="option-subtitle">4 hours</div>
-                                        <div class="option-price">+100%</div>
+                                        <div class="option-price">+200%</div>
                                     </div>
                                 </label>
                             </div>
                         </div>
-
                     </form>
-
-                    <!-- Results Section -->
-                    <div id="resultsSection" class="pricing-results" style="display: none;">
-                        <div class="results-card">
-                            <h3>Pricing Breakdown</h3>
-                            <div class="pricing-details">
-                                <div class="price-item">
-                                    <span>Printing Setup:</span>
-                                    <span id="printingSetupCost">$0</span>
-                                </div>
-                                <div class="price-item" id="finishingSetupItem" style="display: none;">
-                                    <span>Finishing Setup:</span>
-                                    <span id="finishingSetupCost">$0</span>
-                                </div>
-                                <div class="price-item">
-                                    <span>Production Cost:</span>
-                                    <span id="productionCost">$0</span>
-                                </div>
-                                <div class="price-item">
-                                    <span>Material Cost:</span>
-                                    <span id="materialCost">$0</span>
-                                </div>
-                                <div class="price-item" id="finishingCostItem" style="display: none;">
-                                    <span>Finishing Cost:</span>
-                                    <span id="finishingCost">$0</span>
-                                </div>
-                                <div class="price-item subtotal">
-                                    <span>Subtotal:</span>
-                                    <span id="subtotal">$0</span>
-                                </div>
-                                <div class="price-item" id="rushMultiplierItem" style="display: none;">
-                                    <span>Rush Multiplier:</span>
-                                    <span id="rushMultiplier">1x</span>
-                                </div>
-                                <div class="price-item total">
-                                    <span>Total Price:</span>
-                                    <span id="totalPrice">$0</span>
-                                </div>
-                                <div class="price-item unit-price">
-                                    <span>Unit Price:</span>
-                                    <span id="unitPrice">$0</span>
-                                </div>
-                            </div>
-                            <div class="sheets-info">
-                                <span>Sheets Required:</span>
-                                <span id="sheetsRequired">0</span>
-                            </div>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button type="button" class="btn btn-primary btn-lg" id="addToCartBtn" style="display: none;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                                </svg>
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/paperStocks.js"></script>
     <script src="../js/pricingConfig.js"></script>
-    <script src="../js/impositionCalculator.js"></script>
     <script src="../js/calculator.js"></script>
     <script src="../js/cart.js"></script>
-    <script src="../js/configurator.js"></script>
+    <script src="../js/impositionCalculator.js"></script>
+    <script src="../js/universalConfigurator.js"></script>
     <script src="../js/header.js"></script>
     <script src="../js/app.js"></script>
 </body>

@@ -10,6 +10,7 @@ class ProductConfigurator {
         // Initialize configuration based on product type
         if (this.productType === 'booklets') {
             this.currentConfig = {
+                size: '8.5x11',                // Default to standard letter size
                 pages: 8,
                 coverPaperType: 'LYNOC95FSC',  // Default to 100# Cover Uncoated
                 textPaperType: 'LYNO416FSC',   // Default to 80# Text Uncoated
@@ -52,6 +53,13 @@ class ProductConfigurator {
                 material: 'RMPS002', // Default to paper
                 rushType: 'standard',
                 quantity: 1
+            };
+        } else if (this.productType === 'table-tents') {
+            this.currentConfig = {
+                size: '4x6',
+                paperType: 'LYNOC95FSC', // Default to 100# Cover Uncoated
+                rushType: 'standard',
+                quantity: 25
             };
         } else {
             this.currentConfig = {
@@ -97,6 +105,8 @@ class ProductConfigurator {
             return 'apparel';
         } else if (document.getElementById('toteBagForm')) {
             return 'tote-bags';
+        } else if (document.getElementById('tableTentForm')) {
+            return 'table-tents';
         } else if (document.getElementById('posterForm')) {
             return 'posters';
         }
@@ -293,9 +303,38 @@ class ProductConfigurator {
             'booklets': 'Booklet',
             'notebooks': 'Notebook',
             'notepads': 'Notepad',
-            'name-tags': 'Name Tag'
+            'name-tags': 'Name Tag',
+            'table-tents': 'Table Tent'
         };
         return displayNames[this.productType] || 'Product';
+    }
+
+    getProductConstraints() {
+        // Get product-specific quantity constraints from pricingConfig
+        if (window.pricingConfig && window.pricingConfig.productConstraints) {
+            const constraints = window.pricingConfig.productConstraints[this.productType];
+            if (constraints) {
+                return {
+                    minQuantity: constraints.minQuantity,
+                    maxQuantity: constraints.maxQuantity
+                };
+            }
+        }
+        
+        // Fallback to product-specific defaults
+        const fallbacks = {
+            'brochures': { minQuantity: 25, maxQuantity: 2500 },
+            'postcards': { minQuantity: 100, maxQuantity: 5000 },
+            'flyers': { minQuantity: 25, maxQuantity: 2500 },
+            'bookmarks': { minQuantity: 100, maxQuantity: 2500 },
+            'booklets': { minQuantity: 10, maxQuantity: 1000 },
+            'notebooks': { minQuantity: 10, maxQuantity: 500 },
+            'notepads': { minQuantity: 25, maxQuantity: 1000 },
+            'name-tags': { minQuantity: 50, maxQuantity: 5000 },
+            'table-tents': { minQuantity: 10, maxQuantity: 100 }
+        };
+        
+        return fallbacks[this.productType] || { minQuantity: 25, maxQuantity: 2500 };
     }
 
     async init() {
@@ -368,6 +407,8 @@ class ProductConfigurator {
                 return typeof calculateApparelPrice === 'function' ? calculateApparelPrice : null;
             case 'tote-bags':
                 return typeof calculateToteBagPrice === 'function' ? calculateToteBagPrice : null;
+            case 'table-tents':
+                return typeof calculateTableTentPrice === 'function' ? calculateTableTentPrice : null;
             case 'posters':
                 return typeof calculatePosterPrice === 'function' ? calculatePosterPrice : null;
             default:
@@ -403,7 +444,9 @@ class ProductConfigurator {
         if (minusBtn) {
             minusBtn.addEventListener('click', () => {
                 const current = parseInt(quantityInput.value) || 100;
-                const newValue = Math.max(25, current - 25);
+                const constraints = this.getProductConstraints();
+                const step = this.productType === 'table-tents' ? 5 : 25;
+                const newValue = Math.max(constraints.minQuantity, current - step);
                 this.updateQuantity(newValue);
             });
         }
@@ -411,7 +454,9 @@ class ProductConfigurator {
         if (plusBtn) {
             plusBtn.addEventListener('click', () => {
                 const current = parseInt(quantityInput.value) || 100;
-                const newValue = Math.min(2500, current + 25);
+                const constraints = this.getProductConstraints();
+                const step = this.productType === 'table-tents' ? 5 : 25;
+                const newValue = Math.min(constraints.maxQuantity, current + step);
                 this.updateQuantity(newValue);
             });
         }
@@ -531,8 +576,9 @@ class ProductConfigurator {
     }
 
     updateQuantity(newQuantity) {
-        // Validate quantity range
-        const quantity = Math.max(25, Math.min(2500, newQuantity));
+        // Validate quantity range using product constraints
+        const constraints = this.getProductConstraints();
+        const quantity = Math.max(constraints.minQuantity, Math.min(constraints.maxQuantity, newQuantity));
         
         // Update input field
         const quantityInput = document.getElementById('quantity');
@@ -567,9 +613,10 @@ class ProductConfigurator {
     validateQuantity() {
         const quantityInput = document.getElementById('quantity');
         const value = parseInt(quantityInput.value);
+        const constraints = this.getProductConstraints();
         
-        if (isNaN(value) || value < 25 || value > 2500) {
-            const correctedValue = Math.max(25, Math.min(2500, value || 100));
+        if (isNaN(value) || value < constraints.minQuantity || value > constraints.maxQuantity) {
+            const correctedValue = Math.max(constraints.minQuantity, Math.min(constraints.maxQuantity, value || constraints.minQuantity));
             this.updateQuantity(correctedValue);
         }
     }
@@ -697,12 +744,14 @@ class ProductConfigurator {
 
         if (this.productType === 'booklets') {
             // Handle booklet-specific summary fields
+            const summarySize = document.getElementById('summarySize');
             const summaryPages = document.getElementById('summaryPages');
             const summaryCoverPaper = document.getElementById('summaryCoverPaper');
             const summaryTextPaper = document.getElementById('summaryTextPaper');
             const summaryTurnaround = document.getElementById('summaryTurnaround');
             const summaryQuantity = document.getElementById('summaryQuantity');
 
+            if (summarySize) summarySize.textContent = this.currentConfig.size;
             if (summaryPages) summaryPages.textContent = `${this.currentConfig.pages} pages`;
             if (summaryCoverPaper) summaryCoverPaper.textContent = summaryMapping.coverPaperType[this.currentConfig.coverPaperType] || 'Select paper';
             if (summaryTextPaper) summaryTextPaper.textContent = summaryMapping.textPaperType[this.currentConfig.textPaperType] || 'Select paper';
@@ -868,6 +917,7 @@ class ProductConfigurator {
         
         if (this.productType === 'booklets') {
             // Booklet-specific fields
+            formData.append('size', config.size);
             formData.append('pages', config.pages);
             formData.append('coverPaperType', config.coverPaperType);
             formData.append('textPaperType', config.textPaperType);
@@ -1060,6 +1110,7 @@ class ProductConfigurator {
             
             if (this.productType === 'booklets') {
                 // Booklet-specific fields
+                formData.append('size', this.currentConfig.size);
                 formData.append('pages', this.currentConfig.pages);
                 formData.append('coverPaperType', this.currentConfig.coverPaperType);
                 formData.append('textPaperType', this.currentConfig.textPaperType);
@@ -1377,6 +1428,16 @@ class ProductConfigurator {
     }
     
     populateBookletFields(config) {
+        // Handle size selection
+        if (config.size) {
+            const sizeCards = document.querySelectorAll('[data-option="size"]');
+            sizeCards.forEach(card => {
+                if (card.dataset.value === config.size) {
+                    card.click();
+                }
+            });
+        }
+        
         if (config.pages) {
             const pagesInput = document.getElementById('pages');
             if (pagesInput) {

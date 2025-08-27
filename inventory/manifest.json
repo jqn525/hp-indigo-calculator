@@ -1,0 +1,33 @@
+{
+  "name": "SFU Inventory Management",
+  "short_name": "SFU Inventory",
+  "description": "Inventory management system for SFU Document Solutions",
+  "start_url": "/inventory/",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#CC0633",
+  "orientation": "portrait-primary",
+  "scope": "/inventory/",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "screenshots": [
+    {
+      "src": "icons/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png"
+    }
+  ]
+}
