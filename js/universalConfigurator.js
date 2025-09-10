@@ -239,6 +239,8 @@ class UniversalConfigurator {
                 optionsTitle.textContent = 'Booklet Options';
                 optionsContent.innerHTML = this.createBookletOptions();
                 specificSection.style.display = 'block';
+                // Add event listeners for booklet-specific options
+                this.bindBookletEventListeners();
                 break;
                 
             case 'notebooks':
@@ -309,13 +311,113 @@ class UniversalConfigurator {
                 </select>
                 <small class="form-text text-muted">Pages must be in multiples of 4</small>
             </div>
+            
+            <div class="form-group mt-3">
+                <label class="form-label">Cover Type</label>
+                <select class="form-select" id="coverType" name="coverType">
+                    <option value="separate">Separate Cover Stock</option>
+                    <option value="self">Self Cover (same paper throughout)</option>
+                </select>
+                <small class="form-text text-muted">Self cover uses text paper for entire booklet - most economical</small>
+            </div>
+            
             <div class="form-group mt-3">
                 <label class="form-label">Paper Selection</label>
                 <div class="alert alert-info">
-                    <small>Select both cover and text paper above. Cover paper will be used for covers, text paper for interior pages.</small>
+                    <small id="bookletPaperInfo">Select cover and text paper above. For self-cover, only text paper will be used.</small>
                 </div>
             </div>
         `;
+    }
+
+    bindBookletEventListeners() {
+        // Add event listeners for booklet-specific form elements
+        const pagesSelect = document.getElementById('pages');
+        const coverTypeSelect = document.getElementById('coverType');
+        
+        if (pagesSelect) {
+            pagesSelect.addEventListener('change', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+        
+        if (coverTypeSelect) {
+            coverTypeSelect.addEventListener('change', () => {
+                this.handleCoverTypeChange();
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+        
+        // Initialize the paper info text based on current cover type
+        this.handleCoverTypeChange();
+    }
+
+    handleCoverTypeChange() {
+        const coverTypeSelect = document.getElementById('coverType');
+        const paperInfoText = document.getElementById('bookletPaperInfo');
+        const coverPaperSelect = document.getElementById('coverPaper');
+        const textPaperSelect = document.getElementById('textPaper');
+        
+        if (!coverTypeSelect || !paperInfoText) return;
+        
+        const coverType = coverTypeSelect.value;
+        
+        if (coverType === 'self') {
+            // Self cover - only text paper needed
+            paperInfoText.textContent = 'Select text paper above. The same paper will be used throughout the entire booklet (most economical option).';
+            
+            // Hide cover paper requirement (make it optional)
+            if (coverPaperSelect) {
+                const coverPaperGroup = coverPaperSelect.closest('.form-group');
+                if (coverPaperGroup) {
+                    coverPaperGroup.style.opacity = '0.5';
+                    const label = coverPaperGroup.querySelector('label');
+                    if (label) {
+                        label.textContent = 'Cover Weight Paper (not used for self-cover)';
+                    }
+                }
+            }
+            
+            // Emphasize text paper requirement
+            if (textPaperSelect) {
+                const textPaperGroup = textPaperSelect.closest('.form-group');
+                if (textPaperGroup) {
+                    textPaperGroup.style.opacity = '1';
+                    const label = textPaperGroup.querySelector('label');
+                    if (label) {
+                        label.textContent = 'Text Weight Paper (used for entire booklet)';
+                    }
+                }
+            }
+        } else {
+            // Separate cover - both papers needed
+            paperInfoText.textContent = 'Select both cover and text paper above. Cover paper will be used for front/back covers, text paper for interior pages.';
+            
+            // Restore normal styling for both paper selectors
+            if (coverPaperSelect) {
+                const coverPaperGroup = coverPaperSelect.closest('.form-group');
+                if (coverPaperGroup) {
+                    coverPaperGroup.style.opacity = '1';
+                    const label = coverPaperGroup.querySelector('label');
+                    if (label) {
+                        label.textContent = 'Cover Weight Paper';
+                    }
+                }
+            }
+            
+            if (textPaperSelect) {
+                const textPaperGroup = textPaperSelect.closest('.form-group');
+                if (textPaperGroup) {
+                    textPaperGroup.style.opacity = '1';
+                    const label = textPaperGroup.querySelector('label');
+                    if (label) {
+                        label.textContent = 'Text Weight Paper';
+                    }
+                }
+            }
+        }
     }
 
     createBindingOptions() {
@@ -571,7 +673,9 @@ class UniversalConfigurator {
             formData.push(['foldType', foldType]);
         } else if (productType === 'booklets') {
             const pages = document.getElementById('pages')?.value || '8';
+            const coverType = document.getElementById('coverType')?.value || 'separate';
             formData.push(['pages', pages]);
+            formData.push(['coverType', coverType]);
         } else if (productType === 'notebooks') {
             const bindingType = document.getElementById('bindingType')?.value || 'coil';
             const notebookPages = document.getElementById('notebookPages')?.value || '50';
@@ -624,6 +728,57 @@ class UniversalConfigurator {
             // Call the original brochure calculator
             if (typeof calculateBrochurePrice === 'function') {
                 const result = await calculateBrochurePrice(brochureFormData);
+                if (result.error) {
+                    return { error: result.error };
+                }
+                
+                // Convert to expected format
+                return {
+                    totalCost: parseFloat(result.totalCost),
+                    unitPrice: parseFloat(result.unitPrice),
+                    printingSetupCost: result.printingSetupCost,
+                    finishingSetupCost: result.finishingSetupCost,
+                    productionCost: result.productionCost,
+                    materialCost: result.materialCost,
+                    finishingCost: result.finishingCost,
+                    subtotal: result.subtotal,
+                    rushMultiplier: result.rushMultiplier,
+                    sheetsRequired: result.sheetsRequired
+                };
+            }
+        }
+        
+        // For booklets, use the original calculator for perfect consistency
+        if (productType === 'booklets') {
+            const bookletFormData = new FormData();
+            
+            // Map dimensions to standard booklet sizes
+            let size = '8.5x11'; // default
+            if (width <= 6 && height <= 9) {
+                size = '5.5x8.5';
+            }
+            
+            bookletFormData.append('size', size);
+            bookletFormData.append('quantity', quantity);
+            bookletFormData.append('pages', formData.get('pages') || '8');
+            
+            // Handle cover type selection
+            const coverType = formData.get('coverType') || 'separate';
+            if (coverType === 'self') {
+                // Self cover: use text paper for entire booklet
+                bookletFormData.append('coverPaperType', 'SELF_COVER');
+                bookletFormData.append('textPaperType', formData.get('textPaper'));
+            } else {
+                // Separate cover: use both cover and text paper
+                bookletFormData.append('coverPaperType', formData.get('coverPaper'));
+                bookletFormData.append('textPaperType', formData.get('textPaper'));
+            }
+            
+            bookletFormData.append('rushType', rushType);
+            
+            // Call the original booklet calculator
+            if (typeof calculateBookletPrice === 'function') {
+                const result = await calculateBookletPrice(bookletFormData);
                 if (result.error) {
                     return { error: result.error };
                 }
