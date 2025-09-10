@@ -131,7 +131,7 @@ async function calculateBrochurePrice(formData) {
   
   // Get configuration values
   const config = data.pricingConfigs.formula;
-  const S = config.setupFee;               // $30.00 (printing setup)
+  const S = config.setupFee;               // $15.00 (printing setup)
   const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = config.efficiencyExponent;     // 0.75
@@ -224,7 +224,7 @@ async function calculatePostcardPrice(formData) {
   
   // Get configuration values
   const config = data.pricingConfigs.formula;
-  const S = config.setupFee;               // $30.00 (printing setup)
+  const S = config.setupFee;               // $15.00 (printing setup)
   const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.70;                          // 0.70 for postcards (greater economy of scale)
@@ -892,7 +892,7 @@ function calculateBookmarkPrice(formData) {
   
   // Get configuration values
   const config = pricingConfig.formula;
-  const S = config.setupFee;               // $30.00 (printing setup)
+  const S = config.setupFee;               // $15.00 (printing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.65;                          // 0.65 for bookmarks (excellent volume discounts)
   const clicks = config.clicksCost;        // $0.10
@@ -1120,10 +1120,10 @@ async function calculateBookletPrice(formData) {
   
   // Apply formula: C(Q) = S_base + S_pages + P(Q) + M(Q) + F_base + F_variable
   // Where M(Q) includes paper costs + click charges
-  const baseSetup = 30 + (2 * pages);
+  const baseSetup = (pricingConfig.formula.setupFee * 2) + (2 * pages);
   const production = Math.pow(quantity, 0.75) * 6;
   const materials = quantity * materialsCostPerUnit;
-  const finishingSetup = 30;
+  const finishingSetup = pricingConfig.formula.setupFee * 2;
   const finishing = quantity * finishingPerUnit;
   
   // Get rush multiplier
@@ -1208,8 +1208,8 @@ async function calculateNotebookPrice(formData) {
   }
   
   // Setup costs - waive setup for blank pages as discount
-  const baseSetup = pageContent === 'blank' ? 0 : 15;
-  const finishingSetup = 15;  // Always applied
+  const baseSetup = pageContent === 'blank' ? 0 : pricingConfig.formula.setupFee;
+  const finishingSetup = pricingConfig.formula.finishingSetupFee;  // Always applied
   const totalSetup = baseSetup + finishingSetup;
   
   // Use dynamic imposition calculation with static fallback
@@ -1312,14 +1312,14 @@ async function calculateNotepadPrice(formData) {
   // Setup costs based on content type
   let baseSetup = 0;
   if (pageContent === 'custom') {
-    baseSetup = 30; // Custom design setup
+    baseSetup = pricingConfig.formula.setupFee * 2; // Custom design setup
   } else if (pageContent === 'lined') {
-    baseSetup = 15; // Standard lined template
+    baseSetup = pricingConfig.formula.setupFee; // Standard lined template
   } else {
     baseSetup = 0;  // Blank pages (no setup needed)
   }
   
-  const finishingSetup = 15;  // Always applied for padding
+  const finishingSetup = pricingConfig.formula.finishingSetupFee;  // Always applied for padding
   const totalSetup = baseSetup + finishingSetup;
   
   // Use dynamic imposition calculation with static fallback
@@ -1671,7 +1671,7 @@ async function calculatePosterPrice(formData) {
   const chargeRate = materialData.chargeRate; // per sqft
   
   // Calculate costs
-  const setupFee = 30.00; // Standard setup fee
+  const setupFee = data.pricingConfigs.formula.setupFee * 2; // Large format setup fee
   const materialCostPerPoster = squareFootage * chargeRate;
   const totalMaterialCost = materialCostPerPoster * quantity;
   
