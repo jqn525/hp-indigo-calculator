@@ -332,7 +332,9 @@ async function calculateTableTentPrice(formData) {
   
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  // Table tents need ~2.5x the height for folds and base
+  const materialHeight = dimensions.height * 2.5;
+  const dynamicImposition = getDynamicImposition(dimensions.width, materialHeight);
   const imposition = dynamicImposition || data.pricingConfigs.imposition_data['table-tents'][size];
   
   if (!imposition) {
@@ -395,6 +397,8 @@ async function calculateNameTagPrice(formData) {
   }
   const quantity = parseInt(formData.get('quantity'));
   const size = formData.get('size');
+  const customWidth = parseFloat(formData.get('customWidth'));
+  const customHeight = parseFloat(formData.get('customHeight'));
   const paperCode = formData.get('paperType');
   const rushType = formData.get('rushType') || 'standard';
   const hasHolePunch = formData.get('holePunch') === 'true';
@@ -424,16 +428,30 @@ async function calculateNameTagPrice(formData) {
   
   const paperCost = selectedPaper.costPerSheet;
   
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const imposition = dynamicImposition || data.pricingConfigs.imposition_data['name-tags'][size];
-  
-  if (!imposition) {
-    return { error: 'Invalid size selection' };
+  // Determine dimensions to use - custom dimensions take priority
+  let width, height, displaySize;
+  if (customWidth && customHeight) {
+    width = customWidth;
+    height = customHeight;
+    displaySize = `${customWidth}"×${customHeight}"`;
+  } else if (size) {
+    const dimensions = parseSizeString(size);
+    width = dimensions.width;
+    height = dimensions.height;
+    displaySize = size;
+  } else {
+    return { error: 'Size or custom dimensions required' };
   }
   
-  console.log(`Name Tag ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data['name-tags'][size]}, Using=${imposition}`);
+  // Always use dynamic imposition calculation for name tags
+  const dynamicImposition = getDynamicImposition(width, height);
+  
+  if (!dynamicImposition) {
+    return { error: 'Unable to calculate imposition for given dimensions' };
+  }
+  
+  const imposition = dynamicImposition;
+  console.log(`Name Tag ${displaySize}: Dynamic imposition=${imposition}`);
   
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
   const v = (paperCost + clicks) * 1.5 / imposition;
@@ -1135,8 +1153,9 @@ async function calculateBookletPrice(formData) {
   const unitPrice = totalCost / quantity;
   
   // Calculate sheets required
-  const coverSheetsRequired = Math.ceil((quantity * coverSheetsPerBooklet) / imposition);
-  const textSheetsRequired = Math.ceil((quantity * textSheetsPerBooklet) / imposition);
+  // For booklets, show total booklet sheets needed (not divided by press sheet imposition)
+  const coverSheetsRequired = Math.ceil(quantity * coverSheetsPerBooklet);
+  const textSheetsRequired = Math.ceil(quantity * textSheetsPerBooklet);
   const totalSheetsRequired = coverSheetsRequired + textSheetsRequired;
   
   return {
@@ -1312,9 +1331,9 @@ async function calculateNotepadPrice(formData) {
   // Setup costs based on content type
   let baseSetup = 0;
   if (pageContent === 'custom') {
-    baseSetup = pricingConfig.formula.setupFee * 2; // Custom design setup
+    baseSetup = pricingConfig.formula.setupFee; // Custom design setup ($15)
   } else if (pageContent === 'lined') {
-    baseSetup = pricingConfig.formula.setupFee; // Standard lined template
+    baseSetup = 0; // Lined pages (no setup needed)
   } else {
     baseSetup = 0;  // Blank pages (no setup needed)
   }

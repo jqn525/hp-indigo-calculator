@@ -247,12 +247,22 @@ class UniversalConfigurator {
                 optionsTitle.textContent = 'Binding Options';
                 optionsContent.innerHTML = this.createBindingOptions();
                 specificSection.style.display = 'block';
+                // Add event listeners for notebook-specific options
+                this.bindNotebookEventListeners();
                 break;
                 
             case 'notepads':
                 optionsTitle.textContent = 'Pad Options';
                 optionsContent.innerHTML = this.createNotepadOptions();
                 specificSection.style.display = 'block';
+                break;
+                
+            case 'name-tags':
+                optionsTitle.textContent = 'Finishing Options';
+                optionsContent.innerHTML = this.createNameTagOptions();
+                specificSection.style.display = 'block';
+                // Add event listeners for name tag-specific options
+                this.bindNameTagEventListeners();
                 break;
                 
             case 'posters':
@@ -420,22 +430,110 @@ class UniversalConfigurator {
         }
     }
 
+    bindNameTagEventListeners() {
+        // Add event listeners for name tag finishing options
+        const holePunchCheckbox = document.getElementById('holePunch');
+        const lanyardCheckbox = document.getElementById('lanyard');
+        
+        if (holePunchCheckbox) {
+            holePunchCheckbox.addEventListener('change', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+        
+        if (lanyardCheckbox) {
+            lanyardCheckbox.addEventListener('change', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+        
+        // Set up paper change listener to handle adhesive stock restrictions
+        this.setupNameTagPaperRestrictions();
+    }
+
+    bindNotebookEventListeners() {
+        // Add event listeners for notebook-specific form elements
+        const bindingTypeSelect = document.getElementById('bindingType');
+        const notebookPagesInput = document.getElementById('notebookPages');
+        
+        if (bindingTypeSelect) {
+            bindingTypeSelect.addEventListener('change', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+        
+        if (notebookPagesInput) {
+            notebookPagesInput.addEventListener('input', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+    }
+
+    setupNameTagPaperRestrictions() {
+        // Monitor paper selections to disable finishing for adhesive stock
+        const paperSelects = ['textPaper', 'coverPaper', 'specialtyStock'];
+        
+        paperSelects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            if (select) {
+                select.addEventListener('change', () => {
+                    this.updateNameTagFinishingOptions();
+                });
+            }
+        });
+        
+        // Initial update
+        this.updateNameTagFinishingOptions();
+    }
+
+    updateNameTagFinishingOptions() {
+        const holePunchCheckbox = document.getElementById('holePunch');
+        const lanyardCheckbox = document.getElementById('lanyard');
+        const finishingNote = document.getElementById('nameTagFinishingNote');
+        const finishingOptions = document.getElementById('nameTagFinishingOptions');
+        
+        if (!holePunchCheckbox || !lanyardCheckbox || !finishingNote || !finishingOptions) return;
+        
+        // Check if adhesive stock is selected
+        const specialtyStock = document.getElementById('specialtyStock')?.value;
+        const isAdhesiveStock = specialtyStock === 'PAC51319WP';
+        
+        if (isAdhesiveStock) {
+            // Disable finishing options for adhesive stock
+            holePunchCheckbox.disabled = true;
+            lanyardCheckbox.disabled = true;
+            holePunchCheckbox.checked = false;
+            lanyardCheckbox.checked = false;
+            finishingNote.style.display = 'block';
+            finishingOptions.style.opacity = '0.6';
+        } else {
+            // Enable finishing options for cover stock
+            holePunchCheckbox.disabled = false;
+            lanyardCheckbox.disabled = false;
+            finishingNote.style.display = 'none';
+            finishingOptions.style.opacity = '1';
+        }
+    }
+
     createBindingOptions() {
         return `
             <div class="form-group">
                 <label class="form-label">Binding Type</label>
                 <select class="form-select" id="bindingType" name="bindingType">
-                    <option value="coil">Plastic Coil Binding</option>
-                    <option value="wire-o">Wire-O Binding</option>
-                    <option value="perfect">Perfect Binding</option>
+                    <option value="coil">Plastic Coil Binding ($0.31 hardware + $2.50 labor)</option>
+                    <option value="wire-o">Wire-O Binding ($0.35 hardware + $3.00 labor)</option>
+                    <option value="perfect">Perfect Binding ($0 hardware + $3.00 labor)</option>
                 </select>
             </div>
             <div class="form-group mt-3">
                 <label class="form-label">Number of Pages</label>
-                <select class="form-select" id="notebookPages" name="notebookPages">
-                    <option value="50">50 pages</option>
-                    <option value="100">100 pages</option>
-                </select>
+                <input type="number" class="form-control" id="notebookPages" name="notebookPages" 
+                       min="1" max="500" value="50" placeholder="Enter number of pages">
+                <small class="form-text text-muted">Enter any number of pages (1-500)</small>
             </div>
         `;
     }
@@ -444,19 +542,16 @@ class UniversalConfigurator {
         return `
             <div class="form-group">
                 <label class="form-label">Sheets per Pad</label>
-                <select class="form-select" id="sheetsPerPad" name="sheetsPerPad">
-                    <option value="25">25 sheets</option>
-                    <option value="50">50 sheets</option>
-                    <option value="75">75 sheets</option>
-                    <option value="100">100 sheets</option>
-                </select>
+                <input type="number" class="form-control" id="sheetsPerPad" name="sheetsPerPad" 
+                       min="1" max="500" value="50" placeholder="Enter number of sheets">
+                <small class="form-text text-muted">Enter any number of sheets (1-500)</small>
             </div>
             <div class="form-group mt-3">
                 <label class="form-label">Content Type</label>
                 <select class="form-select" id="contentType" name="contentType">
                     <option value="blank">Blank (No setup fee)</option>
-                    <option value="lined">Lined ($15 setup)</option>
-                    <option value="custom">Custom Design ($30 setup)</option>
+                    <option value="lined">Lined (No setup fee)</option>
+                    <option value="custom">Custom Design ($15 setup)</option>
                 </select>
             </div>
         `;
@@ -473,6 +568,44 @@ class UniversalConfigurator {
             </div>
             <div class="alert alert-info mt-3">
                 <small><strong>Note:</strong> Posters are priced per square foot, not by imposition. Price = Width × Height × Material Cost</small>
+            </div>
+        `;
+    }
+
+    createNameTagOptions() {
+        return `
+            <div class="form-group">
+                <label class="form-label d-flex align-items-center">
+                    <span>Finishing Options</span>
+                    <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-bs-toggle="tooltip" 
+                            title="Finishing options are only available for cover stock papers">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                        </svg>
+                    </button>
+                </label>
+                
+                <div class="finishing-options" id="nameTagFinishingOptions">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="holePunch" name="holePunch" value="true">
+                        <label class="form-check-label" for="holePunch">
+                            <strong>Hole Punch</strong>
+                            <small class="text-muted d-block">Add hole punch for lanyards (+$0.05 per tag)</small>
+                        </label>
+                    </div>
+                    
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="lanyard" name="lanyard" value="true">
+                        <label class="form-check-label" for="lanyard">
+                            <strong>Basic Lanyard</strong>
+                            <small class="text-muted d-block">Include basic lanyard with each name tag (+$1.25 per tag)</small>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3" id="nameTagFinishingNote" style="display: none;">
+                    <small><strong>Note:</strong> Finishing options are not available for adhesive stock. Please select a cover stock paper to enable finishing options.</small>
+                </div>
             </div>
         `;
     }
@@ -680,12 +813,17 @@ class UniversalConfigurator {
             const bindingType = document.getElementById('bindingType')?.value || 'coil';
             const notebookPages = document.getElementById('notebookPages')?.value || '50';
             formData.push(['bindingType', bindingType]);
-            formData.push(['pages', notebookPages]);
+            formData.push(['notebookPages', notebookPages]);
         } else if (productType === 'notepads') {
             const sheetsPerPad = document.getElementById('sheetsPerPad')?.value || '50';
             const contentType = document.getElementById('contentType')?.value || 'blank';
             formData.push(['sheetsPerPad', sheetsPerPad]);
             formData.push(['contentType', contentType]);
+        } else if (productType === 'name-tags') {
+            const holePunch = document.getElementById('holePunch')?.checked || false;
+            const lanyard = document.getElementById('lanyard')?.checked || false;
+            formData.push(['holePunch', holePunch ? 'true' : 'false']);
+            formData.push(['lanyard', lanyard ? 'true' : 'false']);
         } else if (productType === 'posters') {
             const posterMaterial = document.getElementById('posterMaterial')?.value || 'RMPS002';
             formData.push(['material', posterMaterial]);
@@ -799,23 +937,23 @@ class UniversalConfigurator {
             }
         }
         
-        // For name tags, use the original calculator for perfect consistency
+        // For name tags, use the original calculator with custom dimensions
         if (productType === 'name-tags') {
             const nameTagFormData = new FormData();
             
-            // Map dimensions to standard name tag sizes
-            if (width <= 2.5 && height <= 3.5) {
-                nameTagFormData.append('size', '2.33x3');
-            } else if (width <= 3.5 && height <= 4.5) {
-                nameTagFormData.append('size', '3x4');
-            } else {
-                nameTagFormData.append('size', '4x6');
-            }
+            // Use custom dimensions directly (no size mapping)
+            nameTagFormData.append('customWidth', width);
+            nameTagFormData.append('customHeight', height);
             
             nameTagFormData.append('quantity', quantity);
             nameTagFormData.append('paperType', formData.get('specialtyStock') || formData.get('textPaper') || formData.get('coverPaper'));
-            nameTagFormData.append('holePunch', formData.get('holePunch') || 'false');
-            nameTagFormData.append('lanyard', formData.get('lanyard') || 'false');
+            
+            // Get finishing options from the form checkboxes
+            const holePunchChecked = document.getElementById('holePunch')?.checked || false;
+            const lanyardChecked = document.getElementById('lanyard')?.checked || false;
+            nameTagFormData.append('holePunch', holePunchChecked ? 'true' : 'false');
+            nameTagFormData.append('lanyard', lanyardChecked ? 'true' : 'false');
+            
             nameTagFormData.append('rushType', rushType);
             
             // Call the original name tag calculator
@@ -846,10 +984,11 @@ class UniversalConfigurator {
             // Create a form data object that matches what the original calculator expects
             const tableTentFormData = new FormData();
             // Map dimensions to standard table tent sizes
+            // Note: Table tent calculator accounts for actual material dimensions (2.5x height for folds/base)
             if (width <= 4.5 && height <= 7) {
-                tableTentFormData.append('size', '4x6');
+                tableTentFormData.append('size', '4x6'); // Uses ~4x15" material
             } else {
-                tableTentFormData.append('size', '5x7');
+                tableTentFormData.append('size', '5x7'); // Uses ~5x17.5" material
             }
             tableTentFormData.append('quantity', quantity);
             tableTentFormData.append('paperType', formData.get('specialtyStock') || formData.get('textPaper') || formData.get('coverPaper'));
@@ -874,6 +1013,101 @@ class UniversalConfigurator {
                     subtotal: result.subtotal,
                     rushMultiplier: result.rushMultiplier,
                     sheetsRequired: result.sheetsRequired
+                };
+            }
+        }
+        
+        // For notepads, use the original calculator with custom dimensions and sheet count
+        if (productType === 'notepads') {
+            const notepadFormData = new FormData();
+            
+            // Create size string from custom dimensions
+            const sizeString = `${width}x${height}`;
+            notepadFormData.append('size', sizeString);
+            notepadFormData.append('quantity', quantity);
+            
+            // Get custom sheet count from input field
+            const sheetsPerPad = parseInt(formData.get('sheetsPerPad')) || 50;
+            notepadFormData.append('sheets', sheetsPerPad);
+            
+            // Get content type and paper selections
+            const contentType = formData.get('contentType') || 'blank';
+            notepadFormData.append('pageContent', contentType);
+            
+            // Use selected paper for text, default backing to cardstock
+            const textPaper = formData.get('specialtyStock') || formData.get('textPaper') || formData.get('coverPaper');
+            notepadFormData.append('textPaper', textPaper);
+            notepadFormData.append('backingPaper', 'LYNOC95FSC'); // Default to 100# Cover Uncoated
+            
+            notepadFormData.append('rushType', rushType);
+            
+            // Call the original notepad calculator
+            if (typeof calculateNotepadPrice === 'function') {
+                const result = await calculateNotepadPrice(notepadFormData);
+                if (result.error) {
+                    return { error: result.error };
+                }
+                
+                // Convert to expected format
+                return {
+                    totalCost: parseFloat(result.totalCost),
+                    unitPrice: parseFloat(result.unitPrice),
+                    printingSetupCost: result.printingSetupCost || result.totalSetupCost,
+                    finishingSetupCost: result.finishingSetupCost,
+                    productionCost: result.productionCost,
+                    materialCost: result.materialCost,
+                    finishingCost: result.laborCost || '0.00',
+                    subtotal: result.subtotal,
+                    rushMultiplier: result.rushMultiplier,
+                    sheetsRequired: Math.ceil((quantity * sheetsPerPad) / (result.imposition || 2))
+                };
+            }
+        }
+        
+        // For notebooks, use the original calculator with custom dimensions, page count, and binding
+        if (productType === 'notebooks') {
+            const notebookFormData = new FormData();
+            
+            // Create size string from custom dimensions
+            const sizeString = `${width}x${height}`;
+            notebookFormData.append('size', sizeString);
+            notebookFormData.append('quantity', quantity);
+            
+            // Get custom page count and binding type
+            const notebookPages = parseInt(formData.get('notebookPages')) || 50;
+            const bindingType = formData.get('bindingType') || 'coil';
+            notebookFormData.append('pages', notebookPages);
+            notebookFormData.append('bindingType', bindingType);
+            
+            // Use selected papers
+            const coverPaper = formData.get('coverPaper');
+            const textPaper = formData.get('textPaper');
+            notebookFormData.append('coverPaper', coverPaper);
+            notebookFormData.append('textPaper', textPaper);
+            
+            // Default page content to blank (can be enhanced later)
+            notebookFormData.append('pageContent', 'blank');
+            notebookFormData.append('rushType', rushType);
+            
+            // Call the original notebook calculator
+            if (typeof calculateNotebookPrice === 'function') {
+                const result = await calculateNotebookPrice(notebookFormData);
+                if (result.error) {
+                    return { error: result.error };
+                }
+                
+                // Convert to expected format
+                return {
+                    totalCost: parseFloat(result.totalCost),
+                    unitPrice: parseFloat(result.unitPrice),
+                    printingSetupCost: result.printingSetupCost || result.totalSetupCost,
+                    finishingSetupCost: result.finishingSetupCost,
+                    productionCost: result.productionCost,
+                    materialCost: result.materialCost,
+                    finishingCost: (parseFloat(result.laborCost || 0) + parseFloat(result.bindingCost || 0)).toFixed(2),
+                    subtotal: result.subtotal,
+                    rushMultiplier: result.rushMultiplier,
+                    sheetsRequired: Math.ceil(quantity * (parseFloat(result.coverSheetsPerNotebook) + parseFloat(result.textSheetsPerNotebook)))
                 };
             }
         }
@@ -982,9 +1216,9 @@ class UniversalConfigurator {
             // Notepads content-based setup fees
             const contentType = formData.get('contentType') || 'blank';
             if (contentType === 'blank') return 0;      // Blank pages = no setup
-            if (contentType === 'lined') return 15.00;  // Lined template
-            if (contentType === 'custom') return 30.00; // Custom design
-            return 15.00;
+            if (contentType === 'lined') return 0;      // Lined pages = no setup
+            if (contentType === 'custom') return 15.00; // Custom design
+            return 0;
         }
         
         // All other products: $15 flat setup fee
@@ -1092,7 +1326,7 @@ class UniversalConfigurator {
         
         // Update status
         document.getElementById('priceStatus').innerHTML = 
-            '<span class="status-text text-success">Ready to add to cart</span>';
+            '<span class="status-text text-white">Ready to add to cart</span>';
         
         // Enable add to cart button
         document.getElementById('addToCartBtn').disabled = false;
