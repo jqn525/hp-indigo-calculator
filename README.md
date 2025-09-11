@@ -1,27 +1,43 @@
-# SFU Document Solutions Pricing Calculator
+# SFU Document Solutions Dual Application Suite
 
-A Progressive Web App for calculating pricing for digital printing services, designed for SFU Document Solutions staff using tablets and mobile devices.
+**Pricing Calculator + Inventory Management** - Two integrated Progressive Web Apps serving SFU Document Solutions with comprehensive digital printing pricing and complete inventory management.
 
 ## ✨ Features
 
 - ⚡ **Static-First Pricing** - Lightning-fast calculations with zero database dependencies
 - 🔐 **Secure Authentication** - Front-door login system with SFU branding
 - ☁️ **Cloud Integration** - Supabase database for user data and quotes only
-- 📱 **Progressive Web App** - Installable on tablets and phones
+- 📱 **Progressive Web App** - Installable on tablets and phones (dual PWA support)
 - 🔄 **Offline Support** - Works without internet after first visit
 - 📋 **Quote Management** - Save, view, and manage customer quotes
-- 🛒 **Cart System** - Batch multiple products for combined quotes
+- 🛒 **Cart System** - Batch multiple products with full edit functionality
+- 📦 **Inventory Management** - Complete inventory system with request workflow
+- 🎛️ **Universal Configurator** - Custom dimensions and real-time pricing for any product
 - 🎨 **SFU Branding** - Official SFU red color scheme and typography
+
+## 🌐 Live Applications
+
+- **Pricing Calculator**: [https://docsol.ca](https://docsol.ca)
+- **Inventory Management**: [https://docsol.ca/inventory/](https://docsol.ca/inventory/)
 
 ## 🧮 Available Calculators
 
 ### Small Format Products
-- ✅ **Brochures** - Tri-fold and bi-fold options, 25-2500 units
-- ✅ **Postcards** - 4 standard sizes, 100-5000 units  
-- ✅ **Flyers** - 4 standard sizes, 25-2500 units
-- ✅ **Bookmarks** - 3 sizes on premium cover stock, 100-2500 units
-- ✅ **Name Tags** - 3 sizes with optimized pricing, 50-5000 units
+- ✅ **Brochures** - Tri-fold and bi-fold options, 25-2500 units (e=0.75)
+- ✅ **Postcards** - 4 standard sizes, 100-5000 units (e=0.70)
+- ✅ **Flyers** - 4 standard sizes, 25-2500 units (e=0.70)
+- ✅ **Bookmarks** - 3 sizes on premium cover stock, 100-2500 units (e=0.65)
+- ✅ **Name Tags** - 3 sizes with optimized pricing, 50-5000 units (e=0.65)
+- ✅ **Booklets** - 8-48 pages, saddle-stitched, 10-1000 units (e=0.75)
+- ✅ **Notebooks** - Coil/wire-o/perfect binding, 50/100 pages, 10-500 units (e=0.80)
+- ✅ **Notepads** - Tear-away pads, 25/50/75/100 sheets, 25-1000 units (e=0.65)
+- ✅ **Table Tents** - Professional marketing displays
 - ✅ **Small Format Hub** - Unified product selection and filtering
+
+### Large Format Products
+- ✅ **Posters** - 18×24", 22×28", 24×36", 36×48" sizes, 1-20 units
+  - Rite-Media Paper: $6/sqft (9mil matte)
+  - Fabric Material: $9/sqft (8mil matte coated)
 
 ### Promotional Products
 - ✅ **Magnets** - Linear interpolation pricing, 4 sizes, 25-1000 units
@@ -29,19 +45,37 @@ A Progressive Web App for calculating pricing for digital printing services, des
 - ✅ **Apparel** - T-shirts and hoodies with size/color options
 - ✅ **Tote Bags** - Canvas bags with bulk pricing tiers
 
-### Large Format
-- 🚧 **Banners & Posters** - Coming soon
+### Advanced Features
+- ✅ **Universal Configurator** - Custom dimensions with real-time pricing calculations
+- ✅ **Cart Edit System** - Full item editing with field population and validation
+- ✅ **Inventory Management** - Complete inventory system with admin workflow
 
-## 🚀 Live Application
+## 📦 Inventory Management System
 
-**Production URL**: [https://docsol.ca](https://docsol.ca)
+Complete inventory management application at `/inventory/` featuring:
+
+### Core Features
+- **Request System** - Submit inventory requests with quantity and notes
+- **Admin Approval** - Approve, reject, or mark requests as fulfilled
+- **Search & Browse** - Full-text search and category tree navigation
+- **Status Tracking** - Real-time updates (pending → approved/rejected → fulfilled)
+- **PWA Support** - Independent service worker for offline functionality
+
+### User Roles
+- **Team Members** - Request items, view request history, search inventory
+- **Admins** - Full administrative panel with request management
+
+### Architecture
+- **Static Inventory Data** - Complete structure in `/inventory/js/inventoryStructure.js`
+- **Database Usage** - Only for requests and status tracking
+- **Authentication** - Shared Supabase authentication with main app
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5
-- **Backend**: Supabase (User Authentication, Quotes, Cart Sync)
+- **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5.3.3
+- **Backend**: Supabase (User Authentication, Quotes, Cart Sync, Inventory Requests)
 - **Hosting**: Vercel with custom domain (docsol.ca)
-- **PWA Features**: Service Worker (v115), Web App Manifest
+- **PWA Features**: Dual Service Workers (v157 main, v1 inventory), Web App Manifests
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
 - **Pricing**: Static files only - no database dependencies
@@ -51,40 +85,42 @@ A Progressive Web App for calculating pricing for digital printing services, des
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/jqn525/sfu-pricing-calculator.git
-   cd sfu-pricing-calculator
+   git clone https://github.com/jqn525/hp-indigo-calculator.git
+   cd hp-indigo-calculator
    ```
 
 2. **Start a local server**
    ```bash
-   # Using Python
-   python -m http.server 8000
-   
    # Using Node.js (recommended for external drives)
    npx serve -p 8000 -s .
+   
+   # Using Python
+   python -m http.server 8000
    ```
 
-3. **Open in browser**
+3. **Access applications**
    ```
-   http://localhost:8000
+   Pricing Calculator:    http://localhost:8000
+   Inventory Management:  http://localhost:8000/inventory/
    ```
 
 ## 🔧 Configuration
 
+### Service Worker Versions
+- **Main Application**: `v157` in `sw.js`
+- **Inventory Application**: `v1` in `/inventory/sw.js`
+- Increment versions when deploying CSS/JS changes to force cache updates
+
 ### Environment Variables
 The application uses hardcoded Supabase credentials for simplicity. For production deployments, consider using environment variables.
-
-### Service Worker
-- Current cache version: `v115`
-- Increment version in `sw.js` when deploying CSS/JS changes
-- Implements cache-first strategy with network-first for CSS files
 
 ## 📱 Mobile Features
 
 - **Responsive Design**: Optimized for tablets and mobile devices
 - **Touch-Friendly**: Large buttons and intuitive navigation
+- **Dual PWA Support**: Install both applications independently
 - **Offline Mode**: Full functionality without internet connection
-- **Installation**: Add to home screen as native app
+- **Installation**: Add to home screen as native apps
 
 ## 🎨 Brand Guidelines
 
@@ -98,7 +134,7 @@ The application uses hardcoded Supabase credentials for simplicity. For producti
 
 ## 🔐 Authentication System
 
-- **Front-door Security**: Single login protects entire application
+- **Front-door Security**: Single login protects both applications
 - **Session Management**: Supports "remember me" functionality
 - **Supabase Integration**: Cloud-based user authentication
 - **Demo Mode**: Fallback authentication for development
@@ -108,8 +144,9 @@ The application uses hardcoded Supabase credentials for simplicity. For producti
 ### Database Usage (Supabase)
 - **User Accounts**: Authentication and profiles
 - **Quote System**: Save quotes with customer information
-- **Cart Sync**: Cross-device cart synchronization
+- **Cart Sync**: Cross-device cart synchronization with full edit support
 - **Quote History**: View and manage all saved quotes
+- **Inventory Requests**: Request tracking and admin workflow
 
 ### Pricing Data (Static Files)
 - **Paper Costs**: `/js/paperStocks.js` - All paper specifications and pricing
@@ -119,36 +156,47 @@ The application uses hardcoded Supabase credentials for simplicity. For producti
 
 ## 🚀 Deployment
 
-### Vercel Deployment
-1. **Push to GitHub**: All changes trigger automatic deployment
-2. **Custom Domain**: Configured for docsol.ca
-3. **Environment**: Production-ready with HTTPS
-
-### Manual Deployment Steps
+### Automatic Deployment (Vercel)
 ```bash
-# Make changes
+# Make changes to either application
 git add -A
 git commit -m "Description of changes"
 git push origin main
-# Vercel automatically deploys
+# Vercel automatically deploys both applications
 ```
+
+### Manual Deployment Steps
+1. **Push to GitHub**: All changes trigger automatic deployment
+2. **Custom Domain**: Configured for docsol.ca with both applications
+3. **Environment**: Production-ready with HTTPS and PWA support
 
 ## 📊 Pricing Engine (Static-First)
 
 The calculator uses a sophisticated pricing formula with data from static files only:
+
 ```
 C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r
 ```
 
 Where:
-- S = Setup fee (varies: $30 standard, $15 name tags)
-- F_setup = Finishing setup fee ($15, if applicable)
-- Q = Quantity
-- e = Efficiency exponent (0.75 brochures, 0.70 postcards/flyers, 0.65 name tags/bookmarks)
-- k = Base production rate ($1.50)
-- v = Variable cost per piece (paper + clicks)
-- f = Finishing cost per piece
-- r = Rush multiplier (1.0-2.0x)
+- **S** = Setup fee (varies: $30 standard, $15 name tags, $0-15 notepads)
+- **F_setup** = Finishing setup fee ($15, if applicable)
+- **Q** = Quantity
+- **e** = Efficiency exponent by product:
+  - 0.75: brochures, booklets
+  - 0.70: postcards, flyers
+  - 0.65: name tags, bookmarks, notepads
+  - 0.80: notebooks
+- **k** = Base production rate ($1.50)
+- **v** = Variable cost per piece (paper + clicks)
+- **f** = Finishing cost per piece
+- **r** = Rush multiplier (1.0-2.0x)
+
+### Special Pricing Features
+- **Universal Configurator**: Custom dimensions with real-time imposition calculations
+- **Notepad Optimization**: Aggressive bulk discounts with Q^0.65 scaling
+- **Table Tent Materials**: 2.5x height calculation for fold requirements
+- **Large Format**: Square-footage pricing ($6-9/sqft)
 
 ### How to Update Pricing
 1. Edit `/js/paperStocks.js` for paper costs
@@ -157,6 +205,26 @@ Where:
 4. Deploy automatically via Vercel
 
 No database updates ever needed for pricing changes!
+
+## 🏗️ Architecture Overview
+
+### Dual Application Structure
+```
+├── /                    # Main Pricing Calculator
+│   ├── pages/           # 25+ product calculators
+│   ├── js/              # Pricing engine and components
+│   └── sw.js            # Service worker v157
+└── /inventory/          # Inventory Management System
+    ├── js/              # Inventory logic and data
+    ├── sql/             # Database schema
+    └── sw.js            # Service worker v1
+```
+
+### Key Components
+- **Universal Configurator**: Advanced pricing tool with custom dimensions
+- **Cart Edit System**: Full item editing with field population
+- **Inventory System**: Static-first with database requests only
+- **PWA Features**: Dual service workers with offline support
 
 ## 🛡️ Browser Support
 
@@ -171,4 +239,4 @@ For technical issues or feature requests, contact SFU Document Solutions IT supp
 
 ## 📄 License
 
-Internal use only - SFU Document Solutions pricing calculator.
+Internal use only - SFU Document Solutions dual application suite.
