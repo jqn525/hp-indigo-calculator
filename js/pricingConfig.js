@@ -134,8 +134,9 @@ const pricingConfig = {
     cutting: 0.05,  // Postcards cutting cost per piece
     scoring: 0.10,   // Future finishing option
     bookletFinishing: {
+      baseLabor: 0.25,
       coverCreasing: 0.10,
-      bindingPerSheet: 0.05
+      bindingPerSheet: 0.10
     },
     // Notebook binding costs
     notebookBinding: {

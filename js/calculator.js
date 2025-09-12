@@ -1134,14 +1134,14 @@ async function calculateBookletPrice(formData) {
   
   // Self cover doesn't need cover creasing (text weight doesn't require it)
   const coverCreasing = isSelfCover ? 0 : bookletFinishing.coverCreasing;
-  const finishingPerUnit = coverCreasing + (bookletFinishing.bindingPerSheet * textSheetsPerBooklet);
+  const finishingPerUnit = bookletFinishing.baseLabor + coverCreasing + (bookletFinishing.bindingPerSheet * textSheetsPerBooklet);
   
   // Apply formula: C(Q) = S_base + S_pages + P(Q) + M(Q) + F_base + F_variable
   // Where M(Q) includes paper costs + click charges
   const baseSetup = (pricingConfig.formula.setupFee * 2) + (2 * pages);
   const production = Math.pow(quantity, 0.75) * 6;
   const materials = quantity * materialsCostPerUnit;
-  const finishingSetup = pricingConfig.formula.setupFee * 2;
+  const finishingSetup = pricingConfig.formula.finishingSetupFee;
   const finishing = quantity * finishingPerUnit;
   
   // Get rush multiplier
