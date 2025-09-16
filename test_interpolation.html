@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Premium Sticker Interpolation</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Premium Sticker Interpolation Test</h1>
+    <div id="testResults"></div>
+
+    <script src="js/promoConfig.js"></script>
+    <script src="js/promoCalculator.js"></script>
+    <script>
+        async function runTests() {
+            const results = document.getElementById('testResults');
+            
+            // Test cases based on our real supplier data
+            const testCases = [
+                { width: 4.5, height: 2.5, quantity: 100, expected: 145 },
+                { width: 2, height: 3.75, quantity: 250, expected: 198 },
+                { width: 3.25, height: 4.25, quantity: 1000, expected: 710 },
+                { width: 2.5, height: 5.75, quantity: 100, expected: 156 },
+                { width: 1.25, height: 4.25, quantity: 500, expected: 244 },
+                { width: 4.75, height: 5.25, quantity: 1000, expected: 1050 }
+            ];
+            
+            for (const testCase of testCases) {
+                try {
+                    const result = await calculatePremiumStickerCustomPrice(
+                        testCase.width, 
+                        testCase.height, 
+                        testCase.quantity
+                    );
+                    
+                    if (result.error) {
+                        results.innerHTML += `<div class="test-result fail">
+                            Error: ${testCase.width}×${testCase.height} @ ${testCase.quantity}pc - ${result.error}
+                        </div>`;
+                        continue;
+                    }
+                    
+                    const actual = Math.round(result.supplierCost);
+                    const tolerance = Math.abs(actual - testCase.expected) / testCase.expected;
+                    const isPass = tolerance < 0.15; // 15% tolerance
+                    
+                    results.innerHTML += `<div class="test-result ${isPass ? 'pass' : 'fail'}">
+                        ${testCase.width}×${testCase.height} @ ${testCase.quantity}pc: 
+                        Expected $${testCase.expected}, Got $${actual} 
+                        (${(tolerance * 100).toFixed(1)}% diff)
+                        ${result.interpolationUsed ? ' - Interpolated between: ' + result.interpolationUsed : ''}
+                    </div>`;
+                } catch (error) {
+                    results.innerHTML += `<div class="test-result fail">
+                        Exception: ${testCase.width}×${testCase.height} @ ${testCase.quantity}pc - ${error.message}
+                    </div>`;
+                }
+            }
+        }
+        
+        // Run tests when page loads
+        runTests();
+    </script>
+</body>
+</html>

@@ -79,9 +79,13 @@ const promoConfig = {
       // Supplier costs at each bracket (before 25% markup)
       supplierCosts: {
         '2x2': [40.00, 59.00, 98.00, 150.00, 221.00, 344.00],
+        '2.5x2.5': [44.00, 68.00, 113.00, 180.00, 277.00, 443.00],
         '3x3': [49.00, 77.00, 130.00, 214.00, 335.00, 545.00],
+        '3.5x3.5': [54.00, 88.00, 147.00, 250.00, 399.00, 655.00],
         '4x4': [60.00, 100.00, 164.00, 286.00, 463.00, 776.00],
-        '5x5': [74.00, 123.00, 204.00, 374.00, 615.00, 1051.00]
+        '4.5x4.5': [67.00, 112.00, 183.00, 329.00, 538.00, 906.00],
+        '5x5': [74.00, 123.00, 204.00, 374.00, 615.00, 1051.00],
+        '5.5x5.5': [82.00, 136.00, 225.00, 418.00, 700.00, 1200.00]
       },
       
       // Sticker-specific markup (25% instead of default 40%)
@@ -89,6 +93,35 @@ const promoConfig = {
       
       // Legacy volume breaks (not used with new pricing)
       volumeBreaks: []
+    },
+
+    'stickers-inhouse': {
+      name: 'Standard Stickers (In-House)',
+      minQuantity: 10,
+      maxQuantity: 1000,
+      stepQuantity: 1,
+      
+      // In-house production pricing
+      pricePerSqFt: 12.00,
+      setupFee: 30.00,
+      
+      // Standard sizes for quick reference
+      standardSizes: {
+        '2x2': 4,    // sq inches
+        '3x3': 9,    // sq inches
+        '4x4': 16,   // sq inches
+        '5x5': 25,   // sq inches
+        '6x6': 36    // sq inches
+      },
+      
+      // Volume discounts for in-house production
+      volumeBreaks: [
+        { min: 10, max: 49, discount: 0.0 },
+        { min: 50, max: 99, discount: 0.05 },
+        { min: 100, max: 249, discount: 0.10 },
+        { min: 250, max: 499, discount: 0.15 },
+        { min: 500, max: 1000, discount: 0.20 }
+      ]
     },
 
     apparel: {

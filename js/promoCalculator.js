@@ -249,7 +249,91 @@ async function calculateMagnetPrice(formData) {
   };
 }
 
+async function calculateInHouseStickerPrice(formData) {
+  // Initialize promo pricing data
+  const data = await initializePromoPricingData();
+  if (!data) {
+    return { error: 'Promo pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const stickerType = formData.get('stickerType');
+  const rushType = formData.get('rushType') || 'standard';
+  
+  // Get product configuration for in-house stickers
+  const product = data.promoConfig.products['stickers-inhouse'];
+  
+  // Validate quantity constraints
+  if (quantity < product.minQuantity || quantity > product.maxQuantity) {
+    return {
+      error: `Quantity must be between ${product.minQuantity} and ${product.maxQuantity}`
+    };
+  }
+  
+  // Calculate area in square feet
+  const sizeMap = {
+    '2x2': 4,
+    '3x3': 9,
+    '4x4': 16,
+    '5x5': 25,
+    '6x6': 36
+  };
+  
+  const areaInSquareInches = sizeMap[size];
+  if (!areaInSquareInches) {
+    return { error: `Invalid size: ${size}` };
+  }
+  
+  const areaInSquareFeet = areaInSquareInches / 144;
+  
+  // Calculate base cost (area * price per sq ft * quantity)
+  const materialCost = areaInSquareFeet * product.pricePerSqFt * quantity;
+  
+  // Get volume discount
+  const volumeDiscount = data.promoConfig.getVolumeDiscount('stickers-inhouse', quantity);
+  const discountedCost = materialCost * (1 - volumeDiscount);
+  
+  // Add setup fee
+  const subtotal = discountedCost + product.setupFee;
+  
+  // Apply rush multiplier
+  const rushMultiplier = data.promoConfig.pricing.rushMultipliers[rushType] || 1.0;
+  const finalPrice = subtotal * rushMultiplier;
+  
+  // Calculate unit price
+  const unitPrice = finalPrice / quantity;
+  
+  return {
+    quantity: quantity,
+    specifications: {
+      size: size,
+      type: stickerType,
+      production: 'in-house'
+    },
+    areaInSquareInches: areaInSquareInches,
+    areaInSquareFeet: areaInSquareFeet,
+    pricePerSqFt: product.pricePerSqFt,
+    materialCost: materialCost,
+    volumeDiscount: volumeDiscount,
+    volumeDiscountPercent: (volumeDiscount * 100),
+    discountedCost: discountedCost,
+    setupFee: product.setupFee,
+    subtotal: subtotal,
+    rushMultiplier: rushMultiplier,
+    totalCost: finalPrice,
+    unitPrice: unitPrice,
+    rushType: rushType
+  };
+}
+
 async function calculateStickerPrice(formData) {
+  // Check if this is for in-house production
+  const productionType = formData.get('productionType');
+  if (productionType === 'standard') {
+    return calculateInHouseStickerPrice(formData);
+  }
+  
   // Initialize promo pricing data
   const data = await initializePromoPricingData();
   if (!data) {
@@ -335,6 +419,134 @@ async function calculateStickerPrice(formData) {
     totalCost: finalPrice,
     unitPrice: unitPrice,
     rushType: rushType
+  };
+}
+
+async function calculatePremiumStickerCustomPrice(width, height, quantity, stickerType = 'vinyl-matte', rushType = 'standard') {
+  // Initialize promo pricing data
+  const data = await initializePromoPricingData();
+  if (!data) {
+    return { error: 'Promo pricing data not available' };
+  }
+
+  // Get product configuration
+  const product = data.promoConfig.products.stickers;
+  
+  // Validate quantity constraints
+  if (quantity < product.minQuantity || quantity > product.maxQuantity) {
+    return {
+      error: `Quantity must be between ${product.minQuantity} and ${product.maxQuantity}`
+    };
+  }
+
+  // Calculate area in square inches
+  const areaInSquareInches = width * height;
+  
+  // Define size reference points with their areas (in sq inches)
+  const sizeReferences = [
+    { size: '2x2', area: 4, costs: product.supplierCosts['2x2'] },
+    { size: '2.5x2.5', area: 6.25, costs: product.supplierCosts['2.5x2.5'] },
+    { size: '3x3', area: 9, costs: product.supplierCosts['3x3'] },
+    { size: '3.5x3.5', area: 12.25, costs: product.supplierCosts['3.5x3.5'] },
+    { size: '4x4', area: 16, costs: product.supplierCosts['4x4'] },
+    { size: '4.5x4.5', area: 20.25, costs: product.supplierCosts['4.5x4.5'] },
+    { size: '5x5', area: 25, costs: product.supplierCosts['5x5'] },
+    { size: '5.5x5.5', area: 30.25, costs: product.supplierCosts['5.5x5.5'] }
+  ];
+  
+  // Find the two nearest sizes for interpolation
+  let lowerSize = sizeReferences[0];
+  let upperSize = sizeReferences[sizeReferences.length - 1];
+  
+  for (let i = 0; i < sizeReferences.length - 1; i++) {
+    if (areaInSquareInches >= sizeReferences[i].area && areaInSquareInches <= sizeReferences[i + 1].area) {
+      lowerSize = sizeReferences[i];
+      upperSize = sizeReferences[i + 1];
+      break;
+    }
+  }
+  
+  // If the area is outside our range, use the nearest boundary
+  if (areaInSquareInches < sizeReferences[0].area) {
+    lowerSize = upperSize = sizeReferences[0];
+  } else if (areaInSquareInches > sizeReferences[sizeReferences.length - 1].area) {
+    lowerSize = upperSize = sizeReferences[sizeReferences.length - 1];
+  }
+  
+  // Get supplier cost using linear interpolation for each quantity bracket
+  const brackets = product.quantityBrackets;
+  const quantityIndex = brackets.findIndex(bracket => quantity <= bracket);
+  const bracketIndex = quantityIndex === -1 ? brackets.length - 1 : quantityIndex;
+  
+  let supplierCost;
+  
+  if (lowerSize === upperSize) {
+    // Exact match or outside range
+    supplierCost = lowerSize.costs[bracketIndex];
+  } else {
+    // Linear interpolation between the two nearest sizes
+    const ratio = (areaInSquareInches - lowerSize.area) / (upperSize.area - lowerSize.area);
+    const lowerCost = lowerSize.costs[bracketIndex];
+    const upperCost = upperSize.costs[bracketIndex];
+    supplierCost = lowerCost + ratio * (upperCost - lowerCost);
+  }
+  
+  // Apply quantity interpolation if needed
+  if (quantityIndex === -1 || quantity !== brackets[bracketIndex]) {
+    // Handle quantity interpolation similar to existing logic
+    let i = 0;
+    while (i < brackets.length - 1 && quantity > brackets[i + 1]) {
+      i++;
+    }
+    
+    if (i < brackets.length - 1) {
+      const q1 = brackets[i];
+      const q2 = brackets[i + 1];
+      
+      // Get costs for both quantity brackets
+      let c1, c2;
+      if (lowerSize === upperSize) {
+        c1 = lowerSize.costs[i];
+        c2 = lowerSize.costs[i + 1];
+      } else {
+        const ratio = (areaInSquareInches - lowerSize.area) / (upperSize.area - lowerSize.area);
+        c1 = lowerSize.costs[i] + ratio * (upperSize.costs[i] - lowerSize.costs[i]);
+        c2 = lowerSize.costs[i + 1] + ratio * (upperSize.costs[i + 1] - lowerSize.costs[i + 1]);
+      }
+      
+      supplierCost = c1 + (quantity - q1) * (c2 - c1) / (q2 - q1);
+    }
+  }
+  
+  // Apply 25% markup
+  const priceAfterMarkup = supplierCost * (1 + product.markupPercentage);
+  
+  // Apply rush multiplier
+  const rushMultiplier = data.promoConfig.pricing.rushMultipliers[rushType] || 1.0;
+  const finalPrice = priceAfterMarkup * rushMultiplier;
+  
+  // Calculate unit price
+  const unitPrice = finalPrice / quantity;
+  
+  return {
+    quantity: quantity,
+    specifications: {
+      width: width,
+      height: height,
+      size: `${width}"x${height}"`,
+      area: areaInSquareInches,
+      type: stickerType,
+      production: 'premium'
+    },
+    areaInSquareInches: areaInSquareInches,
+    supplierCost: supplierCost,
+    markup: product.markupPercentage,
+    priceAfterMarkup: priceAfterMarkup,
+    rushMultiplier: rushMultiplier,
+    totalCost: finalPrice,
+    unitPrice: unitPrice,
+    rushType: rushType,
+    interpolationUsed: lowerSize !== upperSize ? `${lowerSize.size} to ${upperSize.size}` : lowerSize.size
   };
 }
 
