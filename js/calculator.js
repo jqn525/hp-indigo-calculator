@@ -1728,6 +1728,20 @@ async function calculatePosterPrice(formData) {
   };
 }
 
+// Export functions globally for universal configurator
+if (typeof window !== 'undefined') {
+  window.calculateBrochurePrice = calculateBrochurePrice;
+  window.calculatePostcardPrice = calculatePostcardPrice;
+  window.calculateFlyerPrice = calculateFlyerPrice;
+  window.calculateBookmarkPrice = calculateBookmarkPrice;
+  window.calculateNameTagPrice = calculateNameTagPrice;
+  window.calculateBookletPrice = calculateBookletPrice;
+  window.calculateNotebookPrice = calculateNotebookPrice;
+  window.calculateNotepadPrice = calculateNotepadPrice;
+  window.calculateTableTentPrice = calculateTableTentPrice;
+  window.calculatePosterPrice = calculatePosterPrice;
+}
+
 // Initialize card selection when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   new CardSelection();

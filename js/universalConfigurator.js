@@ -1392,12 +1392,12 @@ class UniversalConfigurator {
         return {
             totalCost: Math.round(totalCost * 100) / 100,
             unitPrice: Math.round(unitPrice * 100) / 100,
-            printingSetupCost: setupFee.toFixed(2),
-            finishingSetupCost: finishingSetupFee.toFixed(2),
-            productionCost: productionCost.toFixed(2),
-            materialCost: materialCost.toFixed(2),
-            finishingCost: finishingCost.toFixed(2),
-            subtotal: subtotal.toFixed(2),
+            printingSetupCost: setupFee,
+            finishingSetupCost: finishingSetupFee,
+            productionCost: productionCost,
+            materialCost: materialCost,
+            finishingCost: finishingCost,
+            subtotal: subtotal,
             rushMultiplier: rushMultiplier,
             sheetsRequired: sheetsRequired
         };
@@ -1426,12 +1426,12 @@ class UniversalConfigurator {
         return {
             totalCost: Math.round(totalCost * 100) / 100,
             unitPrice: Math.round(unitPrice * 100) / 100,
-            printingSetupCost: setupFee.toFixed(2),
-            finishingSetupCost: '0.00',
-            productionCost: '0.00',
-            materialCost: materialCost.toFixed(2),
-            finishingCost: '0.00',
-            subtotal: subtotal.toFixed(2),
+            printingSetupCost: setupFee,
+            finishingSetupCost: 0,
+            productionCost: 0,
+            materialCost: materialCost,
+            finishingCost: 0,
+            subtotal: subtotal,
             rushMultiplier: rushMultiplier,
             sheetsRequired: quantity,
             squareFeet: Math.round(squareFeet * 100) / 100
@@ -1535,7 +1535,7 @@ class UniversalConfigurator {
         const isSticker = this.currentConfig.productType === 'stickers';
         
         // Setup cost
-        const setupCost = isSticker ? (pricing.setupFee || 0) : (pricing.printingSetupCost || 0);
+        const setupCost = isSticker ? (pricing.setupFee || 0) : (parseFloat(pricing.printingSetupCost) || 0);
         document.getElementById('redSetupCost').textContent = `$${setupCost.toFixed(2)}`;
         
         // Production cost - different for standard vs premium stickers
@@ -1544,12 +1544,12 @@ class UniversalConfigurator {
             const productionCost = isPremium ? 'Premium die-cut production' : 'Wide format production';
             document.getElementById('redProductionCost').textContent = productionCost;
         } else {
-            const productionCost = pricing.productionCost || 0;
-            document.getElementById('redProductionCost').textContent = `$${productionCost}`;
+            const productionCost = parseFloat(pricing.productionCost) || 0;
+            document.getElementById('redProductionCost').textContent = `$${productionCost.toFixed(2)}`;
         }
-        
+
         // Material cost
-        const materialCost = pricing.materialCost || 0;
+        const materialCost = parseFloat(pricing.materialCost) || 0;
         document.getElementById('redMaterialCost').textContent = `$${materialCost.toFixed(2)}`;
         
         // Finishing cost - different for standard vs premium stickers
@@ -1558,11 +1558,11 @@ class UniversalConfigurator {
             const finishingCost = isPremium ? 'Die-cut included' : 'Kiss-cut included';
             document.getElementById('redFinishingCost').textContent = finishingCost;
         } else {
-            const finishingCost = pricing.finishingCost || 0;
-            document.getElementById('redFinishingCost').textContent = `$${finishingCost}`;
+            const finishingCost = parseFloat(pricing.finishingCost) || 0;
+            document.getElementById('redFinishingCost').textContent = `$${finishingCost.toFixed(2)}`;
         }
-        
-        document.getElementById('redSubtotal').textContent = `$${pricing.subtotal.toFixed(2)}`;
+
+        document.getElementById('redSubtotal').textContent = `$${parseFloat(pricing.subtotal).toFixed(2)}`;
         
         // Sheets required - only relevant for HP Indigo products
         if (isSticker) {
@@ -1574,9 +1574,10 @@ class UniversalConfigurator {
         
         // Show/hide finishing setup fee
         const finishingSetupItem = document.getElementById('redFinishingSetupItem');
-        const finishingSetupCost = document.getElementById('redFinishingSetupCost');
-        if (pricing.finishingSetupCost && parseFloat(pricing.finishingSetupCost) > 0) {
-            finishingSetupCost.textContent = `$${pricing.finishingSetupCost}`;
+        const finishingSetupCostElement = document.getElementById('redFinishingSetupCost');
+        const finishingSetupCostValue = parseFloat(pricing.finishingSetupCost) || 0;
+        if (finishingSetupCostValue > 0) {
+            finishingSetupCostElement.textContent = `$${finishingSetupCostValue.toFixed(2)}`;
             finishingSetupItem.style.display = 'flex';
         } else {
             finishingSetupItem.style.display = 'none';
