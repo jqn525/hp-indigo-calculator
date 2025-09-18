@@ -312,20 +312,95 @@
                                 </button>
                             </div>
                             <div class="option-grid">
-                                <label class="option-card selected" data-option="material" data-value="RMPS002">
-                                    <input type="radio" name="material" value="RMPS002" checked hidden>
+                                <!-- Roll Media -->
+                                <label class="option-card selected" data-option="material" data-value="LARGE_FORMAT_BOND">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_BOND" checked hidden>
                                     <div class="option-content">
-                                        <div class="option-title">Matte Paper</div>
-                                        <div class="option-subtitle">9mil Rite-Media</div>
-                                        <div class="option-badge recommended">$6/sq ft</div>
+                                        <div class="option-title">Bond Paper</div>
+                                        <div class="option-subtitle">20lb Bond</div>
+                                        <div class="option-badge recommended">$3/sq ft</div>
                                     </div>
                                 </label>
-                                <label class="option-card" data-option="material" data-value="QMPFL501503">
-                                    <input type="radio" name="material" value="QMPFL501503" hidden>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_PAPER">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_PAPER" hidden>
                                     <div class="option-content">
-                                        <div class="option-title">Matte Fabric</div>
-                                        <div class="option-subtitle">8mil Coated</div>
+                                        <div class="option-title">Paper</div>
+                                        <div class="option-subtitle">9mil Matte</div>
+                                        <div class="option-badge">$6/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_FABRIC">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_FABRIC" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Fabric</div>
+                                        <div class="option-subtitle">8mil Matte Coated</div>
                                         <div class="option-badge">$9/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_PET_VINYL">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_PET_VINYL" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">PET Vinyl</div>
+                                        <div class="option-subtitle">4mil Matte</div>
+                                        <div class="option-badge">$12/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_SCRIM_VINYL">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_SCRIM_VINYL" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Scrim Vinyl</div>
+                                        <div class="option-subtitle">13mil Banner</div>
+                                        <div class="option-badge">$10/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_VINYL_ADHESIVE">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_VINYL_ADHESIVE" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Vinyl Adhesive</div>
+                                        <div class="option-subtitle">3mil Adhesive</div>
+                                        <div class="option-badge">$12/sq ft</div>
+                                    </div>
+                                </label>
+
+                                <!-- Rigid Substrates -->
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_COROPLAST">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_COROPLAST" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Corrugated Plastic</div>
+                                        <div class="option-subtitle">4mm Rigid</div>
+                                        <div class="option-badge">$10/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_FOAMCORE">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_FOAMCORE" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Foam Core Board</div>
+                                        <div class="option-subtitle">3/16" Rigid</div>
+                                        <div class="option-badge">$12/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_CARDBOARD">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_CARDBOARD" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Corrugated Cardboard</div>
+                                        <div class="option-subtitle">3/16" Eco-Friendly</div>
+                                        <div class="option-badge">$10/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_PVC">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_PVC" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">PVC Board</div>
+                                        <div class="option-subtitle">3mm Rigid</div>
+                                        <div class="option-badge">$14/sq ft</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="material" data-value="LARGE_FORMAT_DIBOND">
+                                    <input type="radio" name="material" value="LARGE_FORMAT_DIBOND" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Aluminum Composite</div>
+                                        <div class="option-subtitle">3mm Premium</div>
+                                        <div class="option-badge premium">$16/sq ft</div>
                                     </div>
                                 </label>
                             </div>
@@ -397,6 +472,7 @@
     <script src="../js/sw-register.js"></script>
     <script src="../js/cart.js"></script>
     <script src="../js/calculator.js"></script>
+    <script src="../js/domCache.js"></script>
     <script src="../js/configurator.js"></script>
     <script src="../js/paperStocks.js"></script>
     <script src="../js/pricingConfig.js"></script>

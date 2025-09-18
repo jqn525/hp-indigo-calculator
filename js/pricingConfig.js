@@ -7,8 +7,84 @@ const pricingConfig = {
     setupFee: 15.00,           // S = $15.00 (prepress and printing setup)
     finishingSetupFee: 15.00,  // F_setup = $15.00 (finishing setup when required)
     baseProductionRate: 1.50,  // k = $1.50
-    efficiencyExponent: 0.75,  // e = 0.75
+    efficiencyExponent: 0.75,  // e = 0.75 (default, overridden by product-specific values)
     clicksCost: 0.10           // Double-sided printing cost
+  },
+
+  // Product-specific formula parameters
+  productFormulas: {
+    brochures: {
+      efficiencyExponent: 0.75,
+      hasFinishing: 'conditional',
+      finishingSetupFee: 15.00,
+      finishingLogic: 'fold-based',
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+    postcards: {
+      efficiencyExponent: 0.70,
+      hasFinishing: false,
+      finishingSetupFee: 0,
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+    'table-tents': {
+      efficiencyExponent: 0.70,
+      hasFinishing: true,
+      finishingSetupFee: 15.00,
+      finishingLogic: 'table-tent',
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+    'name-tags': {
+      efficiencyExponent: 0.65,
+      hasFinishing: 'conditional',
+      finishingSetupFee: 0,
+      finishingLogic: 'name-tag',
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+    flyers: {
+      efficiencyExponent: 0.65,
+      hasFinishing: false,
+      finishingSetupFee: 0,
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+    bookmarks: {
+      efficiencyExponent: 0.65,
+      hasFinishing: false,
+      finishingSetupFee: 0,
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+    booklets: {
+      efficiencyExponent: 0.75,
+      hasFinishing: true,
+      finishingSetupFee: 15.00,
+      finishingLogic: 'booklet',
+      setupFeeMultiplier: 2.0, // Special case: double setup + page-based
+      formula: 'booklet'
+    },
+    notebooks: {
+      efficiencyExponent: 0.80,
+      hasFinishing: true,
+      finishingSetupFee: 15.00,
+      finishingLogic: 'notebook',
+      setupFeeMultiplier: 1.0,
+      formula: 'notebook'
+    },
+    notepads: {
+      efficiencyExponent: 0.65,
+      hasFinishing: true,
+      finishingSetupFee: 15.00,
+      finishingLogic: 'notepad',
+      setupFeeMultiplier: 1.0,
+      formula: 'notepad'
+    },
+    posters: {
+      formula: 'large-format'
+    }
   },
 
   // Product-specific constraints
@@ -74,10 +150,14 @@ const pricingConfig = {
     },
     posters: {
       // Large format - charged per square foot, not per sheet
+      // Common roll media sizes (from 54" wide Epson SureColor)
       '18x24': { sqft: 3.0 },
       '22x28': { sqft: 4.3 },
       '24x36': { sqft: 6.0 },
-      '36x48': { sqft: 12.0 }
+      '36x48': { sqft: 12.0 },
+      '48x72': { sqft: 24.0 },
+      // Rigid substrate sizes (Mutoh flatbed 48x96" sheets)
+      '48x96': { sqft: 32.0 }
     },
     // Future products
     businessCards: {

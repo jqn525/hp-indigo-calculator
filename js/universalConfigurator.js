@@ -63,20 +63,28 @@ class UniversalConfigurator {
         try {
             // Populate from paperStocks.js
             Object.entries(paperStocks).forEach(([code, paper]) => {
-                if (!paper || typeof paper.costPerSheet === 'undefined') {
+                if (!paper || (!paper.costPerSheet && !paper.chargeRate)) {
                     console.warn(`Invalid paper data for ${code}:`, paper);
                     return;
                 }
-                
+
                 const option = document.createElement('option');
                 option.value = code;
-                option.textContent = `${paper.displayName} - $${paper.costPerSheet.toFixed(3)}/sheet`;
+                const price = paper.costPerSheet || paper.chargeRate;
+                const unit = paper.chargeRate ? 'sqft' : 'sheet';
+                option.textContent = `${paper.displayName} - $${price.toFixed(2)}/${unit}`;
                 
                 if (paper.type === 'text_stock') {
                     textSelect.appendChild(option);
                 } else if (paper.type === 'cover_stock') {
                     coverSelect.appendChild(option);
                 } else if (paper.type === 'adhesive_stock') {
+                    specialtySelect.appendChild(option);
+                } else if (paper.type === 'large_format_paper' ||
+                          paper.type === 'large_format_fabric' ||
+                          paper.type === 'large_format_vinyl' ||
+                          paper.type === 'large_format_rigid') {
+                    // Add large format materials to specialty dropdown for poster selection
                     specialtySelect.appendChild(option);
                 }
             });
@@ -166,9 +174,6 @@ class UniversalConfigurator {
         document.getElementById('addToCartBtn').addEventListener('click', () => {
             this.addToCart();
         });
-        
-        // Set up sticker-specific event listeners when stickers are selected
-        this.bindStickerEventListeners();
     }
 
     handleProductTypeChange(productType) {
@@ -274,60 +279,28 @@ class UniversalConfigurator {
                 specificSection.style.display = 'block';
                 // Hide standard paper section for posters
                 document.getElementById('paperSection').style.display = 'none';
-                break;
-                
-            case 'stickers':
-                // Stickers now support custom sizing for in-house production
-                specificSection.style.display = 'block';
-                optionsTitle.textContent = 'Sticker Options';
-                optionsContent.innerHTML = `
-                    <div class="mb-4">
-                        <label class="form-label">Production Type</label>
-                        <select class="form-select" id="stickerProductionType">
-                            <option value="standard">Standard (In-House) - $12/sq ft + $30 setup</option>
-                            <option value="premium">Premium (Supplier) - Custom Sizing Available</option>
-                        </select>
-                    </div>
-                    
-                    <div id="standardStickerOptions">
-                        <div class="mb-3">
-                            <label class="form-label">Finish</label>
-                            <select class="form-select" id="stickerFinish">
-                                <option value="vinyl-matte">Vinyl Matte (Kiss-Cut)</option>
-                            </select>
-                        </div>
-                        <div class="alert alert-success">
-                            <strong>In-House Production:</strong> Enter any dimensions above. 
-                            Wide-format printing at $12/sq ft + $30 setup fee with volume discounts.
-                        </div>
-                    </div>
-                    
-                    <div id="premiumStickerOptions" style="display: none;">
-                        <div class="mb-3">
-                            <label class="form-label">Finish</label>
-                            <select class="form-select" id="premiumStickerFinish">
-                                <option value="vinyl-matte">Premium Vinyl (Die-Cut)</option>
-                            </select>
-                        </div>
-                        <div class="alert alert-info">
-                            <strong>Premium Supplier:</strong> Enter any dimensions above. 
-                            Pricing uses advanced interpolation based on supplier cost structure.
-                            <br><small>Also available with preset sizes on the <a href="stickers.html" class="alert-link">Stickers page</a>.</small>
-                        </div>
-                    </div>
-                `;
-                // Show dimensions section for custom sizing
-                document.getElementById('dimensionsSection').style.display = 'block';
-                // Hide paper section (not needed for stickers)
-                document.getElementById('paperSection').style.display = 'none';
-                // Add event listeners for sticker-specific options
-                this.bindStickerEventListeners();
+                // Bind poster material change event
+                setTimeout(() => {
+                    const posterMaterialSelect = document.getElementById('posterMaterial');
+                    if (posterMaterialSelect) {
+                        // Set initial value and store it
+                        if (posterMaterialSelect.value) {
+                            this.currentConfig.posterMaterial = posterMaterialSelect.value;
+                            this.handlePosterMaterialChange(posterMaterialSelect.value);
+                        }
+
+                        posterMaterialSelect.addEventListener('change', (e) => {
+                            this.handlePosterMaterialChange(e.target.value);
+                        });
+                    }
+                }, 100);
                 break;
                 
             case 'magnets':
+            case 'stickers':
             case 'apparel':
             case 'tote-bags':
-                // Other promotional products - redirect to existing pages
+                // Promotional products - redirect to existing pages or show notice
                 specificSection.style.display = 'block';
                 optionsTitle.textContent = 'Notice';
                 optionsContent.innerHTML = `
@@ -344,29 +317,6 @@ class UniversalConfigurator {
             default:
                 specificSection.style.display = 'none';
         }
-    }
-
-    handleStickerProductionChange() {
-        const productionType = document.getElementById('stickerProductionType').value;
-        const standardOptions = document.getElementById('standardStickerOptions');
-        const premiumOptions = document.getElementById('premiumStickerOptions');
-        const dimensionsSection = document.getElementById('dimensionsSection');
-        
-        if (productionType === 'standard') {
-            standardOptions.style.display = 'block';
-            premiumOptions.style.display = 'none';
-            dimensionsSection.style.display = 'block';
-        } else {
-            standardOptions.style.display = 'none';
-            premiumOptions.style.display = 'block';
-            dimensionsSection.style.display = 'none';
-        }
-        
-        // Trigger pricing recalculation
-        this.debouncedPriceCalculation();
-        
-        // Re-bind sticker event listeners when production type changes
-        this.bindStickerEventListeners();
     }
 
     createFoldingOptions() {
@@ -546,53 +496,6 @@ class UniversalConfigurator {
         }
     }
 
-    bindStickerEventListeners() {
-        // Add event listeners for sticker-specific form elements
-        const stickerProductionType = document.getElementById('stickerProductionType');
-        const stickerFinish = document.getElementById('stickerFinish');
-        const premiumStickerSize = document.getElementById('premiumStickerSize');
-        
-        if (stickerProductionType) {
-            // Remove any existing event listeners to avoid duplicates
-            stickerProductionType.removeEventListener('change', this.stickerProductionChangeHandler);
-            
-            // Create bound handler if it doesn't exist
-            if (!this.stickerProductionChangeHandler) {
-                this.stickerProductionChangeHandler = (e) => {
-                    this.handleStickerProductionChange();
-                };
-            }
-            
-            stickerProductionType.addEventListener('change', this.stickerProductionChangeHandler);
-        }
-        
-        if (stickerFinish) {
-            stickerFinish.removeEventListener('change', this.stickerFinishChangeHandler);
-            
-            if (!this.stickerFinishChangeHandler) {
-                this.stickerFinishChangeHandler = (e) => {
-                    this.updateConfiguration();
-                    this.debouncedPriceCalculation();
-                };
-            }
-            
-            stickerFinish.addEventListener('change', this.stickerFinishChangeHandler);
-        }
-        
-        if (premiumStickerSize) {
-            premiumStickerSize.removeEventListener('change', this.premiumStickerSizeChangeHandler);
-            
-            if (!this.premiumStickerSizeChangeHandler) {
-                this.premiumStickerSizeChangeHandler = (e) => {
-                    this.updateConfiguration();
-                    this.debouncedPriceCalculation();
-                };
-            }
-            
-            premiumStickerSize.addEventListener('change', this.premiumStickerSizeChangeHandler);
-        }
-    }
-
     setupNameTagPaperRestrictions() {
         // Monitor paper selections to disable finishing for adhesive stock
         const paperSelects = ['textPaper', 'coverPaper', 'specialtyStock'];
@@ -678,18 +581,77 @@ class UniversalConfigurator {
     }
 
     createPosterMaterialOptions() {
+        // Dynamically generate poster material options from paperStocks
+        let materialOptions = '<option value="">Select material...</option>';
+
+        if (typeof paperStocks !== 'undefined') {
+            Object.entries(paperStocks).forEach(([code, paper]) => {
+                if (paper && paper.chargeRate &&
+                    (paper.type === 'large_format_paper' ||
+                     paper.type === 'large_format_fabric' ||
+                     paper.type === 'large_format_vinyl' ||
+                     paper.type === 'large_format_rigid')) {
+                    materialOptions += `<option value="${code}">${paper.displayName} - $${paper.chargeRate.toFixed(2)}/sqft</option>`;
+                }
+            });
+        }
+
         return `
             <div class="form-group">
                 <label class="form-label">Material Type</label>
                 <select class="form-select" id="posterMaterial" name="posterMaterial">
-                    <option value="RMPS002">Rite-Media Paper - $6.00/sqft</option>
-                    <option value="RMFAB001">Fabric Material - $9.00/sqft</option>
+                    ${materialOptions}
                 </select>
             </div>
             <div class="alert alert-info mt-3">
-                <small><strong>Note:</strong> Posters are priced per square foot, not by imposition. Price = Width × Height × Material Cost</small>
+                <small><strong>Note:</strong> Select material first to set dimension constraints. Posters are priced per square foot.</small>
             </div>
         `;
+    }
+
+    handlePosterMaterialChange(materialCode) {
+        if (!materialCode || !paperStocks[materialCode]) {
+            return;
+        }
+
+        const material = paperStocks[materialCode];
+        const widthInput = document.getElementById('customWidth');
+        const heightInput = document.getElementById('customHeight');
+        const trimNote = document.querySelector('.trim-note');
+
+        if (!widthInput || !heightInput || !trimNote) {
+            return;
+        }
+
+        if (material.fixedWidth && material.fixedHeight) {
+            // Rigid substrate - lock to fixed dimensions
+            widthInput.value = material.fixedWidth;
+            heightInput.value = material.fixedHeight;
+            widthInput.disabled = true;
+            heightInput.disabled = true;
+            widthInput.style.backgroundColor = '#f8f9fa';
+            heightInput.style.backgroundColor = '#f8f9fa';
+            trimNote.innerHTML = `<strong>Fixed size:</strong> ${material.fixedWidth}" × ${material.fixedHeight}" (substrate constraint)`;
+        } else if (material.maxWidth) {
+            // Roll media - set max width, free height
+            widthInput.disabled = false;
+            heightInput.disabled = false;
+            widthInput.style.backgroundColor = '';
+            heightInput.style.backgroundColor = '';
+            widthInput.max = material.maxWidth;
+            heightInput.max = 1000; // Essentially unlimited for roll length
+
+            // Adjust current value if it exceeds the new max
+            if (parseFloat(widthInput.value) > material.maxWidth) {
+                widthInput.value = material.maxWidth;
+            }
+
+            trimNote.innerHTML = `<strong>Maximum width:</strong> ${material.maxWidth}" • <strong>Height:</strong> Any length up to full roll`;
+        }
+
+        // Update the configuration and recalculate
+        this.currentConfig.posterMaterial = materialCode;
+        this.debouncedPriceCalculation();
     }
 
     createNameTagOptions() {
@@ -748,9 +710,9 @@ class UniversalConfigurator {
     }
 
     updateImpositionDisplay(width, height) {
-        // Skip imposition display for products that don't use HP Indigo
-        if (this.currentConfig.productType === 'posters' || this.currentConfig.productType === 'stickers') {
-            this.showStickerAreaInfo(width, height);
+        // Skip imposition display for posters (they use square footage)
+        if (this.currentConfig.productType === 'posters') {
+            this.showPosterAreaInfo(width, height);
             return;
         }
         
@@ -800,43 +762,6 @@ class UniversalConfigurator {
         document.getElementById('impositionInfo').style.display = 'block';
     }
 
-    showStickerAreaInfo(width, height) {
-        if (this.currentConfig.productType === 'posters') {
-            // Use poster display for posters
-            this.showPosterAreaInfo(width, height);
-            return;
-        }
-        
-        // Sticker-specific area display
-        const squareInches = width * height;
-        const squareFeet = squareInches / 144;
-        const formattedSqIn = Math.round(squareInches * 100) / 100;
-        const formattedSqFt = Math.round(squareFeet * 10000) / 10000; // More precision for small areas
-        
-        document.getElementById('currentImposition').textContent = `${formattedSqIn} sq in`;
-        document.getElementById('efficiencyRating').innerHTML = `
-            <span class="rating-icon">🏷️</span>
-            <span class="rating-text">Wide format stickers</span>
-            <span class="rating-percentage">${formattedSqFt} sq ft</span>
-        `;
-        document.getElementById('efficiencyRating').style.color = '#28a745';
-        
-        document.getElementById('impositionDetails').textContent = 
-            `${this.impositionCalc.formatDimensions(width, height)} = ${formattedSqIn} square inches`;
-        // Check if this is premium or standard stickers
-        const productionType = document.getElementById('stickerProductionType')?.value || 'standard';
-        
-        if (productionType === 'premium') {
-            document.getElementById('bleedInfo').textContent = 
-                `Premium die-cut stickers: Interpolated supplier pricing`;
-        } else {
-            document.getElementById('bleedInfo').textContent = 
-                `Kiss-cut vinyl pricing: $12/sq ft + $30 setup`;
-        }
-        
-        document.getElementById('impositionInfo').style.display = 'block';
-    }
-
     showImpositionError(error) {
         document.getElementById('currentImposition').textContent = 'Size Error';
         document.getElementById('efficiencyRating').innerHTML = `
@@ -864,10 +789,12 @@ class UniversalConfigurator {
                 ? this.impositionCalc.formatDimensions(this.currentConfig.customWidth, this.currentConfig.customHeight)
                 : '-';
                 
-        // Update paper display - priority: specialty > text/cover
+        // Update paper display - priority: specialty > text/cover > poster material
         let paperDisplay = '-';
         if (this.currentConfig.specialtyStock) {
             paperDisplay = paperStocks[this.currentConfig.specialtyStock].displayName;
+        } else if (this.currentConfig.posterMaterial) {
+            paperDisplay = paperStocks[this.currentConfig.posterMaterial].displayName;
         } else if (this.currentConfig.textPaper && this.currentConfig.coverPaper) {
             const textPaper = paperStocks[this.currentConfig.textPaper];
             const coverPaper = paperStocks[this.currentConfig.coverPaper];
@@ -896,17 +823,27 @@ class UniversalConfigurator {
     async calculatePricing() {
         if (this.isCalculating) return;
         
-        // Validate required fields - some products don't require paper
-        const needsPaper = !['stickers', 'posters'].includes(this.currentConfig.productType);
-        
-        if (!this.currentConfig.productType || 
-            !this.currentConfig.customWidth || 
-            !this.currentConfig.customHeight || 
-            !this.currentConfig.quantity ||
-            (needsPaper && !this.currentConfig.specialtyStock && !this.currentConfig.textPaper && !this.currentConfig.coverPaper)) {
-            
+        // Validate required fields - specialty stock can replace text/cover paper, posters use posterMaterial
+        if (!this.currentConfig.productType ||
+            !this.currentConfig.customWidth ||
+            !this.currentConfig.customHeight ||
+            !this.currentConfig.quantity) {
+
             this.resetPricingDisplay();
             return;
+        }
+
+        // Validate material selection based on product type
+        if (this.currentConfig.productType === 'posters') {
+            if (!this.currentConfig.posterMaterial) {
+                this.resetPricingDisplay();
+                return;
+            }
+        } else {
+            if (!this.currentConfig.specialtyStock && !this.currentConfig.textPaper && !this.currentConfig.coverPaper) {
+                this.resetPricingDisplay();
+                return;
+            }
         }
         
         this.isCalculating = true;
@@ -986,11 +923,6 @@ class UniversalConfigurator {
         } else if (productType === 'posters') {
             const posterMaterial = document.getElementById('posterMaterial')?.value || 'RMPS002';
             formData.push(['material', posterMaterial]);
-        } else if (productType === 'stickers') {
-            const stickerProductionType = document.getElementById('stickerProductionType')?.value || 'standard';
-            const stickerFinish = document.getElementById('stickerFinish')?.value || 'vinyl-matte';
-            formData.push(['stickerProductionType', stickerProductionType]);
-            formData.push(['stickerFinish', stickerFinish]);
         }
         
         return formData;
@@ -1007,76 +939,6 @@ class UniversalConfigurator {
         // For posters, use square footage pricing
         if (productType === 'posters') {
             return this.calculatePosterPricing(width, height, quantity, rushType, formData);
-        }
-        
-        // For stickers, handle in-house vs premium pricing
-        if (productType === 'stickers') {
-            const productionType = formData.get('stickerProductionType') || 'standard';
-            
-            if (productionType === 'standard') {
-                // In-house sticker pricing: $12/sq ft + $30 setup
-                const areaInSqFt = (width * height) / 144; // Convert sq inches to sq feet
-                const pricePerSqFt = promoConfig.products['stickers-inhouse'].pricePerSqFt;
-                const setupFee = promoConfig.products['stickers-inhouse'].setupFee;
-                
-                // Calculate base material cost
-                const baseMaterialCost = areaInSqFt * pricePerSqFt * quantity;
-                const totalArea = areaInSqFt * quantity;
-                
-                // Apply area-based discounts (material only)
-                let volumeDiscount = 0;
-                if (totalArea >= 25) volumeDiscount = 0.20;
-                else if (totalArea >= 10) volumeDiscount = 0.15;
-                else if (totalArea >= 5) volumeDiscount = 0.10;
-                else if (totalArea >= 2) volumeDiscount = 0.05;
-                
-                const discountedCost = baseMaterialCost * (1 - volumeDiscount);
-                const subtotal = discountedCost + setupFee;
-                
-                // Apply rush multiplier
-                const rushMultiplier = rushType === 'rush' ? 1.25 : 1.0;
-                const totalCost = Math.round(subtotal * rushMultiplier * 100) / 100;
-                const unitPrice = Math.round((totalCost / quantity) * 100) / 100;
-                
-                return {
-                    totalCost: totalCost,
-                    unitPrice: unitPrice,
-                    materialCost: discountedCost, // Show post-discount material cost
-                    setupFee: setupFee,
-                    subtotal: subtotal,
-                    rushMultiplier: rushMultiplier,
-                    volumeDiscount: volumeDiscount,
-                    areaInSqFt: areaInSqFt,
-                    totalArea: totalArea,
-                    pricePerSqFt: pricePerSqFt
-                };
-            } else {
-                // Premium stickers - use interpolation function
-                try {
-                    const result = await calculatePremiumStickerCustomPrice(width, height, quantity, 'vinyl-matte', rushType);
-                    
-                    if (result.error) {
-                        return { error: result.error };
-                    }
-                    
-                    return {
-                        totalCost: result.totalCost,
-                        unitPrice: result.unitPrice,
-                        materialCost: result.supplierCost,
-                        setupFee: 0, // Premium stickers don't have separate setup fee
-                        subtotal: result.priceAfterMarkup,
-                        rushMultiplier: result.rushMultiplier,
-                        volumeDiscount: 0, // Volume discounts built into supplier pricing
-                        areaInSqFt: result.areaInSquareInches / 144,
-                        pricePerSqFt: result.supplierCost / (result.areaInSquareInches / 144),
-                        interpolationUsed: result.interpolationUsed,
-                        productionType: 'premium'
-                    };
-                } catch (error) {
-                    console.error('Premium sticker calculation error:', error);
-                    return { error: 'Unable to calculate premium sticker pricing.' };
-                }
-            }
         }
         
         // For brochures, use the original calculator for perfect consistency
@@ -1405,15 +1267,15 @@ class UniversalConfigurator {
 
     calculatePosterPricing(width, height, quantity, rushType, formData) {
         const squareFeet = (width * height) / 144;
-        const material = formData.get('material') || 'RMPS002';
-        
-        // Material costs per square foot
-        const materialCosts = {
-            'RMPS002': 6.00, // Rite-Media Paper
-            'RMFAB001': 9.00  // Fabric Material
-        };
-        
-        const costPerSqFt = materialCosts[material] || 6.00;
+        const materialCode = formData.get('material') || 'LARGE_FORMAT_PAPER';
+
+        // Get material data from paperStocks
+        const material = paperStocks[materialCode];
+        if (!material) {
+            throw new Error(`Material ${materialCode} not found in paperStocks`);
+        }
+
+        const costPerSqFt = material.chargeRate || 6.00;
         const materialCost = squareFeet * costPerSqFt * quantity;
         
         const setupFee = 30.00; // Standard setup for large format
@@ -1528,16 +1390,16 @@ class UniversalConfigurator {
     }
 
     updatePricingDisplay(pricing) {
-        document.getElementById('livePrice').textContent = `$${pricing.totalCost.toFixed(2)}`;
-        document.getElementById('liveUnitPrice').textContent = `$${pricing.unitPrice.toFixed(2)}`;
+        document.getElementById('livePrice').textContent = `$${pricing.totalCost}`;
+        document.getElementById('liveUnitPrice').textContent = `$${pricing.unitPrice}`;
         
         // Update breakdown - handle different field names for different product types
         const isSticker = this.currentConfig.productType === 'stickers';
-        
+
         // Setup cost
         const setupCost = isSticker ? (pricing.setupFee || 0) : (parseFloat(pricing.printingSetupCost) || 0);
         document.getElementById('redSetupCost').textContent = `$${setupCost.toFixed(2)}`;
-        
+
         // Production cost - different for standard vs premium stickers
         if (isSticker) {
             const isPremium = pricing.productionType === 'premium';
@@ -1551,7 +1413,7 @@ class UniversalConfigurator {
         // Material cost
         const materialCost = parseFloat(pricing.materialCost) || 0;
         document.getElementById('redMaterialCost').textContent = `$${materialCost.toFixed(2)}`;
-        
+
         // Finishing cost - different for standard vs premium stickers
         if (isSticker) {
             const isPremium = pricing.productionType === 'premium';
@@ -1563,7 +1425,7 @@ class UniversalConfigurator {
         }
 
         document.getElementById('redSubtotal').textContent = `$${parseFloat(pricing.subtotal).toFixed(2)}`;
-        
+
         // Sheets required - only relevant for HP Indigo products
         if (isSticker) {
             const areaInfo = pricing.areaInSqFt ? `${pricing.areaInSqFt.toFixed(4)} sq ft` : 'N/A';

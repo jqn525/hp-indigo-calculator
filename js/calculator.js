@@ -17,6 +17,7 @@ async function initializePricingData() {
     pricingData.paperStocks = paperStocks;
     pricingData.pricingConfigs = {
       formula: pricingConfig.formula,
+      productFormulas: pricingConfig.productFormulas,
       product_constraints: pricingConfig.productConstraints,
       imposition_data: pricingConfig.impositionData,
       finishing_costs: pricingConfig.finishingCosts,
@@ -52,28 +53,6 @@ async function initializePricingData() {
   return null;
 }
 
-// Validate quantity constraints for a product
-function validateQuantity(quantity, productType, constraints) {
-  if (!constraints || !constraints[productType]) return { valid: true };
-  
-  const productConstraints = constraints[productType];
-  
-  if (quantity < productConstraints.minQuantity) {
-    return { 
-      valid: false, 
-      message: `Minimum quantity is ${productConstraints.minQuantity}` 
-    };
-  }
-  
-  if (quantity > productConstraints.maxQuantity) {
-    return { 
-      valid: false, 
-      message: `Maximum quantity is ${productConstraints.maxQuantity}` 
-    };
-  }
-  
-  return { valid: true };
-}
 
 // Dynamic imposition calculation helper functions
 function getDynamicImposition(width, height) {
@@ -122,7 +101,7 @@ async function calculateBrochurePrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'brochures', data.pricingConfigs.product_constraints);
+  const validation = ValidationUtils.validateQuantity(quantity, 'brochures', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return {
       error: validation.message
@@ -215,7 +194,7 @@ async function calculatePostcardPrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'postcards', data.pricingConfigs.product_constraints);
+  const validation = ValidationUtils.validateQuantity(quantity, 'postcards', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return {
       error: validation.message
@@ -307,7 +286,7 @@ async function calculateTableTentPrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'table-tents', data.pricingConfigs.product_constraints);
+  const validation = ValidationUtils.validateQuantity(quantity, 'table-tents', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return {
       error: validation.message
@@ -405,7 +384,7 @@ async function calculateNameTagPrice(formData) {
   const hasLanyard = formData.get('lanyard') === 'true';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'name-tags', data.pricingConfigs.product_constraints);
+  const validation = ValidationUtils.validateQuantity(quantity, 'name-tags', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return {
       error: validation.message
@@ -755,7 +734,7 @@ function calculateFlyerPrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'flyers');
+  const validation = ValidationUtils.validateQuantity(quantity, 'flyers');
   if (!validation.valid) {
     return {
       error: validation.message
@@ -901,7 +880,7 @@ function calculateBookmarkPrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'bookmarks');
+  const validation = ValidationUtils.validateQuantity(quantity, 'bookmarks');
   if (!validation.valid) {
     return {
       error: validation.message
@@ -1066,7 +1045,7 @@ async function calculateBookletPrice(formData) {
   }
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'booklets', data.pricingConfigs.product_constraints);
+  const validation = ValidationUtils.validateQuantity(quantity, 'booklets', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return { error: validation.message };
   }
@@ -1213,7 +1192,7 @@ async function calculateNotebookPrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'notebooks', data.pricingConfigs.product_constraints);
+  const validation = ValidationUtils.validateQuantity(quantity, 'notebooks', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return { error: validation.message };
   }
@@ -1315,7 +1294,7 @@ async function calculateNotepadPrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   
   // Validate quantity constraints
-  const validation = validateQuantity(quantity, 'notepads', data.pricingConfigs.product_constraints);
+  const validation = ValidationUtils.validateQuantity(quantity, 'notepads', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return { error: validation.message };
   }
@@ -1689,8 +1668,8 @@ async function calculatePosterPrice(formData) {
   }
   const chargeRate = materialData.chargeRate; // per sqft
   
-  // Calculate costs
-  const setupFee = data.pricingConfigs.formula.setupFee * 2; // Large format setup fee
+  // Calculate costs - no setup fee for large format (posters, banners, signs)
+  const setupFee = 0;
   const materialCostPerPoster = squareFootage * chargeRate;
   const totalMaterialCost = materialCostPerPoster * quantity;
   
@@ -1703,7 +1682,7 @@ async function calculatePosterPrice(formData) {
   const unitPrice = totalCost / quantity;
   
   return {
-    printingSetupCost: setupFee.toFixed(2),
+    printingSetupCost: "0.00",
     finishingSetupCost: "0.00",
     needsFinishing: false,
     productionCost: "0.00",
@@ -1718,7 +1697,7 @@ async function calculatePosterPrice(formData) {
     materialRate: chargeRate.toFixed(2),
     materialUsed: materialData.displayName,
     // Additional breakdown data for configurator compatibility
-    setupCost: setupFee,
+    setupCost: 0,
     productionCost_numeric: 0,
     materialCost_numeric: totalMaterialCost,
     finishingCost_numeric: 0,

@@ -287,11 +287,21 @@
                             </div>
                         </div>
 
+                        <!-- Product-Specific Options (moved before dimensions for material-first flow) -->
+                        <div class="config-section" id="specificOptionsSection" style="display: none;">
+                            <div class="section-header">
+                                <h3 id="specificOptionsTitle">Options</h3>
+                            </div>
+                            <div id="specificOptionsContent">
+                                <!-- Dynamic content based on product type -->
+                            </div>
+                        </div>
+
                         <!-- Dimensions Configuration -->
                         <div class="config-section" id="dimensionsSection" style="display: none;">
                             <div class="section-header">
                                 <h3>Product Dimensions</h3>
-                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip"
                                         title="Enter the finished trim size of your product (inches)">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
@@ -301,30 +311,20 @@
                             <div class="dimensions-input-group">
                                 <div class="dimension-input">
                                     <label for="customWidth" class="form-label">Width (inches)</label>
-                                    <input type="number" class="form-control" id="customWidth" name="customWidth" 
+                                    <input type="number" class="form-control" id="customWidth" name="customWidth"
                                            min="1" max="12.23" step="0.125" placeholder="4.0">
                                 </div>
                                 <div class="dimension-multiply">×</div>
                                 <div class="dimension-input">
                                     <label for="customHeight" class="form-label">Height (inches)</label>
-                                    <input type="number" class="form-control" id="customHeight" name="customHeight" 
+                                    <input type="number" class="form-control" id="customHeight" name="customHeight"
                                            min="1" max="18.01" step="0.125" placeholder="6.0">
                                 </div>
                             </div>
                             <div class="dimension-info">
-                                <small class="text-muted">
+                                <small class="text-muted trim-note">
                                     Maximum trim size: 12.23" × 18.01" (0.125" bleed added automatically)
                                 </small>
-                            </div>
-                        </div>
-
-                        <!-- Product-Specific Options -->
-                        <div class="config-section" id="specificOptionsSection" style="display: none;">
-                            <div class="section-header">
-                                <h3 id="specificOptionsTitle">Options</h3>
-                            </div>
-                            <div id="specificOptionsContent">
-                                <!-- Dynamic content based on product type -->
                             </div>
                         </div>
 
@@ -426,7 +426,9 @@
     <script src="../js/pricingConfig.js"></script>
     <script src="../js/promoConfig.js"></script>
     <script src="../js/promoCalculator.js"></script>
+    <script src="../js/modules/validationUtils.js"></script>
     <script src="../js/calculator.js"></script>
+    <script src="../js/pricingEngine.js"></script>
     <script src="../js/cart.js"></script>
     <script src="../js/impositionCalculator.js"></script>
     <script src="../js/universalConfigurator.js"></script>

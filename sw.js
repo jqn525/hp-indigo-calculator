@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sfu-calc-v160';
+const CACHE_NAME = 'sfu-calc-v163';
 
 // Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -32,8 +32,9 @@ const urlsToCache = [
   `${basePath}/js/large-format-filters.js`,
   `${basePath}/js/promo-filters.js`,
   `${basePath}/js/configurator.js`,
-  `${basePath}/js/impositionCalculator.js`,
+  `${basePath}/js/domCache.js`,
   `${basePath}/js/universalConfigurator.js`,
+  `${basePath}/js/impositionCalculator.js`,
   `${basePath}/js/admin.js`,
   `${basePath}/pages/brochures.html`,
   `${basePath}/pages/postcards.html`,

@@ -7,69 +7,8 @@ class ProductConfigurator {
         // Detect current product type
         this.productType = this.detectProductType();
         
-        // Initialize configuration based on product type
-        if (this.productType === 'booklets') {
-            this.currentConfig = {
-                size: '8.5x11',                // Default to standard letter size
-                pages: 8,
-                coverPaperType: 'LYNOC95FSC',  // Default to 100# Cover Uncoated
-                textPaperType: 'LYNO416FSC',   // Default to 80# Text Uncoated
-                rushType: 'standard',
-                quantity: 100
-            };
-        } else if (this.productType === 'magnets') {
-            this.currentConfig = {
-                size: '3x3',
-                magnetType: 'super-matte',
-                rushType: 'standard',
-                quantity: 25
-            };
-        } else if (this.productType === 'stickers') {
-            this.currentConfig = {
-                size: '3x3',
-                stickerType: 'kiss-cut-matte',
-                rushType: 'standard',
-                quantity: 25
-            };
-        } else if (this.productType === 'apparel') {
-            this.currentConfig = {
-                garmentType: 'gildan-6400',
-                decorationType: 'dtf',
-                rushType: 'standard',
-                totalQuantity: 0,
-                sizeBreakdown: {}
-            };
-        } else if (this.productType === 'tote-bags') {
-            this.currentConfig = {
-                size: '10x10',
-                bagType: 'canvas-tote',
-                decorationType: 'dtf',
-                rushType: 'standard',
-                quantity: 15
-            };
-        } else if (this.productType === 'posters') {
-            this.currentConfig = {
-                size: '18x24',
-                material: 'RMPS002', // Default to paper
-                rushType: 'standard',
-                quantity: 1
-            };
-        } else if (this.productType === 'table-tents') {
-            this.currentConfig = {
-                size: '4x6',
-                paperType: 'LYNOC95FSC', // Default to 100# Cover Uncoated
-                rushType: 'standard',
-                quantity: 25
-            };
-        } else {
-            this.currentConfig = {
-                size: '8.5x11',
-                foldType: 'bifold',
-                paperType: 'LYNOC95FSC', // Default to 100# Cover Uncoated for postcard compatibility
-                rushType: 'standard',
-                quantity: 100
-            };
-        }
+        // Initialize configuration using clean map-based approach
+        this.currentConfig = this.getDefaultConfig();
         
         this.currentPricing = {
             total: 0,
@@ -83,33 +22,93 @@ class ProductConfigurator {
         this.init();
     }
 
+    getDefaultConfig() {
+        // Centralized product configuration map
+        const productDefaults = {
+            'booklets': {
+                size: '8.5x11',
+                pages: 8,
+                coverPaperType: 'LYNOC95FSC',
+                textPaperType: 'LYNO416FSC',
+                rushType: 'standard',
+                quantity: 100
+            },
+            'magnets': {
+                size: '3x3',
+                magnetType: 'super-matte',
+                rushType: 'standard',
+                quantity: 25
+            },
+            'stickers': {
+                size: '3x3',
+                stickerType: 'vinyl-matte',
+                productionType: 'standard',
+                rushType: 'standard',
+                quantity: 25
+            },
+            'apparel': {
+                garmentType: 'gildan-6400',
+                decorationType: 'dtf',
+                rushType: 'standard',
+                totalQuantity: 0,
+                sizeBreakdown: {}
+            },
+            'tote-bags': {
+                size: '10x10',
+                bagType: 'canvas-tote',
+                decorationType: 'dtf',
+                rushType: 'standard',
+                quantity: 15
+            },
+            'posters': {
+                size: '18x24',
+                material: 'RMPS002',
+                rushType: 'standard',
+                quantity: 1
+            },
+            'table-tents': {
+                size: '4x6',
+                paperType: 'LYNOC95FSC',
+                rushType: 'standard',
+                quantity: 25
+            }
+        };
+
+        // Default fallback configuration
+        const defaultConfig = {
+            size: '8.5x11',
+            foldType: 'bifold',
+            paperType: 'LYNOC95FSC',
+            rushType: 'standard',
+            quantity: 100
+        };
+
+        return productDefaults[this.productType] || defaultConfig;
+    }
+
     detectProductType() {
-        // Detect product type based on form ID
-        if (document.getElementById('postcardForm')) {
-            return 'postcards';
-        } else if (document.getElementById('nameTagForm')) {
-            return 'name-tags';
-        } else if (document.getElementById('flyerForm')) {
-            return 'flyers';
-        } else if (document.getElementById('bookmarkForm')) {
-            return 'bookmarks';
-        } else if (document.getElementById('brochureForm')) {
-            return 'brochures';
-        } else if (document.getElementById('bookletCalculator')) {
-            return 'booklets';
-        } else if (document.getElementById('magnetForm')) {
-            return 'magnets';
-        } else if (document.getElementById('stickerForm')) {
-            return 'stickers';
-        } else if (document.getElementById('apparelForm')) {
-            return 'apparel';
-        } else if (document.getElementById('toteBagForm')) {
-            return 'tote-bags';
-        } else if (document.getElementById('tableTentForm')) {
-            return 'table-tents';
-        } else if (document.getElementById('posterForm')) {
-            return 'posters';
+        // Detect product type using configuration map (cleaner than long if-else)
+        const productFormSelectors = {
+            'postcards': 'postcardForm',
+            'name-tags': 'nameTagForm',
+            'flyers': 'flyerForm',
+            'bookmarks': 'bookmarkForm',
+            'brochures': 'brochureForm',
+            'booklets': 'bookletCalculator',
+            'magnets': 'magnetForm',
+            'stickers': 'stickerForm',
+            'apparel': 'apparelForm',
+            'tote-bags': 'toteBagForm',
+            'table-tents': 'tableTentForm',
+            'posters': 'posterForm'
+        };
+
+        for (const [productType, formId] of Object.entries(productFormSelectors)) {
+            if (domCache.getId(formId)) {
+                return productType;
+            }
         }
+
         return 'brochures'; // Default fallback
     }
     
@@ -144,14 +143,14 @@ class ProductConfigurator {
         
         // Populate common fields across all product types
         if (config.quantity) {
-            const quantityInput = document.getElementById('quantity');
+            const quantityInput = domCache.getId('quantity');
             if (quantityInput) {
                 quantityInput.value = config.quantity;
             }
         }
         
         if (config.rushType) {
-            const rushSelect = document.querySelector('select[name="rush"], #rushType');
+            const rushSelect = domCache.get('select[name="rush"], #rushType');
             if (rushSelect) {
                 rushSelect.value = config.rushType;
             }
@@ -197,14 +196,14 @@ class ProductConfigurator {
     
     setupEditMode() {
         // Update page title
-        const titleElement = document.querySelector('h1, .preview-header h1');
+        const titleElement = domCache.get('h1, .preview-header h1');
         if (titleElement && this.editMode) {
             const productName = this.getProductDisplayName();
             titleElement.textContent = `Edit ${productName}`;
         }
         
         // Update button text and behavior
-        const addButton = document.querySelector('#addToCartBtn, .add-to-cart-btn, button[onclick*="addToCart"]');
+        const addButton = domCache.get('#addToCartBtn, .add-to-cart-btn, button[onclick*="addToCart"]');
         if (addButton) {
             // Clone and replace button to remove all existing event listeners
             const newButton = addButton.cloneNode(true);
@@ -277,19 +276,19 @@ class ProductConfigurator {
     }
     
     getCurrentPricing() {
-        // Extract pricing from the page elements
+        // Extract pricing from the page elements (cached)
         const pricing = {};
-        
-        const unitPriceElement = document.querySelector('.unit-price, #unitPrice');
+
+        const unitPriceElement = domCache.get('.unit-price, #unitPrice');
         if (unitPriceElement) {
             pricing.unitPrice = parseFloat(unitPriceElement.textContent.replace('$', '')) || 0;
         }
-        
-        const totalPriceElement = document.querySelector('.total-price, #totalPrice');
+
+        const totalPriceElement = domCache.get('.total-price, #totalPrice');
         if (totalPriceElement) {
             pricing.totalPrice = parseFloat(totalPriceElement.textContent.replace('$', '')) || 0;
         }
-        
+
         // Add any other pricing fields that might be relevant
         return pricing;
     }
@@ -337,6 +336,28 @@ class ProductConfigurator {
         return fallbacks[this.productType] || { minQuantity: 25, maxQuantity: 2500 };
     }
 
+    async waitForDependencies() {
+        // Wait for critical functions to be available
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        while (attempts < maxAttempts) {
+            const hasProductFunction = this.getProductPricingFunction() !== null;
+            const hasPricingData = (typeof window.pricingConfigs !== 'undefined' || typeof window.dbManager !== 'undefined');
+
+            if (hasProductFunction && hasPricingData) {
+                return;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (attempts >= maxAttempts) {
+            console.warn('⚠️ Some dependencies may not be ready, proceeding anyway');
+        }
+    }
+
     async init() {
         
         try {
@@ -362,30 +383,13 @@ class ProductConfigurator {
         }
     }
 
-    async waitForDependencies() {
-        // Wait for critical functions to be available
-        let attempts = 0;
-        const maxAttempts = 10;
-        
-        while (attempts < maxAttempts) {
-            const hasProductFunction = this.getProductPricingFunction() !== null;
-            const hasPricingData = (typeof window.pricingConfigs !== 'undefined' || typeof window.dbManager !== 'undefined');
-            
-            if (hasProductFunction && hasPricingData) {
-                return;
-            }
-            
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-        }
-        
-        if (attempts >= maxAttempts) {
-            console.warn('⚠️ Some dependencies may not be ready, proceeding anyway');
-        }
-    }
-
     getProductPricingFunction() {
-        // Return the appropriate pricing function for the current product type
+        // Check if we should use the unified PricingEngine for this product type
+        if (this.shouldUsePricingEngine()) {
+            return this.callUnifiedPricingEngine.bind(this);
+        }
+
+        // Return the appropriate legacy pricing function for the current product type
         switch (this.productType) {
             case 'brochures':
                 return typeof calculateBrochurePrice === 'function' ? calculateBrochurePrice : null;
@@ -416,9 +420,63 @@ class ProductConfigurator {
         }
     }
 
+    shouldUsePricingEngine() {
+        // Check if PricingEngine is available and if this product type should use it
+        if (typeof PricingEngine === 'undefined') {
+            return false;
+        }
+
+        // List of product types that should use the unified PricingEngine
+        const unifiedProductTypes = ['brochures', 'postcards', 'flyers', 'bookmarks', 'name-tags', 'table-tents', 'booklets', 'notebooks', 'notepads'];
+
+        return unifiedProductTypes.includes(this.productType);
+    }
+
+    async callUnifiedPricingEngine(formData) {
+        if (!this.pricingEngine) {
+            this.pricingEngine = new PricingEngine();
+        }
+
+        try {
+            const result = await this.pricingEngine.calculatePrice(this.productType, formData);
+            console.log(`🚀 Using unified PricingEngine for ${this.productType}:`, result);
+            return result;
+        } catch (error) {
+            console.error(`❌ PricingEngine failed for ${this.productType}, falling back to legacy:`, error);
+
+            // Fallback to legacy function if available
+            const legacyFunction = this.getLegacyPricingFunction();
+            if (legacyFunction) {
+                return await legacyFunction(formData);
+            }
+
+            throw error;
+        }
+    }
+
+    getLegacyPricingFunction() {
+        // Return the legacy pricing function for fallback
+        switch (this.productType) {
+            case 'brochures':
+                return typeof calculateBrochurePrice === 'function' ? calculateBrochurePrice : null;
+            case 'postcards':
+                return typeof calculatePostcardPrice === 'function' ? calculatePostcardPrice : null;
+            case 'name-tags':
+                return typeof calculateNameTagPrice === 'function' ? calculateNameTagPrice : null;
+            case 'flyers':
+                return typeof calculateFlyerPrice === 'function' ? calculateFlyerPrice : null;
+            case 'bookmarks':
+                return typeof calculateBookmarkPrice === 'function' ? calculateBookmarkPrice : null;
+            case 'booklets':
+                return typeof calculateBookletPrice === 'function' ? calculateBookletPrice : null;
+            default:
+                return null;
+        }
+    }
+
     setupEventListeners() {
         // Option card selections
-        document.querySelectorAll('.option-card').forEach(card => {
+        domCache.getAll('.option-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const option = card.dataset.option;
                 const value = card.dataset.value;
@@ -426,10 +484,10 @@ class ProductConfigurator {
             });
         });
 
-        // Quantity controls
-        const quantityInput = document.getElementById('quantity');
-        const minusBtn = document.querySelector('.quantity-btn.minus');
-        const plusBtn = document.querySelector('.quantity-btn.plus');
+        // Quantity controls (cached)
+        const quantityInput = domCache.getId('quantity');
+        const minusBtn = domCache.get('.quantity-btn.minus');
+        const plusBtn = domCache.get('.quantity-btn.plus');
         
         if (quantityInput) {
             quantityInput.addEventListener('input', (e) => {
@@ -461,17 +519,17 @@ class ProductConfigurator {
             });
         }
 
-        // Quantity suggestions
-        document.querySelectorAll('.qty-suggestion').forEach(btn => {
+        // Quantity suggestions (cached)
+        domCache.getAll('.qty-suggestion').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const qty = parseInt(e.target.dataset.qty);
                 this.updateQuantity(qty);
             });
         });
 
-        // Cart and quote buttons
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        const requestQuoteBtn = document.getElementById('requestQuoteBtn');
+        // Cart and quote buttons (cached)
+        const addToCartBtn = domCache.getId('addToCartBtn');
+        const requestQuoteBtn = domCache.getId('requestQuoteBtn');
 
         // Only add the addToCart listener if we're NOT in edit mode
         if (addToCartBtn && !this.editMode) {
@@ -500,8 +558,8 @@ class ProductConfigurator {
 
         // Poster custom size listeners
         if (this.productType === 'posters') {
-            const customWidthInput = document.getElementById('customWidth');
-            const customHeightInput = document.getElementById('customHeight');
+            const customWidthInput = domCache.getId('customWidth');
+            const customHeightInput = domCache.getId('customHeight');
             
             if (customWidthInput && customHeightInput) {
                 customWidthInput.addEventListener('input', () => {
@@ -520,8 +578,8 @@ class ProductConfigurator {
     }
 
     selectOption(option, value, cardElement) {
-        // Remove selected class from other cards in the same group
-        const optionGroup = document.querySelectorAll(`[data-option="${option}"]`);
+        // Remove selected class from other cards in the same group (cached)
+        const optionGroup = domCache.getAll(`[data-option="${option}"]`);
         optionGroup.forEach(card => {
             card.classList.remove('selected');
             const radio = card.querySelector('input[type="radio"]');
@@ -570,7 +628,8 @@ class ProductConfigurator {
             'stickerType': 'stickerType',
             'garment': 'garmentType',
             'decoration': 'decorationType',
-            'bagType': 'bagType'
+            'bagType': 'bagType',
+            'productionType': 'productionType'
         };
         return mapping[option] || option;
     }
@@ -581,7 +640,7 @@ class ProductConfigurator {
         const quantity = Math.max(constraints.minQuantity, Math.min(constraints.maxQuantity, newQuantity));
         
         // Update input field
-        const quantityInput = document.getElementById('quantity');
+        const quantityInput = domCache.getId('quantity');
         if (quantityInput) {
             quantityInput.value = quantity;
         }
@@ -611,7 +670,7 @@ class ProductConfigurator {
     }
 
     validateQuantity() {
-        const quantityInput = document.getElementById('quantity');
+        const quantityInput = domCache.getId('quantity');
         const value = parseInt(quantityInput.value);
         const constraints = this.getProductConstraints();
         
@@ -645,14 +704,14 @@ class ProductConfigurator {
         this.currentConfig.sizeBreakdown = sizeBreakdown;
         
         // Update display elements if they exist
-        const totalQuantityDisplay = document.getElementById('totalQuantity');
+        const totalQuantityDisplay = domCache.getId('totalQuantity');
         if (totalQuantityDisplay) {
             totalQuantityDisplay.textContent = totalQuantity;
         }
         
         // Update size breakdown summary display
-        const sizeBreakdownSummary = document.getElementById('sizeBreakdownSummary');
-        const sizeBreakdownDisplay = document.getElementById('sizeBreakdownDisplay');
+        const sizeBreakdownSummary = domCache.getId('sizeBreakdownSummary');
+        const sizeBreakdownDisplay = domCache.getId('sizeBreakdownDisplay');
         
         if (sizeBreakdownSummary && sizeBreakdownDisplay) {
             if (Object.keys(sizeBreakdown).length > 0) {
@@ -744,12 +803,12 @@ class ProductConfigurator {
 
         if (this.productType === 'booklets') {
             // Handle booklet-specific summary fields
-            const summarySize = document.getElementById('summarySize');
-            const summaryPages = document.getElementById('summaryPages');
-            const summaryCoverPaper = document.getElementById('summaryCoverPaper');
-            const summaryTextPaper = document.getElementById('summaryTextPaper');
-            const summaryTurnaround = document.getElementById('summaryTurnaround');
-            const summaryQuantity = document.getElementById('summaryQuantity');
+            const summarySize = domCache.getId('summarySize');
+            const summaryPages = domCache.getId('summaryPages');
+            const summaryCoverPaper = domCache.getId('summaryCoverPaper');
+            const summaryTextPaper = domCache.getId('summaryTextPaper');
+            const summaryTurnaround = domCache.getId('summaryTurnaround');
+            const summaryQuantity = domCache.getId('summaryQuantity');
 
             if (summarySize) summarySize.textContent = this.currentConfig.size;
             if (summaryPages) summaryPages.textContent = `${this.currentConfig.pages} pages`;
@@ -759,11 +818,11 @@ class ProductConfigurator {
             if (summaryQuantity) summaryQuantity.textContent = `${this.currentConfig.quantity} pieces`;
         } else {
             // Handle standard product summary fields
-            const summarySize = document.getElementById('summarySize');
-            const summaryFold = document.getElementById('summaryFold');
-            const summaryPaper = document.getElementById('summaryPaper');
-            const summaryTurnaround = document.getElementById('summaryTurnaround');
-            const summaryQuantity = document.getElementById('summaryQuantity');
+            const summarySize = domCache.getId('summarySize');
+            const summaryFold = domCache.getId('summaryFold');
+            const summaryPaper = domCache.getId('summaryPaper');
+            const summaryTurnaround = domCache.getId('summaryTurnaround');
+            const summaryQuantity = domCache.getId('summaryQuantity');
 
             if (summarySize) {
                 if (this.productType === 'apparel') {
@@ -781,7 +840,7 @@ class ProductConfigurator {
             
             // Handle poster material field separately
             if (this.productType === 'posters') {
-                const summaryMaterial = document.getElementById('summaryMaterial');
+                const summaryMaterial = domCache.getId('summaryMaterial');
                 if (summaryMaterial) {
                     summaryMaterial.textContent = summaryMapping.material[this.currentConfig.material];
                 }
@@ -929,6 +988,7 @@ class ProductConfigurator {
             // Sticker-specific fields
             formData.append('size', config.size);
             formData.append('stickerType', config.stickerType);
+            formData.append('productionType', config.productionType);
         } else if (this.productType === 'apparel') {
             // Apparel-specific fields
             formData.append('garmentType', config.garmentType);
@@ -972,9 +1032,9 @@ class ProductConfigurator {
     }
 
     updatePricingDisplay(status) {
-        const livePrice = document.getElementById('livePrice');
-        const liveUnitPrice = document.getElementById('liveUnitPrice');
-        const priceStatus = document.getElementById('priceStatus');
+        const livePrice = domCache.getId('livePrice');
+        const liveUnitPrice = domCache.getId('liveUnitPrice');
+        const priceStatus = domCache.getId('priceStatus');
 
         switch (status) {
             case 'calculating':
@@ -1010,15 +1070,15 @@ class ProductConfigurator {
         const breakdown = this.currentPricing.breakdown;
         
         // Update breakdown values
-        const setupCost = document.getElementById('setupCost');
-        const productionCost = document.getElementById('productionCost');
-        const materialCost = document.getElementById('materialCost');
-        const finishingCost = document.getElementById('finishingCost');
-        const subtotal = document.getElementById('subtotal');
-        const rushMultiplier = document.getElementById('rushMultiplier');
-        const rushMultiplierItem = document.getElementById('rushMultiplierItem');
-        const breakdownTotal = document.getElementById('breakdownTotal');
-        const sheetsRequired = document.getElementById('sheetsRequired');
+        const setupCost = domCache.getId('setupCost');
+        const productionCost = domCache.getId('productionCost');
+        const materialCost = domCache.getId('materialCost');
+        const finishingCost = domCache.getId('finishingCost');
+        const subtotal = domCache.getId('subtotal');
+        const rushMultiplier = domCache.getId('rushMultiplier');
+        const rushMultiplierItem = domCache.getId('rushMultiplierItem');
+        const breakdownTotal = domCache.getId('breakdownTotal');
+        const sheetsRequired = domCache.getId('sheetsRequired');
 
         if (setupCost) setupCost.textContent = `$${(breakdown.setupFee || 0).toFixed(2)}`;
         if (productionCost) productionCost.textContent = `$${(breakdown.productionCost || 0).toFixed(2)}`;
@@ -1031,40 +1091,40 @@ class ProductConfigurator {
         // Update red cell breakdown elements
         if (this.productType === 'magnets' || this.productType === 'stickers') {
             // Single supplier cost breakdown for magnets and stickers
-            const redSupplierCost = document.getElementById('redSupplierCost');
-            const redMarkupCost = document.getElementById('redMarkupCost');
-            const redSubtotal = document.getElementById('redSubtotal');
+            const redSupplierCost = domCache.getId('redSupplierCost');
+            const redMarkupCost = domCache.getId('redMarkupCost');
+            const redSubtotal = domCache.getId('redSubtotal');
 
             if (redSupplierCost) redSupplierCost.textContent = `$${(breakdown.supplierCost || 0).toFixed(2)}`;
             if (redMarkupCost) redMarkupCost.textContent = `$${((breakdown.priceAfterMarkup || 0) - (breakdown.supplierCost || 0)).toFixed(2)}`;
             if (redSubtotal) redSubtotal.textContent = `$${(breakdown.priceAfterMarkup || 0).toFixed(2)}`;
         } else if (this.productType === 'apparel') {
             // Two-line breakdown for apparel: garment + printing
-            const redStockCost = document.getElementById('redStockCost');
-            const redPrintingCost = document.getElementById('redPrintingCost');
-            const redSubtotal = document.getElementById('redSubtotal');
+            const redStockCost = domCache.getId('redStockCost');
+            const redPrintingCost = domCache.getId('redPrintingCost');
+            const redSubtotal = domCache.getId('redSubtotal');
 
             if (redStockCost) redStockCost.textContent = `$${(breakdown.garmentSubtotal || 0).toFixed(2)}`;
             if (redPrintingCost) redPrintingCost.textContent = `$${(breakdown.printingSubtotal || 0).toFixed(2)}`;
             if (redSubtotal) redSubtotal.textContent = `$${(breakdown.subtotal || 0).toFixed(2)}`;
         } else if (this.productType === 'tote-bags') {
             // Two-line breakdown for tote bags: bag + printing
-            const redStockCost = document.getElementById('redStockCost');
-            const redPrintingCost = document.getElementById('redPrintingCost');
-            const redSubtotal = document.getElementById('redSubtotal');
+            const redStockCost = domCache.getId('redStockCost');
+            const redPrintingCost = domCache.getId('redPrintingCost');
+            const redSubtotal = domCache.getId('redSubtotal');
 
             if (redStockCost) redStockCost.textContent = `$${(breakdown.bagCost || 0).toFixed(2)}`;
             if (redPrintingCost) redPrintingCost.textContent = `$${(breakdown.printingCost || 0).toFixed(2)}`;
             if (redSubtotal) redSubtotal.textContent = `$${(breakdown.subtotal || 0).toFixed(2)}`;
         } else {
             // Standard product red cell breakdown
-            const redSetupCost = document.getElementById('redSetupCost');
-            const redProductionCost = document.getElementById('redProductionCost');
-            const redMaterialCost = document.getElementById('redMaterialCost');
-            const redFinishingCost = document.getElementById('redFinishingCost');
-            const redSubtotal = document.getElementById('redSubtotal');
-            const redRushMultiplier = document.getElementById('redRushMultiplier');
-            const redRushMultiplierItem = document.getElementById('redRushMultiplierItem');
+            const redSetupCost = domCache.getId('redSetupCost');
+            const redProductionCost = domCache.getId('redProductionCost');
+            const redMaterialCost = domCache.getId('redMaterialCost');
+            const redFinishingCost = domCache.getId('redFinishingCost');
+            const redSubtotal = domCache.getId('redSubtotal');
+            const redRushMultiplier = domCache.getId('redRushMultiplier');
+            const redRushMultiplierItem = domCache.getId('redRushMultiplierItem');
 
             if (redSetupCost) redSetupCost.textContent = `$${(breakdown.setupFee || 0).toFixed(2)}`;
             if (redProductionCost) redProductionCost.textContent = `$${(breakdown.productionCost || 0).toFixed(2)}`;
@@ -1074,8 +1134,8 @@ class ProductConfigurator {
         }
 
         // Show/hide rush multiplier
-        const redRushMultiplier = document.getElementById('redRushMultiplier');
-        const redRushMultiplierItem = document.getElementById('redRushMultiplierItem');
+        const redRushMultiplier = domCache.getId('redRushMultiplier');
+        const redRushMultiplierItem = domCache.getId('redRushMultiplierItem');
         
         if (breakdown.rushMultiplier && breakdown.rushMultiplier > 1) {
             if (rushMultiplier) rushMultiplier.textContent = `${breakdown.rushMultiplier.toFixed(1)}x`;
@@ -1089,7 +1149,7 @@ class ProductConfigurator {
     }
 
     enableAddToCart() {
-        const addToCartBtn = document.getElementById('addToCartBtn');
+        const addToCartBtn = domCache.getId('addToCartBtn');
         if (addToCartBtn) {
             addToCartBtn.disabled = false;
         }
@@ -1173,7 +1233,7 @@ class ProductConfigurator {
     }
 
     showAddToCartSuccess() {
-        const addToCartBtn = document.getElementById('addToCartBtn');
+        const addToCartBtn = domCache.getId('addToCartBtn');
         if (addToCartBtn) {
             const originalText = addToCartBtn.innerHTML;
             addToCartBtn.innerHTML = `
@@ -1216,15 +1276,15 @@ class ProductConfigurator {
 
     // Poster-specific methods
     handlePosterSizeSelection(sizeValue) {
-        const customSizeInputs = document.getElementById('customSizeInputs');
+        const customSizeInputs = domCache.getId('customSizeInputs');
         
         if (sizeValue === 'custom') {
             // Show custom size inputs
             if (customSizeInputs) {
                 customSizeInputs.style.display = 'block';
                 // Initialize with default values if empty
-                const widthInput = document.getElementById('customWidth');
-                const heightInput = document.getElementById('customHeight');
+                const widthInput = domCache.getId('customWidth');
+                const heightInput = domCache.getId('customHeight');
                 if (widthInput && !widthInput.value) widthInput.value = '24';
                 if (heightInput && !heightInput.value) heightInput.value = '18';
                 this.updateCustomSizeDisplay();
@@ -1239,8 +1299,8 @@ class ProductConfigurator {
     }
 
     updateMaterialConstraints(materialValue) {
-        const widthInput = document.getElementById('customWidth');
-        const widthConstraint = document.getElementById('widthConstraint');
+        const widthInput = domCache.getId('customWidth');
+        const widthConstraint = domCache.getId('widthConstraint');
         
         if (widthInput && widthConstraint) {
             let maxWidth;
@@ -1276,10 +1336,10 @@ class ProductConfigurator {
     }
 
     updateCustomSizeDisplay() {
-        const widthInput = document.getElementById('customWidth');
-        const heightInput = document.getElementById('customHeight');
-        const sizeDisplay = document.getElementById('customSizeDisplay');
-        const sqftDisplay = document.getElementById('customSqftDisplay');
+        const widthInput = domCache.getId('customWidth');
+        const heightInput = domCache.getId('customHeight');
+        const sizeDisplay = domCache.getId('customSizeDisplay');
+        const sqftDisplay = domCache.getId('customSqftDisplay');
         
         if (widthInput && heightInput && sizeDisplay && sqftDisplay) {
             const width = parseFloat(widthInput.value) || 0;
@@ -1302,8 +1362,8 @@ class ProductConfigurator {
     }
 
     validateCustomSize() {
-        const widthInput = document.getElementById('customWidth');
-        const heightInput = document.getElementById('customHeight');
+        const widthInput = domCache.getId('customWidth');
+        const heightInput = domCache.getId('customHeight');
         
         if (!widthInput || !heightInput) return;
         
@@ -1344,7 +1404,7 @@ class ProductConfigurator {
     }
 
     showValidationMessage(message, type = 'error') {
-        const validationDiv = document.getElementById('customSizeValidation');
+        const validationDiv = domCache.getId('customSizeValidation');
         if (validationDiv) {
             validationDiv.textContent = message;
             validationDiv.className = `validation-message ${type}`;
@@ -1353,7 +1413,7 @@ class ProductConfigurator {
     }
 
     hideValidationMessage() {
-        const validationDiv = document.getElementById('customSizeValidation');
+        const validationDiv = domCache.getId('customSizeValidation');
         if (validationDiv) {
             validationDiv.style.display = 'none';
         }
@@ -1439,7 +1499,7 @@ class ProductConfigurator {
         }
         
         if (config.pages) {
-            const pagesInput = document.getElementById('pages');
+            const pagesInput = domCache.getId('pages');
             if (pagesInput) {
                 pagesInput.value = config.pages;
             }

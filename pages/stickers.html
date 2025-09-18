@@ -250,27 +250,74 @@
                             </div>
                         </div>
 
+                        <!-- Quality Tier Configuration -->
+                        <div class="config-section">
+                            <div class="section-header">
+                                <h3>Quality Tier</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip" 
+                                        title="Choose between standard in-house or premium supplier production">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="option-grid">
+                                <label class="option-card selected" data-option="productionType" data-value="standard">
+                                    <input type="radio" name="productionType" value="standard" checked hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Standard</div>
+                                        <div class="option-subtitle">In-House Production</div>
+                                        <div class="option-price">Faster & More Affordable</div>
+                                        <div class="option-badge recommended">Best Value</div>
+                                    </div>
+                                </label>
+                                <label class="option-card" data-option="productionType" data-value="premium">
+                                    <input type="radio" name="productionType" value="premium" hidden>
+                                    <div class="option-content">
+                                        <div class="option-title">Premium</div>
+                                        <div class="option-subtitle">Supplier Die-Cut</div>
+                                        <div class="option-price">Highest Quality</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- Type Configuration -->
                         <div class="config-section">
                             <div class="section-header">
                                 <h3>Finish</h3>
                             </div>
-                            <div class="option-grid">
-                                <label class="option-card selected" data-option="type" data-value="kiss-cut-matte">
-                                    <input type="radio" name="stickerType" value="kiss-cut-matte" checked hidden>
-                                    <div class="option-content">
-                                        <div class="option-title">Kiss Cut Matte</div>
-                                        <div class="option-subtitle">Premium Matte Finish</div>
-                                        <div class="option-badge recommended">Recommended</div>
-                                    </div>
-                                </label>
-                                <label class="option-card" data-option="type" data-value="kiss-cut-gloss">
-                                    <input type="radio" name="stickerType" value="kiss-cut-gloss" hidden>
-                                    <div class="option-content">
-                                        <div class="option-title">Kiss Cut Gloss</div>
-                                        <div class="option-subtitle">Premium Gloss Finish</div>
-                                    </div>
-                                </label>
+                            <div class="option-grid" id="finishOptions">
+                                <!-- Standard options (default) -->
+                                <div class="standard-options">
+                                    <label class="option-card selected" data-option="type" data-value="vinyl-matte">
+                                        <input type="radio" name="stickerType" value="vinyl-matte" checked hidden>
+                                        <div class="option-content">
+                                            <div class="option-title">Vinyl Matte</div>
+                                            <div class="option-subtitle">Durable Matte Finish</div>
+                                            <div class="option-badge recommended">Kiss-Cut</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Premium options (hidden by default) -->
+                                <div class="premium-options" style="display: none;">
+                                    <label class="option-card" data-option="type" data-value="kiss-cut-matte">
+                                        <input type="radio" name="stickerType" value="kiss-cut-matte" hidden>
+                                        <div class="option-content">
+                                            <div class="option-title">Kiss Cut Matte</div>
+                                            <div class="option-subtitle">Premium Matte Finish</div>
+                                            <div class="option-badge recommended">Recommended</div>
+                                        </div>
+                                    </label>
+                                    <label class="option-card" data-option="type" data-value="kiss-cut-gloss">
+                                        <input type="radio" name="stickerType" value="kiss-cut-gloss" hidden>
+                                        <div class="option-content">
+                                            <div class="option-title">Kiss Cut Gloss</div>
+                                            <div class="option-subtitle">Premium Gloss Finish</div>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -287,13 +334,25 @@
                             </div>
                             <div class="quantity-input-group">
                                 <input type="number" class="form-control" id="quantity" name="quantity" 
-                                       value="25" min="25" max="1000" step="5" required>
-                                <div class="quantity-suggestions">
-                                    <button type="button" class="qty-suggestion active" data-qty="25">25</button>
-                                    <button type="button" class="qty-suggestion" data-qty="50">50</button>
-                                    <button type="button" class="qty-suggestion" data-qty="100">100</button>
-                                    <button type="button" class="qty-suggestion" data-qty="250">250</button>
-                                    <button type="button" class="qty-suggestion" data-qty="500">500</button>
+                                       value="25" min="10" max="1000" step="1" required>
+                                <div class="quantity-suggestions" id="quantitySuggestions">
+                                    <!-- Standard suggestions (default) -->
+                                    <div class="standard-suggestions">
+                                        <button type="button" class="qty-suggestion" data-qty="10">10</button>
+                                        <button type="button" class="qty-suggestion active" data-qty="25">25</button>
+                                        <button type="button" class="qty-suggestion" data-qty="50">50</button>
+                                        <button type="button" class="qty-suggestion" data-qty="100">100</button>
+                                        <button type="button" class="qty-suggestion" data-qty="250">250</button>
+                                    </div>
+                                    
+                                    <!-- Premium suggestions (hidden by default) -->
+                                    <div class="premium-suggestions" style="display: none;">
+                                        <button type="button" class="qty-suggestion active" data-qty="25">25</button>
+                                        <button type="button" class="qty-suggestion" data-qty="50">50</button>
+                                        <button type="button" class="qty-suggestion" data-qty="100">100</button>
+                                        <button type="button" class="qty-suggestion" data-qty="250">250</button>
+                                        <button type="button" class="qty-suggestion" data-qty="500">500</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -348,6 +407,7 @@
     <script src="../js/promoConfig.js"></script>
     <script src="../js/promoCalculator.js"></script>
     <script src="../js/cart.js"></script>
+    <script src="../js/domCache.js"></script>
     <script src="../js/configurator.js"></script>
     <script src="../js/header.js"></script>
     <script src="../js/app.js"></script>
@@ -423,8 +483,74 @@
             }
         };
 
-        // Initialize help modal functionality
+        // Initialize tier switching functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Handle production tier switching
+            const productionTypeCards = document.querySelectorAll('[data-option="productionType"]');
+            const finishOptions = document.getElementById('finishOptions');
+            const quantityInput = document.getElementById('quantity');
+            const quantitySuggestions = document.getElementById('quantitySuggestions');
+            
+            productionTypeCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const value = this.dataset.value;
+                    
+                    if (value === 'standard') {
+                        // Show standard options
+                        finishOptions.querySelector('.standard-options').style.display = 'block';
+                        finishOptions.querySelector('.premium-options').style.display = 'none';
+                        quantitySuggestions.querySelector('.standard-suggestions').style.display = 'block';
+                        quantitySuggestions.querySelector('.premium-suggestions').style.display = 'none';
+                        
+                        // Update quantity constraints for standard
+                        quantityInput.min = '10';
+                        quantityInput.step = '1';
+                        quantityInput.value = '25';
+                        
+                        // Select default standard finish
+                        const defaultFinish = finishOptions.querySelector('.standard-options .option-card[data-value="vinyl-matte"]');
+                        if (defaultFinish) {
+                            finishOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                            defaultFinish.classList.add('selected');
+                            defaultFinish.querySelector('input').checked = true;
+                        }
+                    } else {
+                        // Show premium options
+                        finishOptions.querySelector('.standard-options').style.display = 'none';
+                        finishOptions.querySelector('.premium-options').style.display = 'block';
+                        quantitySuggestions.querySelector('.standard-suggestions').style.display = 'none';
+                        quantitySuggestions.querySelector('.premium-suggestions').style.display = 'block';
+                        
+                        // Update quantity constraints for premium
+                        quantityInput.min = '25';
+                        quantityInput.step = '5';
+                        quantityInput.value = '25';
+                        
+                        // Select default premium finish
+                        const defaultFinish = finishOptions.querySelector('.premium-options .option-card[data-value="kiss-cut-matte"]');
+                        if (defaultFinish) {
+                            finishOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                            defaultFinish.classList.add('selected');
+                            defaultFinish.querySelector('input').checked = true;
+                        }
+                    }
+                    
+                    // Update quantity suggestions active state
+                    quantitySuggestions.querySelectorAll('.qty-suggestion').forEach(btn => btn.classList.remove('active'));
+                    const activeQty = value === 'standard' ? '25' : '25';
+                    const activeBtn = quantitySuggestions.querySelector(`[data-qty="${activeQty}"]`);
+                    if (activeBtn && activeBtn.offsetParent !== null) {
+                        activeBtn.classList.add('active');
+                    }
+                    
+                    // Trigger pricing update if configurator exists
+                    if (window.configurator && window.configurator.calculatePrice) {
+                        window.configurator.calculatePrice();
+                    }
+                });
+            });
+            
+            // Initialize help modal functionality
             const helpToggles = document.querySelectorAll('.help-toggle');
             const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
             const helpModalLabel = document.getElementById('helpModalLabel');
