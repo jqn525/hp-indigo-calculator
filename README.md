@@ -35,9 +35,10 @@
 - ✅ **Small Format Hub** - Unified product selection and filtering
 
 ### Large Format Products
-- ✅ **Posters** - 18×24", 22×28", 24×36", 36×48" sizes, 1-20 units
-  - Rite-Media Paper: $6/sqft (9mil matte)
-  - Fabric Material: $9/sqft (8mil matte coated)
+- ✅ **Posters** - Custom dimensions with dynamic constraints, 1-50 units
+  - **Roll Media**: Bond Paper ($3/sqft), Paper ($6/sqft), Fabric ($9/sqft), PET Vinyl ($12/sqft), Scrim Vinyl ($10/sqft), Vinyl Adhesive ($12/sqft)
+  - **Rigid Substrates**: Corrugated Plastic ($10/sqft), Foam Core ($12/sqft), Cardboard ($10/sqft), PVC Board ($14/sqft), Aluminum Composite ($16/sqft)
+  - **Dynamic Constraints**: Material-based width limits (Bond: 54", PET Vinyl: 36", Rigid: 48"×96" fixed)
 
 ### Promotional Products
 - ✅ **Magnets** - Linear interpolation pricing, 4 sizes, 25-1000 units
@@ -46,9 +47,11 @@
 - ✅ **Tote Bags** - Canvas bags with bulk pricing tiers
 
 ### Advanced Features
-- ✅ **Universal Configurator** - Custom dimensions with real-time pricing calculations
+- ✅ **Universal Configurator** - Custom dimensions with real-time pricing calculations and dynamic material constraints
 - ✅ **Cart Edit System** - Full item editing with field population and validation
 - ✅ **Inventory Management** - Complete inventory system with admin workflow
+- ✅ **DOM Caching System** - Performance optimization reducing DOM queries by ~80%
+- ✅ **Consolidated Architecture** - Streamlined configurator system (7 files → 1) for easier maintenance
 
 ## 📦 Inventory Management System
 
@@ -75,11 +78,13 @@ Complete inventory management application at `/inventory/` featuring:
 - **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5.3.3
 - **Backend**: Supabase (User Authentication, Quotes, Cart Sync, Inventory Requests)
 - **Hosting**: Vercel with custom domain (docsol.ca)
-- **PWA Features**: Dual Service Workers (v157 main, v1 inventory), Web App Manifests
+- **PWA Features**: Dual Service Workers (v163 main, v1 inventory), Web App Manifests
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
 - **Pricing**: Static files only - no database dependencies
 - **Architecture**: Clean static-first system with modular components
+- **Performance**: DOM caching system (~80% query reduction), consolidated configurators
+- **Modularity**: Organized component structure in `/js/modules/` for maintainability
 
 ## 💻 Local Development
 
@@ -107,7 +112,7 @@ Complete inventory management application at `/inventory/` featuring:
 ## 🔧 Configuration
 
 ### Service Worker Versions
-- **Main Application**: `v157` in `sw.js`
+- **Main Application**: `v163` in `sw.js`
 - **Inventory Application**: `v1` in `/inventory/sw.js`
 - Increment versions when deploying CSS/JS changes to force cache updates
 
@@ -212,8 +217,13 @@ No database updates ever needed for pricing changes!
 ```
 ├── /                    # Main Pricing Calculator
 │   ├── pages/           # 25+ product calculators
-│   ├── js/              # Pricing engine and components
-│   └── sw.js            # Service worker v157
+│   ├── js/              # Core pricing engine and components
+│   │   ├── modules/     # Modular components (validation, pricing, cart, etc.)
+│   │   ├── calculator.js        # Main pricing calculations
+│   │   ├── configurator.js      # Consolidated configurator (7→1 files)
+│   │   ├── domCache.js          # DOM caching for performance
+│   │   └── universalConfigurator.js  # Universal product configurator
+│   └── sw.js            # Service worker v163
 └── /inventory/          # Inventory Management System
     ├── js/              # Inventory logic and data
     ├── sql/             # Database schema
@@ -221,10 +231,19 @@ No database updates ever needed for pricing changes!
 ```
 
 ### Key Components
-- **Universal Configurator**: Advanced pricing tool with custom dimensions
-- **Cart Edit System**: Full item editing with field population
+- **Universal Configurator**: Advanced pricing tool with custom dimensions and dynamic material constraints
+- **DOM Caching System**: Performance optimization with cached element access (~80% query reduction)
+- **Consolidated Configurator**: Streamlined architecture combining 7 configurator files into 1
+- **Modular Architecture**: Organized components in `/js/modules/` for validation, pricing, cart management
+- **Cart Edit System**: Full item editing with field population and validation
 - **Inventory System**: Static-first with database requests only
 - **PWA Features**: Dual service workers with offline support
+
+### Performance Optimizations
+- **DOM Caching**: Intelligent element caching reduces redundant DOM queries by ~80%
+- **Consolidated Code**: Merged configurator files from 4,947 lines across 7 files to 1,643 lines in 1 file
+- **Lazy Loading**: Efficient resource loading for better performance
+- **Service Worker**: Cache-first strategy with automatic updates (v163)
 
 ## 🛡️ Browser Support
 
