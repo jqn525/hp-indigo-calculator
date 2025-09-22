@@ -101,8 +101,8 @@ class AuthGuard {
   redirectToLogin() {
     const currentPath = window.location.pathname + window.location.search;
     const returnUrl = encodeURIComponent(currentPath);
-    
-    window.location.href = `/login.html?return=${returnUrl}`;
+
+    window.location.href = `pages/signin.html?return=${returnUrl}`;
   }
 
   setupGlobalAuth() {
@@ -171,7 +171,7 @@ class AuthGuard {
       this.clearAuth();
       
       // Redirect to login page
-      window.location.href = 'login.html';
+      window.location.href = 'pages/signin.html';
     }
   }
 

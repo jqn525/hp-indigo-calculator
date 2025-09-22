@@ -1,18 +1,17 @@
-# SFU Document Solutions Dual Application Suite
+# SFU Document Solutions Streamlined Pricing Calculator
 
-**Pricing Calculator + Inventory Management** - Two integrated Progressive Web Apps serving SFU Document Solutions with comprehensive digital printing pricing and complete inventory management.
+**Streamlined Staff Pricing Tool** - A focused Progressive Web App designed specifically for SFU Document Solutions staff with direct access to the universal pricing configurator.
 
 ## ✨ Features
 
-- ⚡ **Static-First Pricing** - Lightning-fast calculations with zero database dependencies
-- 🔐 **Secure Authentication** - Front-door login system with SFU branding
-- ☁️ **Cloud Integration** - Supabase database for user data and quotes only
-- 📱 **Progressive Web App** - Installable on tablets and phones (dual PWA support)
+- ⚡ **Universal Configurator** - Single powerful tool for pricing any print product
+- 🔐 **Staff-Focused Login** - Direct access to pricing tools without marketing content
+- ☁️ **Cloud Integration** - Supabase database for user data and quotes
+- 📱 **Progressive Web App** - Installable on tablets and phones
 - 🔄 **Offline Support** - Works without internet after first visit
 - 📋 **Quote Management** - Save, view, and manage customer quotes
 - 🛒 **Cart System** - Batch multiple products with full edit functionality
-- 📦 **Inventory Management** - Complete inventory system with request workflow
-- 🎛️ **Universal Configurator** - Custom dimensions and real-time pricing for any product
+- 📦 **Inventory Management** - Complete inventory system at `/inventory/`
 - 🎨 **SFU Branding** - Official SFU red color scheme and typography
 
 ## 🌐 Live Applications
@@ -20,38 +19,22 @@
 - **Pricing Calculator**: [https://docsol.ca](https://docsol.ca)
 - **Inventory Management**: [https://docsol.ca/inventory/](https://docsol.ca/inventory/)
 
-## 🧮 Available Calculators
+## 🎛️ Universal Configurator
 
-### Small Format Products
-- ✅ **Brochures** - Tri-fold and bi-fold options, 25-2500 units (e=0.75)
-- ✅ **Postcards** - 4 standard sizes, 100-5000 units (e=0.70)
-- ✅ **Flyers** - 4 standard sizes, 25-2500 units (e=0.70)
-- ✅ **Bookmarks** - 3 sizes on premium cover stock, 100-2500 units (e=0.65)
-- ✅ **Name Tags** - 3 sizes with optimized pricing, 50-5000 units (e=0.65)
-- ✅ **Booklets** - 8-48 pages, saddle-stitched, 10-1000 units (e=0.75)
-- ✅ **Notebooks** - Coil/wire-o/perfect binding, 50/100 pages, 10-500 units (e=0.80)
-- ✅ **Notepads** - Tear-away pads, 25/50/75/100 sheets, 25-1000 units (e=0.65)
-- ✅ **Table Tents** - Professional marketing displays
-- ✅ **Small Format Hub** - Unified product selection and filtering
+The streamlined application centers around a single powerful configurator that handles all print products:
 
-### Large Format Products
-- ✅ **Posters** - Custom dimensions with dynamic constraints, 1-50 units
-  - **Roll Media**: Bond Paper ($3/sqft), Paper ($6/sqft), Fabric ($9/sqft), PET Vinyl ($12/sqft), Scrim Vinyl ($10/sqft), Vinyl Adhesive ($12/sqft)
-  - **Rigid Substrates**: Corrugated Plastic ($10/sqft), Foam Core ($12/sqft), Cardboard ($10/sqft), PVC Board ($14/sqft), Aluminum Composite ($16/sqft)
-  - **Dynamic Constraints**: Material-based width limits (Bond: 54", PET Vinyl: 36", Rigid: 48"×96" fixed)
+### Supported Products
+- **Small Format**: Brochures, postcards, flyers, bookmarks, name tags, booklets, notebooks, notepads, table tents
+- **Large Format**: Posters with roll media and rigid substrates
+- **Promotional**: Magnets, stickers, apparel, tote bags
+- **Custom Products**: Any product with custom dimensions and specifications
 
-### Promotional Products
-- ✅ **Magnets** - Linear interpolation pricing, 4 sizes, 25-1000 units
-- ✅ **Stickers** - Various sizes with quantity-based pricing
-- ✅ **Apparel** - T-shirts and hoodies with size/color options
-- ✅ **Tote Bags** - Canvas bags with bulk pricing tiers
-
-### Advanced Features
-- ✅ **Universal Configurator** - Custom dimensions with real-time pricing calculations and dynamic material constraints
-- ✅ **Cart Edit System** - Full item editing with field population and validation
-- ✅ **Inventory Management** - Complete inventory system with admin workflow
-- ✅ **DOM Caching System** - Performance optimization reducing DOM queries by ~80%
-- ✅ **Consolidated Architecture** - Streamlined configurator system (7 files → 1) for easier maintenance
+### Key Features
+- **Real-time Pricing** - Instant calculations as you configure
+- **Custom Dimensions** - Enter any size within material constraints
+- **Material Selection** - Wide range of paper stocks and specialty materials
+- **Quantity Optimization** - Bulk pricing with efficiency scaling
+- **Imposition Calculations** - Automatic sheet optimization for cost savings
 
 ## 📦 Inventory Management System
 
@@ -68,23 +51,16 @@ Complete inventory management application at `/inventory/` featuring:
 - **Team Members** - Request items, view request history, search inventory
 - **Admins** - Full administrative panel with request management
 
-### Architecture
-- **Static Inventory Data** - Complete structure in `/inventory/js/inventoryStructure.js`
-- **Database Usage** - Only for requests and status tracking
-- **Authentication** - Shared Supabase authentication with main app
-
 ## 🛠️ Technology Stack
 
 - **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5.3.3
 - **Backend**: Supabase (User Authentication, Quotes, Cart Sync, Inventory Requests)
 - **Hosting**: Vercel with custom domain (docsol.ca)
-- **PWA Features**: Dual Service Workers (v163 main, v1 inventory), Web App Manifests
+- **PWA Features**: Dual Service Workers (v164 main, v1 inventory), Web App Manifests
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
 - **Pricing**: Static files only - no database dependencies
-- **Architecture**: Clean static-first system with modular components
-- **Performance**: DOM caching system (~80% query reduction), consolidated configurators
-- **Modularity**: Organized component structure in `/js/modules/` for maintainability
+- **Architecture**: Streamlined single-page application for staff efficiency
 
 ## 💻 Local Development
 
@@ -98,7 +74,7 @@ Complete inventory management application at `/inventory/` featuring:
    ```bash
    # Using Node.js (recommended for external drives)
    npx serve -p 8000 -s .
-   
+
    # Using Python
    python -m http.server 8000
    ```
@@ -112,7 +88,7 @@ Complete inventory management application at `/inventory/` featuring:
 ## 🔧 Configuration
 
 ### Service Worker Versions
-- **Main Application**: `v163` in `sw.js`
+- **Main Application**: `v164` in `sw.js`
 - **Inventory Application**: `v1` in `/inventory/sw.js`
 - Increment versions when deploying CSS/JS changes to force cache updates
 
@@ -139,10 +115,10 @@ The application uses hardcoded Supabase credentials for simplicity. For producti
 
 ## 🔐 Authentication System
 
-- **Front-door Security**: Single login protects both applications
+- **Direct Access**: Login redirects immediately to universal configurator
 - **Session Management**: Supports "remember me" functionality
 - **Supabase Integration**: Cloud-based user authentication
-- **Demo Mode**: Fallback authentication for development
+- **Staff-Focused**: No marketing content or unnecessary navigation
 
 ## 💾 Data Management
 
@@ -199,9 +175,9 @@ Where:
 
 ### Special Pricing Features
 - **Universal Configurator**: Custom dimensions with real-time imposition calculations
-- **Notepad Optimization**: Aggressive bulk discounts with Q^0.65 scaling
-- **Table Tent Materials**: 2.5x height calculation for fold requirements
-- **Large Format**: Square-footage pricing ($6-9/sqft)
+- **Bulk Optimization**: Aggressive discounts with quantity scaling
+- **Material-Specific Pricing**: Dynamic pricing based on paper stocks and finishing
+- **Large Format**: Square-footage pricing with substrate options
 
 ### How to Update Pricing
 1. Edit `/js/paperStocks.js` for paper costs
@@ -213,43 +189,39 @@ No database updates ever needed for pricing changes!
 
 ## 🏗️ Architecture Overview
 
-### Dual Application Structure
+### Streamlined Application Structure
 ```
-├── /                    # Main Pricing Calculator
-│   ├── pages/           # 25+ product calculators
-│   ├── js/              # Core pricing engine and components
-│   │   ├── modules/     # Modular components (validation, pricing, cart, etc.)
-│   │   ├── calculator.js        # Main pricing calculations
-│   │   ├── configurator.js      # Consolidated configurator (7→1 files)
-│   │   ├── domCache.js          # DOM caching for performance
-│   │   └── universalConfigurator.js  # Universal product configurator
-│   └── sw.js            # Service worker v163
-└── /inventory/          # Inventory Management System
-    ├── js/              # Inventory logic and data
-    ├── sql/             # Database schema
-    └── sw.js            # Service worker v1
+├── /                           # Streamlined Pricing Calculator
+│   ├── index.html             # Auto-redirects to universal configurator
+│   ├── pages/
+│   │   ├── universal-configurator.html  # Main pricing interface
+│   │   ├── cart.html          # Cart management
+│   │   ├── quotes.html        # Quote history
+│   │   ├── signin.html        # Authentication
+│   │   └── admin.html         # Admin functions
+│   ├── js/                    # Core pricing engine
+│   │   ├── calculator.js      # Pricing calculations
+│   │   ├── universalConfigurator.js   # Main configurator logic
+│   │   ├── pricingConfig.js   # Product constraints and formulas
+│   │   └── paperStocks.js     # Material specifications
+│   └── sw.js                  # Service worker v164
+└── /inventory/                # Inventory Management System
+    ├── js/                    # Inventory logic and data
+    ├── sql/                   # Database schema
+    └── sw.js                  # Service worker v1
 ```
 
-### Key Components
-- **Universal Configurator**: Advanced pricing tool with custom dimensions and dynamic material constraints
-- **DOM Caching System**: Performance optimization with cached element access (~80% query reduction)
-- **Consolidated Configurator**: Streamlined architecture combining 7 configurator files into 1
-- **Modular Architecture**: Organized components in `/js/modules/` for validation, pricing, cart management
-- **Cart Edit System**: Full item editing with field population and validation
-- **Inventory System**: Static-first with database requests only
-- **PWA Features**: Dual service workers with offline support
-
-### Performance Optimizations
-- **DOM Caching**: Intelligent element caching reduces redundant DOM queries by ~80%
-- **Consolidated Code**: Merged configurator files from 4,947 lines across 7 files to 1,643 lines in 1 file
-- **Lazy Loading**: Efficient resource loading for better performance
-- **Service Worker**: Cache-first strategy with automatic updates (v163)
+### Key Features
+- **Single Entry Point**: Direct access to universal configurator after login
+- **No Marketing Content**: Staff-focused interface without promotional material
+- **Simplified Navigation**: Essential functions only (Calculator, Cart, Quotes, Admin)
+- **Efficient Workflow**: Minimal clicks to access pricing functionality
 
 ## 🛡️ Browser Support
 
 - **Chrome/Edge** (Recommended for best PWA experience)
 - **Safari** on iOS/macOS
-- **Firefox** 
+- **Firefox**
 - Any modern browser with PWA and Service Worker support
 
 ## 📞 Support
@@ -258,4 +230,4 @@ For technical issues or feature requests, contact SFU Document Solutions IT supp
 
 ## 📄 License
 
-Internal use only - SFU Document Solutions dual application suite.
+Internal use only - SFU Document Solutions streamlined pricing calculator.

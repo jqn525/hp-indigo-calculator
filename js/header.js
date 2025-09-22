@@ -205,7 +205,7 @@ class HeaderNavigation {
       `;
       
       userMenuContent.innerHTML = `
-        <a href="pages/quotes.html" class="dropdown-item">
+        <a href="quotes.html" class="dropdown-item">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
           </svg>
@@ -227,17 +227,11 @@ class HeaderNavigation {
       `;
       
       userMenuContent.innerHTML = `
-        <a href="pages/signin.html" class="dropdown-item">
+        <a href="signin.html" class="dropdown-item">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
           </svg>
           Sign In
-        </a>
-        <a href="pages/signin.html" class="dropdown-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12,15C12.81,15 13.5,14.7 14.11,14.11C14.7,13.5 15,12.81 15,12C15,11.19 14.7,10.5 14.11,9.89C13.5,9.3 12.81,9 12,9C11.19,9 10.5,9.3 9.89,9.89C9.3,10.5 9,11.19 9,12C9,12.81 9.3,13.5 9.89,14.11C10.5,14.7 11.19,15 12,15M21,16V10.5L15.5,16H21M4.5,10.5V16H10L4.5,10.5M15,8A7,7 0 0,1 8,1A7,7 0 0,1 1,8A7,7 0 0,1 8,15A7,7 0 0,1 15,8M8,13A5,5 0 0,0 13,8A5,5 0 0,0 8,3A5,5 0 0,0 3,8A5,5 0 0,0 8,13Z"/>
-          </svg>
-          Create Account
         </a>
       `;
     }
@@ -300,7 +294,7 @@ function handleSignOut() {
     // Fallback logout
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
-    window.location.href = 'pages/signin.html';
+    window.location.href = 'signin.html';
   }
 }
 
