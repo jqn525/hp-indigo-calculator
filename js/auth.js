@@ -41,13 +41,45 @@ class AuthManager {
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     this.session = session;
     this.user = session?.user || null;
+
+    // If we have an existing session, sync it with localStorage for auth-guard.js
+    if (session && session.user) {
+      const authData = {
+        user: {
+          email: session.user.email,
+          name: session.user.user_metadata?.full_name || session.user.email,
+          id: session.user.id
+        },
+        token: session.access_token,
+        expires: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : new Date(Date.now() + 24*60*60*1000).toISOString()
+      };
+      localStorage.setItem('sfu_auth', JSON.stringify(authData));
+    }
     
     // Listen for auth changes
     window.supabaseClient.auth.onAuthStateChange((event, session) => {
       this.session = session;
       this.user = session?.user || null;
+
+      // Bridge authentication systems: sync Supabase auth with localStorage for auth-guard.js
+      if (event === 'SIGNED_IN' && session) {
+        const authData = {
+          user: {
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.email,
+            id: session.user.id
+          },
+          token: session.access_token,
+          expires: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : new Date(Date.now() + 24*60*60*1000).toISOString()
+        };
+        localStorage.setItem('sfu_auth', JSON.stringify(authData));
+      } else if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('sfu_auth');
+        sessionStorage.removeItem('sfu_auth');
+      }
+
       this.updateAuthUI();
-      
+
       // Handle cart migration on login
       if (event === 'SIGNED_IN' && window.cartManager) {
         window.cartManager.migrateLocalCartToCloud();
@@ -101,7 +133,11 @@ class AuthManager {
     // Clear local data
     this.user = null;
     this.session = null;
-    
+
+    // Clear localStorage auth data for auth-guard.js
+    localStorage.removeItem('sfu_auth');
+    sessionStorage.removeItem('sfu_auth');
+
     // Redirect to home
     if (!window.location.pathname.includes('index.html') && window.location.pathname !== '/') {
       window.location.href = '../index.html';
