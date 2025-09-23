@@ -30,7 +30,7 @@ class AuthGuard {
 
   isLoginPage() {
     const path = window.location.pathname.toLowerCase();
-    return path.includes('login.html') || path.endsWith('/login');
+    return path.includes('signin.html') || path.includes('login.html') || path.endsWith('/login');
   }
 
   isAuthenticated() {
@@ -102,7 +102,11 @@ class AuthGuard {
     const currentPath = window.location.pathname + window.location.search;
     const returnUrl = encodeURIComponent(currentPath);
 
-    window.location.href = `pages/signin.html?return=${returnUrl}`;
+    // Determine correct relative path to signin.html based on current location
+    const isInPagesDir = window.location.pathname.includes('/pages/');
+    const signinPath = isInPagesDir ? `signin.html?return=${returnUrl}` : `pages/signin.html?return=${returnUrl}`;
+
+    window.location.href = signinPath;
   }
 
   setupGlobalAuth() {
@@ -171,7 +175,9 @@ class AuthGuard {
       this.clearAuth();
       
       // Redirect to login page
-      window.location.href = 'pages/signin.html';
+      const isInPagesDir = window.location.pathname.includes('/pages/');
+      const signinPath = isInPagesDir ? 'signin.html' : 'pages/signin.html';
+      window.location.href = signinPath;
     }
   }
 

@@ -87,7 +87,7 @@
                 <!-- Guest Mode -->
                 <div class="text-center mt-4">
                     <p class="text-muted">Or continue without an account</p>
-                    <a href="../index.html" class="btn btn-outline-secondary">Continue as Guest</a>
+                    <a href="universal-configurator.html" class="btn btn-outline-secondary">Continue as Guest</a>
                 </div>
             </div>
         </div>
@@ -108,7 +108,7 @@
             
             // Redirect if already authenticated
             if (authManager.isAuthenticated()) {
-                window.location.href = '../index.html';
+                window.location.href = 'universal-configurator.html';
                 return;
             }
             
@@ -124,8 +124,8 @@
                     await authManager.signIn(email, password);
                     showMessage('success', 'Sign in successful! Redirecting...');
                     
-                    // Redirect to previous page or home
-                    const returnUrl = new URLSearchParams(window.location.search).get('return') || '../index.html';
+                    // Redirect to previous page or universal configurator
+                    const returnUrl = new URLSearchParams(window.location.search).get('return') || 'universal-configurator.html';
                     setTimeout(() => window.location.href = returnUrl, 1000);
                 } catch (error) {
                     showMessage('danger', error.message);
