@@ -1690,8 +1690,8 @@ class UniversalConfigurator {
     }
 
     updatePricingDisplay(pricing) {
-        document.getElementById('livePrice').textContent = `$${pricing.totalCost}`;
-        document.getElementById('liveUnitPrice').textContent = `$${pricing.unitPrice}`;
+        document.getElementById('livePrice').textContent = `$${parseFloat(pricing.totalCost).toFixed(2)}`;
+        document.getElementById('liveUnitPrice').textContent = `$${parseFloat(pricing.unitPrice).toFixed(2)}`;
         
         // Update breakdown - handle different field names for different product types
         const isSticker = this.currentConfig.productType === 'stickers';
