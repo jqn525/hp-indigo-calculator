@@ -23,6 +23,7 @@ class PricingDataManager {
             this.data.paperStocks = paperStocks;
             this.data.pricingConfigs = {
                 formula: pricingConfig.formula,
+                productFormulas: pricingConfig.productFormulas,
                 product_constraints: pricingConfig.productConstraints,
                 imposition_data: pricingConfig.impositionData,
                 finishing_costs: pricingConfig.finishingCosts,

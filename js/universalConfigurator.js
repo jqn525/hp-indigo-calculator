@@ -264,7 +264,15 @@ class UniversalConfigurator {
                 optionsContent.innerHTML = this.createNotepadOptions();
                 specificSection.style.display = 'block';
                 break;
-                
+
+            case 'perfect-bound-books':
+                optionsTitle.textContent = 'Perfect Bound Book Options';
+                optionsContent.innerHTML = this.createPerfectBoundOptions();
+                specificSection.style.display = 'block';
+                // Add event listeners for perfect bound book-specific options
+                this.bindPerfectBoundEventListeners();
+                break;
+
             case 'name-tags':
                 optionsTitle.textContent = 'Finishing Options';
                 optionsContent.innerHTML = this.createNameTagOptions();
@@ -809,6 +817,20 @@ class UniversalConfigurator {
         `;
     }
 
+    createPerfectBoundOptions() {
+        return `
+            <div class="form-group">
+                <label class="form-label">Number of Pages</label>
+                <input type="number" class="form-control" id="pages" name="pages"
+                       min="12" max="300" step="2" value="40" placeholder="40">
+                <small class="form-text text-muted">Must be 12-300 pages in multiples of 2</small>
+            </div>
+            <div class="alert alert-info mt-3">
+                <small><strong>Note:</strong> Common book sizes: 5.5×8.5" (Novel), 6×9" (Trade), 8.5×11" (Letter)</small>
+            </div>
+        `;
+    }
+
     handleDimensionChange() {
         const width = parseFloat(document.getElementById('customWidth').value) || 0;
         const height = parseFloat(document.getElementById('customHeight').value) || 0;
@@ -1050,6 +1072,9 @@ class UniversalConfigurator {
             formData.push(['stickerProductionType', stickerProductionType]);
             formData.push(['stickerFinish', stickerFinish]);
             formData.push(['premiumStickerFinish', premiumStickerFinish]);
+        } else if (productType === 'perfect-bound-books') {
+            const pages = document.getElementById('pages')?.value || '40';
+            formData.push(['pages', pages]);
         }
 
         return formData;
@@ -1339,7 +1364,48 @@ class UniversalConfigurator {
                 };
             }
         }
-        
+
+        // For perfect-bound-books, use the perfect bound calculator
+        if (productType === 'perfect-bound-books') {
+            const perfectBoundFormData = new FormData();
+
+            // Add dimensions
+            perfectBoundFormData.append('customWidth', width);
+            perfectBoundFormData.append('customHeight', height);
+            perfectBoundFormData.append('quantity', quantity);
+
+            // Get page count from the form
+            const pages = parseInt(formData.get('pages')) || 40;
+            perfectBoundFormData.append('pages', pages);
+
+            // Get paper selections
+            perfectBoundFormData.append('textPaper', formData.get('textPaper'));
+            perfectBoundFormData.append('coverPaper', formData.get('coverPaper'));
+            perfectBoundFormData.append('rushType', rushType);
+
+            // Call the perfect bound price calculator
+            if (typeof calculatePerfectBoundPrice === 'function') {
+                const result = await calculatePerfectBoundPrice(perfectBoundFormData);
+                if (result.error) {
+                    return { error: result.error };
+                }
+
+                // Convert to expected format
+                return {
+                    totalCost: parseFloat(result.totalCost_numeric || result.totalCost),
+                    unitPrice: parseFloat(result.unitPrice_numeric || result.unitPrice),
+                    printingSetupCost: parseFloat(result.breakdown?.setupCost || 0),
+                    finishingSetupCost: 0,
+                    productionCost: parseFloat(result.breakdown?.productionCost || 0),
+                    materialCost: parseFloat(result.breakdown?.materialsCost || 0),
+                    finishingCost: parseFloat(result.breakdown?.laborCost || 0),
+                    subtotal: parseFloat(result.totalCost_numeric || result.totalCost),
+                    rushMultiplier: parseFloat(result.breakdown?.rushMultiplier || 1),
+                    sheetsRequired: parseInt(result.breakdown?.sheets?.total || 0)
+                };
+            }
+        }
+
         // For other products, calculate using imposition
         const impositionData = this.impositionCalc.calculateImposition(width, height);
         
@@ -1851,6 +1917,28 @@ class UniversalConfigurator {
             updateCartDisplay();
         }
     }
+
+    bindPerfectBoundEventListeners() {
+        // Add event listeners for perfect bound book-specific form elements
+        const pagesInput = document.getElementById('pages');
+
+        // Pages input listener
+        if (pagesInput) {
+            pagesInput.addEventListener('input', () => {
+                // Validate even numbers
+                const pages = parseInt(pagesInput.value);
+                if (pages && pages % 2 !== 0) {
+                    pagesInput.setCustomValidity('Page count must be an even number');
+                } else {
+                    pagesInput.setCustomValidity('');
+                }
+
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+    }
+
 }
 
 // Initialize when DOM is loaded

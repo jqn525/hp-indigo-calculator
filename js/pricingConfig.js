@@ -84,6 +84,14 @@ const pricingConfig = {
     },
     posters: {
       formula: 'large-format'
+    },
+    'perfect-bound-books': {
+      efficiencyExponent: 0.80,
+      hasFinishing: true,
+      finishingSetupFee: 30.00,
+      finishingLogic: 'perfectBinding',
+      setupFeeMultiplier: 2.0,
+      formula: 'perfectBound'
     }
   },
 
@@ -133,6 +141,16 @@ const pricingConfig = {
     notepads: {
       minQuantity: 25,
       maxQuantity: 1000
+    },
+    // Perfect bound books - Professional binding
+    'perfect-bound-books': {
+      minQuantity: 5,
+      maxQuantity: 500,
+      minPages: 12,
+      maxPages: 300,
+      pageMultiple: 2,
+      requiredCoverStock: true,
+      allowsCustomDimensions: true
     },
     // Future products can be added here
     businessCards: {
@@ -230,7 +248,13 @@ const pricingConfig = {
       perfectBinding: 3.00  // Labor for perfect binding
     },
     // Notepad finishing costs
-    notepadPadding: 1.50    // Glue padding labor per notepad
+    notepadPadding: 1.50,    // Glue padding labor per notepad
+    // Perfect binding costs
+    perfectBinding: {
+      baseLabor: 3.00,       // Labor cost per book for perfect binding
+      spineGlue: 0,          // Included in labor
+      coverScoring: 0        // Included in setup
+    }
   },
 
   // Rush order multipliers

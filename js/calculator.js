@@ -1707,6 +1707,148 @@ async function calculatePosterPrice(formData) {
   };
 }
 
+async function calculatePerfectBoundPrice(formData) {
+  // Initialize pricing data
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const pages = parseInt(formData.get('pages'));
+  const textPaperCode = formData.get('textPaper');
+  const coverPaperCode = formData.get('coverPaper');
+  const rushType = formData.get('rushType') || 'standard';
+
+  // Get custom dimensions
+  const customWidth = parseFloat(formData.get('customWidth')) || 8.5;
+  const customHeight = parseFloat(formData.get('customHeight')) || 11;
+
+  // Validate constraints
+  const perfectBoundConstraints = data.pricingConfigs.product_constraints['perfect-bound-books'];
+
+  if (quantity < perfectBoundConstraints.minQuantity || quantity > perfectBoundConstraints.maxQuantity) {
+    return { error: `Quantity must be between ${perfectBoundConstraints.minQuantity} and ${perfectBoundConstraints.maxQuantity}` };
+  }
+
+  if (pages < perfectBoundConstraints.minPages || pages > perfectBoundConstraints.maxPages) {
+    return { error: `Page count must be between ${perfectBoundConstraints.minPages} and ${perfectBoundConstraints.maxPages}` };
+  }
+
+  if (pages % perfectBoundConstraints.pageMultiple !== 0) {
+    return { error: `Page count must be in multiples of ${perfectBoundConstraints.pageMultiple}` };
+  }
+
+  // Validate paper selections
+  const textPaper = data.paperStocks[textPaperCode];
+  const coverPaper = data.paperStocks[coverPaperCode];
+
+  if (!textPaper || textPaper.type !== 'text_stock') {
+    return { error: 'Please select a valid text paper' };
+  }
+
+  if (!coverPaper || coverPaper.type !== 'cover_stock') {
+    return { error: 'Please select a valid cover paper (cover stock required)' };
+  }
+
+  // Enforce 80# minimum cover weight
+  const coverWeight = parseInt(coverPaper.weight.replace('#', ''));
+  if (coverWeight < 80) {
+    return { error: 'Cover stock must be 80# or heavier for perfect binding' };
+  }
+
+  // Calculate imposition using dynamic calculator
+  const impositionCalc = new ImpositionCalculator();
+  const impositionResult = impositionCalc.calculateImposition(customWidth, customHeight);
+
+  if (impositionResult.error) {
+    return { error: impositionResult.error };
+  }
+
+  const pagesPerSheet = impositionResult.copies * 2; // Double-sided
+
+  // Calculate sheets needed
+  const interiorPages = pages - 4; // Subtract cover pages
+  const interiorSheets = Math.ceil(interiorPages / pagesPerSheet);
+  const coverSheets = 1; // Always 1 sheet for cover
+  const totalSheets = interiorSheets + coverSheets;
+
+  // Get pricing formula values
+  const config = data.pricingConfigs.formula;
+  const perfectBoundConfig = data.pricingConfigs.productFormulas['perfect-bound-books'];
+
+  const S = config.setupFee * (perfectBoundConfig.setupFeeMultiplier || 1); // $15.00 × 2 = $30.00
+  const F_setup = perfectBoundConfig.finishingSetupFee; // $30.00 perfect binding setup
+  const k = 6.00; // Higher production rate for perfect binding complexity
+  const e = perfectBoundConfig.efficiencyExponent; // 0.80
+  const clicks = config.clicksCost; // $0.10 for double-sided
+
+  // Calculate material costs
+  const interiorCost = interiorSheets * textPaper.costPerSheet;
+  const coverCost = coverSheets * coverPaper.costPerSheet;
+  const clickCost = totalSheets * clicks; // Click charges per sheet
+  const materialCost = (interiorCost + coverCost + clickCost) * 1.5; // 1.5x multiplier for waste
+
+  console.log('Material Debug:', {
+    pages,
+    interiorSheets,
+    coverSheets,
+    totalSheets,
+    interiorCost,
+    coverCost,
+    clickCost,
+    materialCost,
+    'per book': materialCost,
+    'total for qty': materialCost * quantity
+  });
+
+  // Calculate variable cost per piece: material cost per book
+  const v = materialCost;
+
+  // Get finishing cost per unit
+  const f = data.pricingConfigs.finishing_costs.perfectBinding.baseLabor; // $4.50
+
+  // Apply formula: C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r
+  const setupCost = S + F_setup;
+  const productionCost = Math.pow(quantity, e) * k;
+  const materialsCost = quantity * v;
+  const laborCost = quantity * f;
+
+  let totalCost = setupCost + productionCost + materialsCost + laborCost;
+
+  // Apply rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  totalCost *= rushMultiplier;
+
+  const unitPrice = totalCost / quantity;
+
+  return {
+    quantity,
+    pages,
+    size: `${customWidth}" × ${customHeight}"`,
+    textPaper: textPaper.displayName,
+    coverPaper: coverPaper.displayName,
+    rushType,
+    breakdown: {
+      setupCost: setupCost.toFixed(2),
+      productionCost: productionCost.toFixed(2),
+      materialsCost: materialsCost.toFixed(2),
+      laborCost: laborCost.toFixed(2),
+      rushMultiplier: rushMultiplier,
+      sheets: {
+        interior: interiorSheets,
+        cover: coverSheets,
+        total: totalSheets,
+        pagesPerSheet: pagesPerSheet
+      }
+    },
+    totalCost: `$${totalCost.toFixed(2)}`,
+    unitPrice: `$${unitPrice.toFixed(2)}`,
+    totalCost_numeric: totalCost,
+    unitPrice_numeric: unitPrice
+  };
+}
+
 // Export functions globally for universal configurator
 if (typeof window !== 'undefined') {
   window.calculateBrochurePrice = calculateBrochurePrice;
@@ -1719,6 +1861,7 @@ if (typeof window !== 'undefined') {
   window.calculateNotepadPrice = calculateNotepadPrice;
   window.calculateTableTentPrice = calculateTableTentPrice;
   window.calculatePosterPrice = calculatePosterPrice;
+  window.calculatePerfectBoundPrice = calculatePerfectBoundPrice;
 }
 
 // Initialize card selection when DOM is loaded
