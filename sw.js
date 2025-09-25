@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sfu-calc-v165';
+const CACHE_NAME = 'sfu-calc-v166';
 
 // Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -61,8 +61,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Use network-first strategy for CSS files to ensure fresh styles
-  if (event.request.url.includes('.css')) {
+  // Use network-first strategy for CSS and HTML files to ensure fresh content
+  if (event.request.url.includes('.css') || event.request.url.includes('.html')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
