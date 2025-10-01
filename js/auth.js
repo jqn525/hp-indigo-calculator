@@ -95,15 +95,16 @@ class AuthManager {
     if (!window.supabaseClient) {
       throw new Error('Supabase not configured');
     }
-    
+
     const { data, error } = await window.supabaseClient.auth.signUp({
       email,
       password,
       options: {
-        data: metadata // full_name, company_name, etc.
+        data: metadata, // full_name, company_name, etc.
+        emailRedirectTo: 'https://docsol.ca/pages/signin.html'
       }
     });
-    
+
     if (error) throw error;
     return data;
   }
