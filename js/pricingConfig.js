@@ -13,6 +13,25 @@ const pricingConfig = {
 
   // Product-specific formula parameters
   productFormulas: {
+    // STREAMLINED CATEGORIES (Primary)
+    'flat-prints': {
+      efficiencyExponent: 0.65,
+      hasFinishing: 'conditional',
+      finishingSetupFee: 0,
+      finishingLogic: 'flat-print-addons',
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+    'folded-prints': {
+      efficiencyExponent: 0.75,
+      hasFinishing: 'conditional',
+      finishingSetupFee: 15.00,
+      finishingLogic: 'fold-based',
+      setupFeeMultiplier: 1.0,
+      formula: 'standard'
+    },
+
+    // LEGACY PRODUCTS (Backward Compatibility)
     brochures: {
       efficiencyExponent: 0.75,
       hasFinishing: 'conditional',
@@ -101,6 +120,19 @@ const pricingConfig = {
 
   // Product-specific constraints
   productConstraints: {
+    // STREAMLINED CATEGORIES
+    'flat-prints': {
+      minQuantity: 25,
+      maxQuantity: 5000,
+      allowsCustomDimensions: true
+    },
+    'folded-prints': {
+      minQuantity: 25,
+      maxQuantity: 2500,
+      allowsCustomDimensions: false
+    },
+
+    // LEGACY PRODUCTS (Backward Compatibility)
     brochures: {
       minQuantity: 25,
       maxQuantity: 2500
@@ -229,9 +261,16 @@ const pricingConfig = {
 
   // Finishing costs per unit
   finishingCosts: {
+    // Flat print add-ons
+    flatPrintAddons: {
+      'holePunch': 0.05,
+      'lanyard': 1.25
+    },
     folding: {
+      'none': 0,
       'bifold': 0.10,
-      'trifold': 0.10
+      'trifold': 0.10,
+      'table-tent': 0.50
     },
     cutting: 0.05,  // Postcards cutting cost per piece
     scoring: 0.10,   // Future finishing option

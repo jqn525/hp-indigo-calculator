@@ -1870,8 +1870,190 @@ async function calculatePerfectBoundPrice(formData) {
   };
 }
 
+async function calculateFlatPrintPrice(formData) {
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const customWidth = parseFloat(formData.get('customWidth'));
+  const customHeight = parseFloat(formData.get('customHeight'));
+  const paperCode = formData.get('paperType');
+  const rushType = formData.get('rushType') || 'standard';
+  const hasHolePunch = formData.get('holePunch') === 'true';
+  const hasLanyard = formData.get('lanyard') === 'true';
+
+  const validation = ValidationUtils.validateQuantity(quantity, 'flat-prints', data.pricingConfigs.product_constraints);
+  if (!validation.valid) {
+    return { error: validation.message };
+  }
+
+  const config = data.pricingConfigs.formula;
+  const S = config.setupFee;
+  const k = config.baseProductionRate;
+  const e = 0.65;
+  const clicks = config.clicksCost;
+
+  const selectedPaper = data.paperStocks[paperCode];
+  if (!selectedPaper) {
+    return { error: 'Invalid paper selection' };
+  }
+
+  const paperCost = selectedPaper.costPerSheet;
+
+  let width, height, displaySize;
+  if (customWidth && customHeight) {
+    width = customWidth;
+    height = customHeight;
+    displaySize = `${customWidth}"×${customHeight}"`;
+  } else if (size) {
+    const dimensions = parseSizeString(size);
+    width = dimensions.width;
+    height = dimensions.height;
+    displaySize = size;
+  } else {
+    return { error: 'Size or custom dimensions required' };
+  }
+
+  const dynamicImposition = getDynamicImposition(width, height);
+  if (!dynamicImposition) {
+    return { error: 'Unable to calculate imposition for given dimensions' };
+  }
+
+  const imposition = dynamicImposition;
+  const v = (paperCost + clicks) * 1.5 / imposition;
+
+  const isAdhesive = paperCode === 'PAC51319WP';
+  let f = 0;
+  if (!isAdhesive) {
+    if (hasHolePunch) f += 0.05;
+    if (hasLanyard) f += 1.25;
+  }
+  const needsFinishing = f > 0;
+
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+
+  const printingSetupCost = S;
+  const finishingSetupCost = 0;
+  const productionCost = Math.pow(quantity, e) * k;
+  const materialCost = quantity * v;
+  const finishingCost = quantity * f;
+
+  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
+  const totalCost = subtotal * rushMultiplier;
+
+  const sheetsRequired = Math.ceil(quantity / imposition);
+  const unitPrice = totalCost / quantity;
+
+  return {
+    printingSetupCost: printingSetupCost.toFixed(2),
+    finishingSetupCost: finishingSetupCost.toFixed(2),
+    needsFinishing: needsFinishing,
+    productionCost: productionCost.toFixed(2),
+    materialCost: materialCost.toFixed(2),
+    finishingCost: finishingCost.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(3),
+    sheetsRequired: sheetsRequired,
+    paperUsed: selectedPaper.displayName,
+    imposition: imposition,
+    size: displaySize
+  };
+}
+
+async function calculateFoldedPrintPrice(formData) {
+  const data = await initializePricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const size = formData.get('size');
+  const paperCode = formData.get('paperType');
+  const foldType = formData.get('foldType') || 'none';
+  const rushType = formData.get('rushType') || 'standard';
+
+  const validation = ValidationUtils.validateQuantity(quantity, 'folded-prints', data.pricingConfigs.product_constraints);
+  if (!validation.valid) {
+    return { error: validation.message };
+  }
+
+  const config = data.pricingConfigs.formula;
+  const S = config.setupFee;
+  const F_setup = config.finishingSetupFee;
+  const k = config.baseProductionRate;
+  const e = 0.75;
+  const clicks = config.clicksCost;
+
+  const selectedPaper = data.paperStocks[paperCode];
+  if (!selectedPaper) {
+    return { error: 'Invalid paper selection' };
+  }
+
+  const paperCost = selectedPaper.costPerSheet;
+
+  const dimensions = parseSizeString(size);
+  let dynamicImposition;
+
+  if (foldType === 'table-tent') {
+    const materialHeight = dimensions.height * 2.5;
+    dynamicImposition = getDynamicImposition(dimensions.width, materialHeight);
+  } else {
+    dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
+  }
+
+  if (!dynamicImposition) {
+    return { error: 'Unable to calculate imposition for given size' };
+  }
+
+  const imposition = dynamicImposition;
+  const v = (paperCost + clicks) * 1.5 / imposition;
+
+  const f = data.pricingConfigs.finishing_costs.folding[foldType] || 0;
+  const needsFinishing = foldType && foldType !== 'none' && f > 0;
+
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+
+  const printingSetupCost = S;
+  const finishingSetupCost = needsFinishing ? F_setup : 0;
+  const productionCost = Math.pow(quantity, e) * k;
+  const materialCost = quantity * v;
+  const finishingCost = quantity * f;
+
+  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
+  const totalCost = subtotal * rushMultiplier;
+
+  const sheetsRequired = Math.ceil(quantity / imposition);
+  const unitPrice = totalCost / quantity;
+
+  return {
+    printingSetupCost: printingSetupCost.toFixed(2),
+    finishingSetupCost: finishingSetupCost.toFixed(2),
+    needsFinishing: needsFinishing,
+    productionCost: productionCost.toFixed(2),
+    materialCost: materialCost.toFixed(2),
+    finishingCost: finishingCost.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(3),
+    sheetsRequired: sheetsRequired,
+    paperUsed: selectedPaper.displayName,
+    imposition: imposition,
+    foldType: foldType
+  };
+}
+
 // Export functions globally for universal configurator
 if (typeof window !== 'undefined') {
+  window.calculateFlatPrintPrice = calculateFlatPrintPrice;
+  window.calculateFoldedPrintPrice = calculateFoldedPrintPrice;
   window.calculateBrochurePrice = calculateBrochurePrice;
   window.calculatePostcardPrice = calculatePostcardPrice;
   window.calculateFlyerPrice = calculateFlyerPrice;

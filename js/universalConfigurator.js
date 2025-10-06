@@ -237,12 +237,26 @@ class UniversalConfigurator {
         optionsContent.innerHTML = '';
         
         switch (productType) {
+            case 'flat-prints':
+                optionsTitle.textContent = 'Add-Ons & Options';
+                optionsContent.innerHTML = this.createFlatPrintOptions();
+                specificSection.style.display = 'block';
+                this.bindFlatPrintEventListeners();
+                break;
+
+            case 'folded-prints':
+                optionsTitle.textContent = 'Folding Options';
+                optionsContent.innerHTML = this.createFoldedPrintOptions();
+                specificSection.style.display = 'block';
+                this.bindFoldedPrintEventListeners();
+                break;
+
             case 'brochures':
                 optionsTitle.textContent = 'Folding Options';
                 optionsContent.innerHTML = this.createFoldingOptions();
                 specificSection.style.display = 'block';
                 break;
-                
+
             case 'booklets':
                 optionsTitle.textContent = 'Booklet Options';
                 optionsContent.innerHTML = this.createBookletOptions();
@@ -371,6 +385,82 @@ class UniversalConfigurator {
                 
             default:
                 specificSection.style.display = 'none';
+        }
+    }
+
+    createFlatPrintOptions() {
+        return `
+            <div class="alert alert-info mb-3">
+                <strong>Flat Prints:</strong> Perfect for postcards, flyers, bookmarks, and name tags.
+                Supports standard presets or custom dimensions.
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Optional Add-Ons</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="holePunch" name="holePunch" value="true">
+                    <label class="form-check-label" for="holePunch">
+                        Hole Punch (+$0.05/piece)
+                    </label>
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="lanyard" name="lanyard" value="true">
+                    <label class="form-check-label" for="lanyard">
+                        Include Lanyard (+$1.25/piece)
+                    </label>
+                </div>
+                <small class="form-text text-muted mt-2 d-block">Add-ons not available with adhesive stock</small>
+            </div>
+        `;
+    }
+
+    createFoldedPrintOptions() {
+        return `
+            <div class="alert alert-info mb-3">
+                <strong>Folded Prints:</strong> Includes brochures and table tents.
+                Select folding type below.
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Folding Type</label>
+                <select class="form-select" id="foldType" name="foldType">
+                    <option value="none">No Folding (Flat)</option>
+                    <option value="bifold">Bi-Fold (2 panels) - +$0.10/piece</option>
+                    <option value="trifold">Tri-Fold (3 panels) - +$0.10/piece</option>
+                    <option value="table-tent">Table Tent - +$0.50/piece</option>
+                </select>
+                <small class="form-text text-muted">Table tents include scoring, folding, and assembly materials</small>
+            </div>
+        `;
+    }
+
+    bindFlatPrintEventListeners() {
+        const holePunchCheck = document.getElementById('holePunch');
+        const lanyardCheck = document.getElementById('lanyard');
+
+        if (holePunchCheck) {
+            holePunchCheck.addEventListener('change', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+
+        if (lanyardCheck) {
+            lanyardCheck.addEventListener('change', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
+        }
+    }
+
+    bindFoldedPrintEventListeners() {
+        const foldTypeSelect = document.getElementById('foldType');
+
+        if (foldTypeSelect) {
+            foldTypeSelect.addEventListener('change', () => {
+                this.updateConfiguration();
+                this.debouncedPriceCalculation();
+            });
         }
     }
 
@@ -1037,9 +1127,17 @@ class UniversalConfigurator {
     getProductSpecificFormData() {
         const formData = [];
         const productType = this.currentConfig.productType;
-        
+
         // Add product-specific form data
-        if (productType === 'brochures') {
+        if (productType === 'flat-prints') {
+            const holePunch = document.getElementById('holePunch')?.checked || false;
+            const lanyard = document.getElementById('lanyard')?.checked || false;
+            formData.push(['holePunch', holePunch ? 'true' : 'false']);
+            formData.push(['lanyard', lanyard ? 'true' : 'false']);
+        } else if (productType === 'folded-prints') {
+            const foldType = document.getElementById('foldType')?.value || 'none';
+            formData.push(['foldType', foldType]);
+        } else if (productType === 'brochures') {
             const foldType = document.getElementById('foldType')?.value || 'none';
             formData.push(['foldType', foldType]);
         } else if (productType === 'booklets') {
@@ -1096,6 +1194,99 @@ class UniversalConfigurator {
         // For stickers, use sticker-specific pricing logic
         if (productType === 'stickers') {
             return await this.calculateStickerPricing(width, height, quantity, rushType, formData);
+        }
+
+        // For flat-prints, use the new streamlined calculator
+        if (productType === 'flat-prints') {
+            const flatPrintFormData = new FormData();
+
+            // Use custom dimensions if provided, otherwise use a default size
+            if (width && height) {
+                flatPrintFormData.append('customWidth', width);
+                flatPrintFormData.append('customHeight', height);
+            } else {
+                flatPrintFormData.append('size', '5x7'); // default size
+            }
+
+            flatPrintFormData.append('quantity', quantity);
+            flatPrintFormData.append('paperType', formData.get('specialtyStock') || formData.get('textPaper') || formData.get('coverPaper'));
+
+            // Get add-on options from the form checkboxes
+            const holePunchChecked = document.getElementById('holePunch')?.checked || false;
+            const lanyardChecked = document.getElementById('lanyard')?.checked || false;
+            flatPrintFormData.append('holePunch', holePunchChecked ? 'true' : 'false');
+            flatPrintFormData.append('lanyard', lanyardChecked ? 'true' : 'false');
+
+            flatPrintFormData.append('rushType', rushType);
+
+            // Call the new flat-print calculator
+            if (typeof calculateFlatPrintPrice === 'function') {
+                const result = await calculateFlatPrintPrice(flatPrintFormData);
+                if (result.error) {
+                    return { error: result.error };
+                }
+
+                // Convert to expected format
+                return {
+                    totalCost: parseFloat(result.totalCost),
+                    unitPrice: parseFloat(result.unitPrice),
+                    printingSetupCost: result.printingSetupCost,
+                    finishingSetupCost: result.finishingSetupCost,
+                    productionCost: result.productionCost,
+                    materialCost: result.materialCost,
+                    finishingCost: result.finishingCost,
+                    subtotal: result.subtotal,
+                    rushMultiplier: result.rushMultiplier,
+                    sheetsRequired: result.sheetsRequired
+                };
+            }
+        }
+
+        // For folded-prints, use the new streamlined calculator
+        if (productType === 'folded-prints') {
+            const foldedPrintFormData = new FormData();
+
+            // Map dimensions to standard sizes
+            let size = '8.5x11'; // default
+            if (width && height) {
+                if (width <= 6 && height <= 9) {
+                    size = '5.5x8.5';
+                } else if (width <= 9 && height <= 12) {
+                    size = '8.5x11';
+                } else if (width <= 9 && height <= 14.5) {
+                    size = '8.5x14';
+                } else {
+                    size = '11x17';
+                }
+            }
+
+            foldedPrintFormData.append('size', size);
+            foldedPrintFormData.append('quantity', quantity);
+            foldedPrintFormData.append('paperType', formData.get('specialtyStock') || formData.get('textPaper') || formData.get('coverPaper'));
+            foldedPrintFormData.append('foldType', formData.get('foldType') || 'none');
+            foldedPrintFormData.append('rushType', rushType);
+
+            // Call the new folded-print calculator
+            if (typeof calculateFoldedPrintPrice === 'function') {
+                const result = await calculateFoldedPrintPrice(foldedPrintFormData);
+                if (result.error) {
+                    return { error: result.error };
+                }
+
+                // Convert to expected format
+                return {
+                    totalCost: parseFloat(result.totalCost),
+                    unitPrice: parseFloat(result.unitPrice),
+                    printingSetupCost: result.printingSetupCost,
+                    finishingSetupCost: result.finishingSetupCost,
+                    productionCost: result.productionCost,
+                    materialCost: result.materialCost,
+                    finishingCost: result.finishingCost,
+                    subtotal: result.subtotal,
+                    rushMultiplier: result.rushMultiplier,
+                    sheetsRequired: result.sheetsRequired
+                };
+            }
         }
 
         // For brochures, use the original calculator for perfect consistency
@@ -1888,6 +2079,8 @@ class UniversalConfigurator {
 
     getProductDisplayName(productType) {
         const names = {
+            'flat-prints': 'Flat Prints',
+            'folded-prints': 'Folded Prints',
             'brochures': 'Brochures',
             'postcards': 'Postcards',
             'flyers': 'Flyers',
@@ -1898,6 +2091,7 @@ class UniversalConfigurator {
             'notepads': 'Notepads',
             'table-tents': 'Table Tents',
             'posters': 'Posters',
+            'perfect-bound-books': 'Perfect Bound Books',
             'magnets': 'Magnets',
             'stickers': 'Stickers',
             'apparel': 'Apparel',
