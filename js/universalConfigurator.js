@@ -80,13 +80,8 @@ class UniversalConfigurator {
                     coverSelect.appendChild(option);
                 } else if (paper.type === 'adhesive_stock') {
                     specialtySelect.appendChild(option);
-                } else if (paper.type === 'large_format_paper' ||
-                          paper.type === 'large_format_fabric' ||
-                          paper.type === 'large_format_vinyl' ||
-                          paper.type === 'large_format_rigid') {
-                    // Add large format materials to specialty dropdown for poster selection
-                    specialtySelect.appendChild(option);
                 }
+                // Note: Large format materials are handled separately in poster-specific options
             });
             console.log('Paper options populated successfully');
         } catch (error) {

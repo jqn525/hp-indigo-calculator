@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sfu-calc-v172';
+const CACHE_NAME = 'sfu-calc-v173';
 
 // Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
