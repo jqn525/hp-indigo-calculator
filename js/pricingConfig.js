@@ -83,7 +83,11 @@ const pricingConfig = {
       formula: 'notepad'
     },
     posters: {
-      formula: 'large-format'
+      formula: 'large-format',
+      hasFinishing: false,
+      setupFeeMultiplier: 0,
+      efficiencyExponent: 0,
+      finishingSetupFee: 0
     },
     'perfect-bound-books': {
       efficiencyExponent: 0.80,
@@ -279,6 +283,17 @@ const pricingConfig = {
       description: 'Same-Day Rush (+100%)',
       note: 'Subject to current capacity - Call to confirm'
     }
+  },
+
+  // Large Format Volume Discounts (based on total square footage)
+  largeFormatVolumeDiscounts: {
+    tiers: [
+      { minSqft: 0, maxSqft: 29.99, discount: 0, multiplier: 1.00, description: 'Standard Rate' },
+      { minSqft: 30, maxSqft: 59.99, discount: 5, multiplier: 0.95, description: '5% Volume Discount (30-59 sqft)' },
+      { minSqft: 60, maxSqft: 89.99, discount: 10, multiplier: 0.90, description: '10% Volume Discount (60-89 sqft)' },
+      { minSqft: 90, maxSqft: 119.99, discount: 15, multiplier: 0.85, description: '15% Volume Discount (90-119 sqft)' },
+      { minSqft: 120, maxSqft: Infinity, discount: 20, multiplier: 0.80, description: '20% Volume Discount (120+ sqft) - Maximum' }
+    ]
   }
 };
 

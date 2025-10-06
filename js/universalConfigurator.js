@@ -1474,19 +1474,39 @@ class UniversalConfigurator {
         }
 
         const costPerSqFt = material.chargeRate || 6.00;
-        const materialCost = squareFeet * costPerSqFt * quantity;
-        
-        const setupFee = 30.00; // Standard setup for large format
-        const subtotal = setupFee + materialCost;
-        
+
+        // Calculate total square footage for volume discount
+        const totalSquareFootage = squareFeet * quantity;
+
+        // Determine volume discount tier
+        let volumeDiscount = { discount: 0, multiplier: 1.00, description: 'Standard Rate' };
+        const volumeTiers = pricingConfig.largeFormatVolumeDiscounts?.tiers || [];
+
+        for (const tier of volumeTiers) {
+            if (totalSquareFootage >= tier.minSqft && totalSquareFootage <= tier.maxSqft) {
+                volumeDiscount = tier;
+                break;
+            }
+        }
+
+        // Calculate costs with volume discount: material sqft rate × volumeDiscount × sqft × quantity
+        const materialCost = squareFeet * costPerSqFt * volumeDiscount.multiplier * quantity;
+
+        // Simple pricing: material sqft rate × sqft × quantity (no setup fee)
+        const subtotal = materialCost;
+
         const rushMultiplier = this.getRushMultiplier(rushType);
         const totalCost = subtotal * rushMultiplier;
         const unitPrice = totalCost / quantity;
-        
+
+        // Calculate savings from volume discount
+        const originalMaterialCost = squareFeet * costPerSqFt * quantity;
+        const volumeSavings = originalMaterialCost - materialCost;
+
         return {
             totalCost: Math.round(totalCost * 100) / 100,
             unitPrice: Math.round(unitPrice * 100) / 100,
-            printingSetupCost: setupFee,
+            printingSetupCost: 0,
             finishingSetupCost: 0,
             productionCost: 0,
             materialCost: materialCost,
@@ -1494,7 +1514,11 @@ class UniversalConfigurator {
             subtotal: subtotal,
             rushMultiplier: rushMultiplier,
             sheetsRequired: quantity,
-            squareFeet: Math.round(squareFeet * 100) / 100
+            squareFeet: Math.round(squareFeet * 100) / 100,
+            totalSquareFootage: Math.round(totalSquareFootage * 100) / 100,
+            volumeDiscount: volumeDiscount.discount,
+            volumeDiscountDescription: volumeDiscount.description,
+            volumeSavings: Math.round(volumeSavings * 100) / 100
         };
     }
 
@@ -1714,6 +1738,19 @@ class UniversalConfigurator {
         const materialCost = parseFloat(pricing.materialCost) || 0;
         document.getElementById('redMaterialCost').textContent = `$${materialCost.toFixed(2)}`;
 
+        // Show/hide volume discount (large format only)
+        const volumeDiscountItem = document.getElementById('redVolumeDiscountItem');
+        const volumeDiscountPercent = document.getElementById('redVolumeDiscountPercent');
+        const volumeDiscountAmount = document.getElementById('redVolumeDiscount');
+
+        if (pricing.volumeDiscount && pricing.volumeDiscount > 0) {
+            volumeDiscountPercent.textContent = `(${pricing.volumeDiscount}% off)`;
+            volumeDiscountAmount.textContent = `-$${parseFloat(pricing.volumeSavings).toFixed(2)}`;
+            volumeDiscountItem.style.display = 'flex';
+        } else {
+            volumeDiscountItem.style.display = 'none';
+        }
+
         // Finishing cost - different for standard vs premium stickers
         if (isSticker) {
             const isPremium = pricing.productionType === 'premium';
@@ -1777,7 +1814,8 @@ class UniversalConfigurator {
         });
         document.getElementById('redSheetsRequired').textContent = '0';
         document.getElementById('redRushMultiplierItem').style.display = 'none';
-        
+        document.getElementById('redVolumeDiscountItem').style.display = 'none';
+
         // Disable add to cart
         document.getElementById('addToCartBtn').disabled = true;
     }

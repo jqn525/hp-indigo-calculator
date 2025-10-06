@@ -1667,20 +1667,37 @@ async function calculatePosterPrice(formData) {
     squareFootage = sizeData.sqft;
   }
   const chargeRate = materialData.chargeRate; // per sqft
-  
-  // Calculate costs - no setup fee for large format (posters, banners, signs)
-  const setupFee = 0;
-  const materialCostPerPoster = squareFootage * chargeRate;
+
+  // Calculate total square footage for volume discount
+  const totalSquareFootage = squareFootage * quantity;
+
+  // Determine volume discount tier
+  let volumeDiscount = { discount: 0, multiplier: 1.00, description: 'Standard Rate' };
+  const volumeTiers = data.pricingConfigs.largeFormatVolumeDiscounts?.tiers || [];
+
+  for (const tier of volumeTiers) {
+    if (totalSquareFootage >= tier.minSqft && totalSquareFootage <= tier.maxSqft) {
+      volumeDiscount = tier;
+      break;
+    }
+  }
+
+  // Calculate costs with volume discount: material sqft rate × volumeDiscount × sqft × quantity
+  const materialCostPerPoster = squareFootage * chargeRate * volumeDiscount.multiplier;
   const totalMaterialCost = materialCostPerPoster * quantity;
-  
+
   // Get rush multiplier
   const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
-  
-  // Calculate totals
-  const subtotal = setupFee + totalMaterialCost;
+
+  // Calculate totals (no setup fee, no production cost - material only)
+  const subtotal = totalMaterialCost;
   const totalCost = subtotal * rushMultiplier;
   const unitPrice = totalCost / quantity;
-  
+
+  // Calculate savings from volume discount
+  const originalMaterialCost = squareFootage * chargeRate * quantity;
+  const volumeSavings = originalMaterialCost - totalMaterialCost;
+
   return {
     printingSetupCost: "0.00",
     finishingSetupCost: "0.00",
@@ -1694,8 +1711,12 @@ async function calculatePosterPrice(formData) {
     totalCost: totalCost.toFixed(2),
     unitPrice: unitPrice.toFixed(2),
     squareFootage: squareFootage.toFixed(1),
+    totalSquareFootage: totalSquareFootage.toFixed(1),
     materialRate: chargeRate.toFixed(2),
     materialUsed: materialData.displayName,
+    volumeDiscount: volumeDiscount.discount,
+    volumeDiscountDescription: volumeDiscount.description,
+    volumeSavings: volumeSavings.toFixed(2),
     // Additional breakdown data for configurator compatibility
     setupCost: 0,
     productionCost_numeric: 0,
