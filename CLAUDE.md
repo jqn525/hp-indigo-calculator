@@ -6,7 +6,7 @@ SFU Document Solutions streamlined pricing calculator: Universal Configurator + 
 
 - **Tech Stack**: Vanilla JS, Bootstrap 5.3.3, Supabase, PWA
 - **Architecture**: Streamlined single-page app with universal configurator, database for user data only
-- **Hosting**: Vercel with custom domain (docsol.ca)
+- **Hosting**: Netlify with custom domain (docsol.ca)
 - **Live URLs**: https://docsol.ca (pricing) | https://docsol.ca/inventory/ (inventory)
 
 ## Essential Commands
@@ -25,7 +25,7 @@ python -m http.server 8000
 git add -A
 git commit -m "Description"
 git push origin main
-# Auto-deploys via Vercel
+# Auto-deploys via Netlify
 ```
 
 ### Cache Busting
@@ -153,7 +153,7 @@ git push origin main
 
 - **External Drives**: Use `npx serve` instead of Python server to avoid connection drops
 - **Bootstrap**: Currently using 5.3.3 with integrity verification
-- **Environment**: Service worker auto-detects localhost vs Vercel paths
+- **Environment**: Service worker auto-detects localhost vs production paths
 - **Manifest**: Uses SVG icons (no PNG conversion needed)
 - **Streamlined Focus**: Application optimized for staff use with minimal navigation
 

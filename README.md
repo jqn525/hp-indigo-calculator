@@ -55,7 +55,7 @@ Complete inventory management application at `/inventory/` featuring:
 
 - **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5.3.3
 - **Backend**: Supabase (User Authentication, Quotes, Cart Sync, Inventory Requests)
-- **Hosting**: Vercel with custom domain (docsol.ca)
+- **Hosting**: Netlify with custom domain (docsol.ca)
 - **PWA Features**: Dual Service Workers (v164 main, v1 inventory), Web App Manifests
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
@@ -137,13 +137,13 @@ The application uses hardcoded Supabase credentials for simplicity. For producti
 
 ## 🚀 Deployment
 
-### Automatic Deployment (Vercel)
+### Automatic Deployment (Netlify)
 ```bash
 # Make changes to either application
 git add -A
 git commit -m "Description of changes"
 git push origin main
-# Vercel automatically deploys both applications
+# Netlify automatically deploys both applications
 ```
 
 ### Manual Deployment Steps
@@ -183,7 +183,7 @@ Where:
 1. Edit `/js/paperStocks.js` for paper costs
 2. Edit `/js/pricingConfig.js` for formulas and constraints
 3. Commit changes via git
-4. Deploy automatically via Vercel
+4. Deploy automatically via Netlify
 
 No database updates ever needed for pricing changes!
 
