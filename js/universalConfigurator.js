@@ -109,20 +109,38 @@ class UniversalConfigurator {
             this.handleDimensionChange();
         });
 
-        // Paper selections
+        // Paper selections - with mutual exclusivity
         document.getElementById('textPaper').addEventListener('change', (e) => {
+            if (e.target.value) {
+                document.getElementById('coverPaper').value = '';
+                document.getElementById('specialtyStock').value = '';
+                this.currentConfig.coverPaper = '';
+                this.currentConfig.specialtyStock = '';
+            }
             this.currentConfig.textPaper = e.target.value;
             this.updateConfiguration();
             this.debouncedPriceCalculation();
         });
-        
+
         document.getElementById('coverPaper').addEventListener('change', (e) => {
+            if (e.target.value) {
+                document.getElementById('textPaper').value = '';
+                document.getElementById('specialtyStock').value = '';
+                this.currentConfig.textPaper = '';
+                this.currentConfig.specialtyStock = '';
+            }
             this.currentConfig.coverPaper = e.target.value;
             this.updateConfiguration();
             this.debouncedPriceCalculation();
         });
-        
+
         document.getElementById('specialtyStock').addEventListener('change', (e) => {
+            if (e.target.value) {
+                document.getElementById('textPaper').value = '';
+                document.getElementById('coverPaper').value = '';
+                this.currentConfig.textPaper = '';
+                this.currentConfig.coverPaper = '';
+            }
             this.currentConfig.specialtyStock = e.target.value;
             this.updateConfiguration();
             this.debouncedPriceCalculation();
