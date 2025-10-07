@@ -104,13 +104,18 @@ class UniversalConfigurator {
             this.handleDimensionChange();
         });
 
-        // Paper selections - with mutual exclusivity
+        // Paper selections - with conditional mutual exclusivity
         document.getElementById('textPaper').addEventListener('change', (e) => {
             if (e.target.value) {
-                document.getElementById('coverPaper').value = '';
+                // Always clear specialty stock when selecting text paper
                 document.getElementById('specialtyStock').value = '';
-                this.currentConfig.coverPaper = '';
                 this.currentConfig.specialtyStock = '';
+
+                // Only clear cover paper for single-paper products
+                if (!this.requiresMultiplePapers()) {
+                    document.getElementById('coverPaper').value = '';
+                    this.currentConfig.coverPaper = '';
+                }
             }
             this.currentConfig.textPaper = e.target.value;
             this.updateConfiguration();
@@ -119,10 +124,15 @@ class UniversalConfigurator {
 
         document.getElementById('coverPaper').addEventListener('change', (e) => {
             if (e.target.value) {
-                document.getElementById('textPaper').value = '';
+                // Always clear specialty stock when selecting cover paper
                 document.getElementById('specialtyStock').value = '';
-                this.currentConfig.textPaper = '';
                 this.currentConfig.specialtyStock = '';
+
+                // Only clear text paper for single-paper products
+                if (!this.requiresMultiplePapers()) {
+                    document.getElementById('textPaper').value = '';
+                    this.currentConfig.textPaper = '';
+                }
             }
             this.currentConfig.coverPaper = e.target.value;
             this.updateConfiguration();
@@ -131,6 +141,7 @@ class UniversalConfigurator {
 
         document.getElementById('specialtyStock').addEventListener('change', (e) => {
             if (e.target.value) {
+                // Specialty stock always clears both text and cover
                 document.getElementById('textPaper').value = '';
                 document.getElementById('coverPaper').value = '';
                 this.currentConfig.textPaper = '';
@@ -2088,6 +2099,16 @@ class UniversalConfigurator {
         }
         
         return config;
+    }
+
+    requiresMultiplePapers() {
+        const multiPaperProducts = [
+            'booklets',
+            'notebooks',
+            'notepads',
+            'perfect-bound-books'
+        ];
+        return multiPaperProducts.includes(this.currentConfig.productType);
     }
 
     getProductDisplayName(productType) {
