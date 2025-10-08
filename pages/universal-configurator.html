@@ -132,6 +132,10 @@
                                 <span class="summary-label">Imposition:</span>
                                 <span class="summary-value" id="currentImposition">-</span>
                             </div>
+                            <div class="summary-item" id="printingSidesDisplay" style="display: none;">
+                                <span class="summary-label">Printing:</span>
+                                <span class="summary-value" id="currentPrintingSides">-</span>
+                            </div>
                             <div class="summary-item">
                                 <span class="summary-label">Paper:</span>
                                 <span class="summary-value" id="currentPaper">-</span>
@@ -281,16 +285,6 @@
                             </div>
                         </div>
 
-                        <!-- Product-Specific Options (moved before dimensions for material-first flow) -->
-                        <div class="config-section" id="specificOptionsSection" style="display: none;">
-                            <div class="section-header">
-                                <h3 id="specificOptionsTitle">Options</h3>
-                            </div>
-                            <div id="specificOptionsContent">
-                                <!-- Dynamic content based on product type -->
-                            </div>
-                        </div>
-
                         <!-- Dimensions Configuration -->
                         <div class="config-section" id="dimensionsSection" style="display: none;">
                             <div class="section-header">
@@ -322,6 +316,26 @@
                             </div>
                         </div>
 
+                        <!-- Printing Sides Configuration -->
+                        <div class="config-section" id="printingSidesSection" style="display: none;">
+                            <div class="section-header">
+                                <h3>Printing Sides</h3>
+                                <button type="button" class="help-toggle" data-bs-toggle="tooltip"
+                                        title="Choose single-sided or double-sided printing. Double-sided uses less paper but more clicks.">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <select class="form-select" id="printingSides" name="printingSides">
+                                    <option value="double-sided">Double-Sided (Front &amp; Back)</option>
+                                    <option value="single-sided">Single-Sided (Front Only)</option>
+                                </select>
+                                <small class="form-text text-muted">Single-sided uses more paper but fewer clicks</small>
+                            </div>
+                        </div>
+
                         <!-- Paper Configuration -->
                         <div class="config-section" id="paperSection" style="display: none;">
                             <div class="section-header">
@@ -346,6 +360,16 @@
                                         <option value="">No specialty stock...</option>
                                     </select>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Product-Specific Options -->
+                        <div class="config-section" id="specificOptionsSection" style="display: none;">
+                            <div class="section-header">
+                                <h3 id="specificOptionsTitle">Options</h3>
+                            </div>
+                            <div id="specificOptionsContent">
+                                <!-- Dynamic content based on product type -->
                             </div>
                         </div>
 
@@ -426,7 +450,7 @@
     <script src="../js/modules/pricingEngine.js"></script>
     <script src="../js/cart.js"></script>
     <script src="../js/impositionCalculator.js"></script>
-    <script src="../js/universalConfigurator.js"></script>
+    <script type="module" src="../js/universalConfigurator.js"></script>
     <script src="../js/header.js"></script>
     <script src="../js/app.js"></script>
 </body>

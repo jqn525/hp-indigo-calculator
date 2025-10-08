@@ -99,7 +99,12 @@ async function calculateBrochurePrice(formData) {
   const paperCode = formData.get('paperType');
   const foldType = formData.get('foldType');
   const rushType = formData.get('rushType') || 'standard';
-  
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'brochures', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
@@ -107,36 +112,36 @@ async function calculateBrochurePrice(formData) {
       error: validation.message
     };
   }
-  
+
   // Get configuration values
   const config = data.pricingConfigs.formula;
   const S = config.setupFee;               // $15.00 (printing setup)
   const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = config.efficiencyExponent;     // 0.75
-  const clicks = config.clicksCost;        // $0.10
-  
+
   // Get paper and imposition data
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   const paperCost = selectedPaper.costPerSheet;
-  
+
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
   const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.brochures[size];
-  
-  if (!imposition) {
+  const impositionPerSide = dynamicImposition || data.pricingConfigs.imposition_data.brochures[size];
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+
+  if (!impositionPerSide) {
     return { error: 'Invalid size selection' };
   }
-  
-  console.log(`Brochure ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.brochures[size]}, Using=${imposition}`);
-  
+
+  console.log(`Brochure ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.brochures[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
+
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
   
   // Get finishing cost per unit
   const f = data.pricingConfigs.finishing_costs.folding[foldType] || 0;
@@ -192,7 +197,12 @@ async function calculatePostcardPrice(formData) {
   const size = formData.get('size');
   const paperCode = formData.get('paperType');
   const rushType = formData.get('rushType') || 'standard';
-  
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'postcards', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
@@ -200,36 +210,36 @@ async function calculatePostcardPrice(formData) {
       error: validation.message
     };
   }
-  
+
   // Get configuration values
   const config = data.pricingConfigs.formula;
   const S = config.setupFee;               // $15.00 (printing setup)
   const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.70;                          // 0.70 for postcards (greater economy of scale)
-  const clicks = config.clicksCost;        // $0.10
-  
+
   // Get paper and imposition data
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   const paperCost = selectedPaper.costPerSheet;
-  
+
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
   const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.postcards[size];
-  
-  if (!imposition) {
+  const impositionPerSide = dynamicImposition || data.pricingConfigs.imposition_data.postcards[size];
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+
+  if (!impositionPerSide) {
     return { error: 'Invalid size selection' };
   }
-  
-  console.log(`Postcard ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.postcards[size]}, Using=${imposition}`);
-  
+
+  console.log(`Postcard ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.postcards[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
+
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
   
   // Postcards have no finishing costs
   const f = 0;
@@ -284,7 +294,12 @@ async function calculateTableTentPrice(formData) {
   const size = formData.get('size');
   const paperCode = formData.get('paperType');
   const rushType = formData.get('rushType') || 'standard';
-  
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'table-tents', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
@@ -292,38 +307,38 @@ async function calculateTableTentPrice(formData) {
       error: validation.message
     };
   }
-  
+
   // Get configuration values
   const config = data.pricingConfigs.formula;
   const S = config.setupFee;               // $15.00 (printing setup)
   const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.70;                          // 0.70 for table tents (same as postcards)
-  const clicks = config.clicksCost;        // $0.10
-  
+
   // Get paper and imposition data
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   const paperCost = selectedPaper.costPerSheet;
-  
+
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
   // Table tents need ~2.5x the height for folds and base
   const materialHeight = dimensions.height * 2.5;
   const dynamicImposition = getDynamicImposition(dimensions.width, materialHeight);
-  const imposition = dynamicImposition || data.pricingConfigs.imposition_data['table-tents'][size];
-  
-  if (!imposition) {
+  const impositionPerSide = dynamicImposition || data.pricingConfigs.imposition_data['table-tents'][size];
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+
+  if (!impositionPerSide) {
     return { error: 'Invalid size selection' };
   }
-  
-  console.log(`Table Tent ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data['table-tents'][size]}, Using=${imposition}`);
-  
+
+  console.log(`Table Tent ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data['table-tents'][size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
+
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
   
   // Table tents require comprehensive finishing (delivered flat/unassembled)
   // Scoring (2 scores): $0.10 + Folding: $0.10 + Double-sided tape + application: $0.30
@@ -382,7 +397,12 @@ async function calculateNameTagPrice(formData) {
   const rushType = formData.get('rushType') || 'standard';
   const hasHolePunch = formData.get('holePunch') === 'true';
   const hasLanyard = formData.get('lanyard') === 'true';
-  
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'name-tags', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
@@ -390,23 +410,22 @@ async function calculateNameTagPrice(formData) {
       error: validation.message
     };
   }
-  
+
   // Get configuration values
   const config = data.pricingConfigs.formula;
   const S = config.setupFee;               // $15.00 (printing setup)
   const F_setup = 0;                       // No setup fee for finishing (standalone unit)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.65;                          // 0.65 for name tags (better volume discounts)
-  const clicks = config.clicksCost;        // $0.10
-  
+
   // Get paper and imposition data
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   const paperCost = selectedPaper.costPerSheet;
-  
+
   // Determine dimensions to use - custom dimensions take priority
   let width, height, displaySize;
   if (customWidth && customHeight) {
@@ -421,19 +440,20 @@ async function calculateNameTagPrice(formData) {
   } else {
     return { error: 'Size or custom dimensions required' };
   }
-  
+
   // Always use dynamic imposition calculation for name tags
   const dynamicImposition = getDynamicImposition(width, height);
-  
+
   if (!dynamicImposition) {
     return { error: 'Unable to calculate imposition for given dimensions' };
   }
-  
-  const imposition = dynamicImposition;
-  console.log(`Name Tag ${displaySize}: Dynamic imposition=${imposition}`);
-  
+
+  const impositionPerSide = dynamicImposition;
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+  console.log(`Name Tag ${displaySize}: Dynamic imposition per side=${impositionPerSide}, Sides=${sidesMultiplier}, Final=${imposition}`);
+
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
   
   // Calculate finishing costs based on paper type and selections
   // Only allow finishing for cover stock, not adhesive
@@ -732,7 +752,12 @@ function calculateFlyerPrice(formData) {
   const size = formData.get('size');
   const paperCode = formData.get('paperType');
   const rushType = formData.get('rushType') || 'standard';
-  
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'flyers');
   if (!validation.valid) {
@@ -740,34 +765,34 @@ function calculateFlyerPrice(formData) {
       error: validation.message
     };
   }
-  
+
   // Get configuration values
   const config = pricingConfig.formula;
   const S = config.setupFee;               // $15.00 (printing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.65;                          // 0.65 for flyers (excellent bulk discount)
-  const clicks = config.clicksCost;        // $0.10
-  
+
   // Get paper and imposition data
   const selectedPaper = paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   const paperCost = selectedPaper.costPerSheet;
-  
+
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
   const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const imposition = dynamicImposition || pricingConfig.impositionData.flyers[size];
-  console.log(`Flyers ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.flyers[size]}, Using=${imposition}`);
-  
-  if (!imposition) {
+  const impositionPerSide = dynamicImposition || pricingConfig.impositionData.flyers[size];
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+  console.log(`Flyers ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.flyers[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
+
+  if (!impositionPerSide) {
     return { error: 'Invalid size selection' };
   }
-  
+
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
   
   // Flyers have no finishing costs
   const f = 0;
@@ -878,7 +903,12 @@ function calculateBookmarkPrice(formData) {
   const size = formData.get('size');
   const paperCode = formData.get('paperType');
   const rushType = formData.get('rushType') || 'standard';
-  
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'bookmarks');
   if (!validation.valid) {
@@ -886,34 +916,34 @@ function calculateBookmarkPrice(formData) {
       error: validation.message
     };
   }
-  
+
   // Get configuration values
   const config = pricingConfig.formula;
   const S = config.setupFee;               // $15.00 (printing setup)
   const k = config.baseProductionRate;     // $1.50
   const e = 0.65;                          // 0.65 for bookmarks (excellent volume discounts)
-  const clicks = config.clicksCost;        // $0.10
-  
+
   // Get paper and imposition data
   const selectedPaper = paperStocks[paperCode];
   if (!selectedPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   const paperCost = selectedPaper.costPerSheet;
-  
+
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
   const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const imposition = dynamicImposition || pricingConfig.impositionData.bookmarks[size];
-  console.log(`Bookmarks ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.bookmarks[size]}, Using=${imposition}`);
-  
-  if (!imposition) {
+  const impositionPerSide = dynamicImposition || pricingConfig.impositionData.bookmarks[size];
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+  console.log(`Bookmarks ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.bookmarks[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
+
+  if (!impositionPerSide) {
     return { error: 'Invalid size selection' };
   }
-  
+
   // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
   
   // Bookmarks have no finishing costs
   const f = 0;
@@ -1032,6 +1062,11 @@ async function calculateBookletPrice(formData) {
   const coverPaperCode = formData.get('coverPaperType');
   const textPaperCode = formData.get('textPaperType');
   const rushType = formData.get('rushType') || 'standard';
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksCost = printingSides === 'double-sided' ? 0.10 : 0.05;
   
   // Validate pages
   const bookletConstraints = data.pricingConfigs.product_constraints.booklets;
@@ -1098,9 +1133,8 @@ async function calculateBookletPrice(formData) {
   const multiUpFactor = (dimensions.width <= 6.5 && dimensions.height <= 9) ? 2 : 1;
   console.log(`Booklets ${size}: Multi-up factor=${multiUpFactor} booklets per sheet set`);
 
-  // Get click cost from config
-  const clicksCost = data.pricingConfigs.formula.clicksCost || 0.10;
-  const clicksPerBooklet = (pages / 2) / multiUpFactor;  // Pages/2 = impressions, divided by multi-up
+  // Calculate clicks per booklet accounting for printing sides
+  const clicksPerBooklet = (pages / sidesMultiplier) / multiUpFactor;  // Pages/sides = impressions, divided by multi-up
 
   // Calculate material cost per booklet (account for multi-up production)
   const coverCost = (coverSheetsPerBooklet * coverPaper.costPerSheet) / multiUpFactor;
@@ -1190,45 +1224,50 @@ async function calculateNotebookPrice(formData) {
   const textPaperCode = formData.get('textPaper');
   const pageContent = formData.get('pageContent');
   const rushType = formData.get('rushType') || 'standard';
-  
+
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksCost = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'notebooks', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return { error: validation.message };
   }
-  
+
   // Get paper data
   const coverPaper = data.paperStocks[coverPaperCode];
   const textPaper = data.paperStocks[textPaperCode];
-  
+
   if (!coverPaper || !textPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   // Setup costs - waive setup for blank pages as discount
   const baseSetup = pageContent === 'blank' ? 0 : pricingConfig.formula.setupFee;
   const finishingSetup = pricingConfig.formula.finishingSetupFee;  // Always applied
   const totalSetup = baseSetup + finishingSetup;
-  
+
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
   const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
   const imposition = dynamicImposition || data.pricingConfigs.imposition_data.notebooks[size] || 2;
   console.log(`Notebooks ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.notebooks[size]}, Using=${imposition}`);
-  
+
   // Calculate sheets needed per notebook
   const coverSheetsPerNotebook = 1 / imposition;
-  const textSheetsPerNotebook = pages / (imposition * 2);  // Pages per sheet (both sides)
-  
+  const textSheetsPerNotebook = pages / (imposition * sidesMultiplier);  // Pages per sheet (accounting for sides)
+
   // Click calculations - all pages go through HP (including blank)
-  const coverClicks = 1;
-  const textClicks = Math.round(textSheetsPerNotebook * 2);  // Sheets × 2 sides, rounded
+  const coverClicks = 1; // Cover always double-sided
+  const textClicks = Math.round(textSheetsPerNotebook * sidesMultiplier);  // Sheets × sides, rounded
   const totalClicks = coverClicks + textClicks;
-  
+
   // Material costs per notebook
   const coverCost = coverSheetsPerNotebook * coverPaper.costPerSheet;
   const textCost = textSheetsPerNotebook * textPaper.costPerSheet;
-  const clickCost = totalClicks * (data.pricingConfigs.formula.clicksCost || 0.10);
+  const clickCost = totalClicks * clicksCost;
   const materialsCostPerUnit = (coverCost + textCost + clickCost) * 1.25; // 25% markup
   
   // Binding costs based on type
@@ -1292,21 +1331,26 @@ async function calculateNotepadPrice(formData) {
   const backingPaperCode = formData.get('backingPaper') || 'LYNOC95FSC'; // Default to 100# Cover Uncoated
   const pageContent = formData.get('pageContent');
   const rushType = formData.get('rushType') || 'standard';
-  
+
+  // Get printing sides configuration (notepads typically single-sided but allow flexibility)
+  const printingSides = formData.get('printingSides') || 'single-sided'; // Default to single-sided for notepads
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksCost = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate quantity constraints
   const validation = ValidationUtils.validateQuantity(quantity, 'notepads', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return { error: validation.message };
   }
-  
+
   // Get paper data
   const textPaper = data.paperStocks[paperCode];
   const backingPaper = data.paperStocks[backingPaperCode];
-  
+
   if (!textPaper || !backingPaper) {
     return { error: 'Invalid paper selection' };
   }
-  
+
   // Setup costs based on content type
   let baseSetup = 0;
   if (pageContent === 'custom') {
@@ -1316,35 +1360,35 @@ async function calculateNotepadPrice(formData) {
   } else {
     baseSetup = 0;  // Blank pages (no setup needed)
   }
-  
+
   const finishingSetup = pricingConfig.formula.finishingSetupFee;  // Always applied for padding
   const totalSetup = baseSetup + finishingSetup;
-  
+
   // Use dynamic imposition calculation with static fallback
   const dimensions = parseSizeString(size);
   const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
   const imposition = dynamicImposition || data.pricingConfigs.imposition_data.notepads[size] || 2;
   console.log(`Notepads ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.notepads[size]}, Using=${imposition}`);
-  
-  // Calculate sheets needed per notepad (SINGLE-SIDED PRINTING)
+
+  // Calculate sheets needed per notepad
   // Each notepad has 'sheets' number of physical sheets
   const textSheetsPerPad = sheets;  // Physical sheets per notepad
   const backingSheetsPerPad = 1 / imposition;  // Backing sheet (cardstock)
-  
-  // Calculate 13x19" press sheets needed for production
-  const pressSheetsNeeded = (quantity * sheets) / imposition;  // Total press sheets for all notepads
-  
+
+  // Calculate 13x19" press sheets needed for production (accounting for printing sides)
+  const pressSheetsNeeded = (quantity * sheets) / (imposition * sidesMultiplier);  // Total press sheets for all notepads
+
   // Click calculations - based on press sheets (all notepads run through press)
   // Blank pages still incur clicks, they just save the $15 setup fee
   const totalClicksForProduction = pressSheetsNeeded;  // All pages need clicks
   // Backing is not printed, so no clicks for backing
   const totalClicks = totalClicksForProduction;
-  
+
   // Material costs per notepad
   // Text paper cost: based on press sheets needed divided by quantity
   const textCostPerUnit = (pressSheetsNeeded * textPaper.costPerSheet) / quantity;
   const backingCost = backingSheetsPerPad * backingPaper.costPerSheet;
-  const clickCostPerUnit = (totalClicks * (data.pricingConfigs.formula.clicksCost || 0.10)) / quantity;
+  const clickCostPerUnit = (totalClicks * clicksCost) / quantity;
   const materialsCostPerUnit = (textCostPerUnit + backingCost + clickCostPerUnit) * 1.25; // 25% markup
   
   // Padding labor cost - $0.01 per sheet
@@ -1745,6 +1789,11 @@ async function calculatePerfectBoundPrice(formData) {
   const customWidth = parseFloat(formData.get('customWidth')) || 8.5;
   const customHeight = parseFloat(formData.get('customHeight')) || 11;
 
+  // Get printing sides configuration (interior pages only, cover is always double-sided)
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerSheet = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   // Validate constraints
   const perfectBoundConstraints = data.pricingConfigs.product_constraints['perfect-bound-books'];
 
@@ -1786,7 +1835,7 @@ async function calculatePerfectBoundPrice(formData) {
     return { error: impositionResult.error };
   }
 
-  const pagesPerSheet = impositionResult.copies * 2; // Double-sided
+  const pagesPerSheet = impositionResult.copies * sidesMultiplier; // Account for printing sides
 
   // Calculate sheets needed
   const interiorPages = pages - 4; // Subtract cover pages
@@ -1802,12 +1851,13 @@ async function calculatePerfectBoundPrice(formData) {
   const F_setup = perfectBoundConfig.finishingSetupFee; // $30.00 perfect binding setup
   const k = 6.00; // Higher production rate for perfect binding complexity
   const e = perfectBoundConfig.efficiencyExponent; // 0.80
-  const clicks = config.clicksCost; // $0.10 for double-sided
 
-  // Calculate material costs
+  // Calculate material costs with variable click charges
   const interiorCost = interiorSheets * textPaper.costPerSheet;
   const coverCost = coverSheets * coverPaper.costPerSheet;
-  const clickCost = totalSheets * clicks; // Click charges per sheet
+  const interiorClicks = interiorSheets * clicksPerSheet; // Interior uses variable click cost
+  const coverClicks = coverSheets * 0.10; // Cover always double-sided
+  const clickCost = interiorClicks + coverClicks;
   const materialCost = (interiorCost + coverCost + clickCost) * 1.5; // 1.5x multiplier for waste
 
   console.log('Material Debug:', {
@@ -1885,6 +1935,11 @@ async function calculateFlatPrintPrice(formData) {
   const hasHolePunch = formData.get('holePunch') === 'true';
   const hasLanyard = formData.get('lanyard') === 'true';
 
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   const validation = ValidationUtils.validateQuantity(quantity, 'flat-prints', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return { error: validation.message };
@@ -1894,7 +1949,6 @@ async function calculateFlatPrintPrice(formData) {
   const S = config.setupFee;
   const k = config.baseProductionRate;
   const e = 0.65;
-  const clicks = config.clicksCost;
 
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
@@ -1922,8 +1976,9 @@ async function calculateFlatPrintPrice(formData) {
     return { error: 'Unable to calculate imposition for given dimensions' };
   }
 
-  const imposition = dynamicImposition;
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const impositionPerSide = dynamicImposition;
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
 
   const isAdhesive = paperCode === 'PAC51319WP';
   let f = 0;
@@ -1978,6 +2033,11 @@ async function calculateFoldedPrintPrice(formData) {
   const foldType = formData.get('foldType') || 'none';
   const rushType = formData.get('rushType') || 'standard';
 
+  // Get printing sides configuration
+  const printingSides = formData.get('printingSides') || 'double-sided';
+  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
+  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
+
   const validation = ValidationUtils.validateQuantity(quantity, 'folded-prints', data.pricingConfigs.product_constraints);
   if (!validation.valid) {
     return { error: validation.message };
@@ -1988,7 +2048,6 @@ async function calculateFoldedPrintPrice(formData) {
   const F_setup = config.finishingSetupFee;
   const k = config.baseProductionRate;
   const e = 0.75;
-  const clicks = config.clicksCost;
 
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
@@ -2011,8 +2070,9 @@ async function calculateFoldedPrintPrice(formData) {
     return { error: 'Unable to calculate imposition for given size' };
   }
 
-  const imposition = dynamicImposition;
-  const v = (paperCost + clicks) * 1.5 / imposition;
+  const impositionPerSide = dynamicImposition;
+  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
+  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
 
   const f = data.pricingConfigs.finishing_costs.folding[foldType] || 0;
   const needsFinishing = foldType && foldType !== 'none' && f > 0;

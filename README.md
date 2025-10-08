@@ -53,14 +53,14 @@ Complete inventory management application at `/inventory/` featuring:
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: Vanilla JavaScript, CSS Grid & Flexbox, Bootstrap 5.3.3
+- **Frontend**: Vanilla JavaScript (ES6 modules), CSS Grid & Flexbox, Bootstrap 5.3.3
 - **Backend**: Supabase (User Authentication, Quotes, Cart Sync, Inventory Requests)
 - **Hosting**: Netlify with custom domain (docsol.ca)
-- **PWA Features**: Dual Service Workers (v164 main, v1 inventory), Web App Manifests
+- **PWA Features**: Dual Service Workers (v178 main, v1 inventory), Web App Manifests
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
 - **Pricing**: Static files only - no database dependencies
-- **Architecture**: Streamlined single-page application for staff efficiency
+- **Architecture**: Modular single-page application with separation of concerns
 
 ## 💻 Local Development
 
@@ -88,7 +88,7 @@ Complete inventory management application at `/inventory/` featuring:
 ## 🔧 Configuration
 
 ### Service Worker Versions
-- **Main Application**: `v164` in `sw.js`
+- **Main Application**: `v178` in `sw.js`
 - **Inventory Application**: `v1` in `/inventory/sw.js`
 - Increment versions when deploying CSS/JS changes to force cache updates
 
@@ -201,10 +201,26 @@ No database updates ever needed for pricing changes!
 │   │   └── admin.html         # Admin functions
 │   ├── js/                    # Core pricing engine
 │   │   ├── calculator.js      # Pricing calculations
-│   │   ├── universalConfigurator.js   # Main configurator logic
+│   │   ├── universalConfigurator.js   # Main configurator orchestrator (354 lines)
+│   │   ├── universalConfigurator/     # Modular architecture (14 files)
+│   │   │   ├── ConfigurationManager.js  # State management
+│   │   │   ├── UIManager.js             # DOM operations
+│   │   │   ├── PricingManager.js        # Pricing coordination
+│   │   │   ├── products/                # Product-specific handlers
+│   │   │   │   ├── ProductHandler.js
+│   │   │   │   ├── FlatPrintHandler.js
+│   │   │   │   ├── FoldedPrintHandler.js
+│   │   │   │   ├── BookletHandler.js
+│   │   │   │   ├── PosterHandler.js
+│   │   │   │   ├── StickerHandler.js
+│   │   │   │   └── ProductHandlerFactory.js
+│   │   │   └── utils/                   # Helper utilities
+│   │   │       ├── FormDataBuilder.js
+│   │   │       ├── ValidationHelper.js
+│   │   │       └── EventBindingHelper.js
 │   │   ├── pricingConfig.js   # Product constraints and formulas
 │   │   └── paperStocks.js     # Material specifications
-│   └── sw.js                  # Service worker v164
+│   └── sw.js                  # Service worker v178
 └── /inventory/                # Inventory Management System
     ├── js/                    # Inventory logic and data
     ├── sql/                   # Database schema
@@ -216,6 +232,8 @@ No database updates ever needed for pricing changes!
 - **No Marketing Content**: Staff-focused interface without promotional material
 - **Simplified Navigation**: Essential functions only (Calculator, Cart, Quotes, Admin)
 - **Efficient Workflow**: Minimal clicks to access pricing functionality
+- **Modular Architecture**: Separation of concerns with ES6 modules for maintainability
+- **Type-Safe Calculations**: Proper number handling in pricing display and calculations
 
 ## 🛡️ Browser Support
 

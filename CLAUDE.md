@@ -29,7 +29,7 @@ git push origin main
 ```
 
 ### Cache Busting
-- Increment `CACHE_NAME` in `sw.js` (current: v164) and `/inventory/sw.js` (current: v1)
+- Increment `CACHE_NAME` in `sw.js` (current: v178) and `/inventory/sw.js` (current: v1)
 - Required when deploying CSS/JS changes
 
 ## Architecture
@@ -43,7 +43,7 @@ git push origin main
 - **Formula**: `C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r`
 - **Data Sources**: `/js/pricingConfig.js` + `/js/paperStocks.js` (authoritative)
 - **Database**: User data only (accounts, carts, quotes) - NO pricing data
-- **Cache**: Service worker v164 with cache-first strategy
+- **Cache**: Service worker v178 with cache-first strategy
 
 ### Supported Products (via Universal Configurator)
 - **Small Format**: brochures, postcards, flyers, bookmarks, name-tags, booklets, notebooks, notepads, table-tents
@@ -65,7 +65,13 @@ git push origin main
 - `/js/pricingConfig.js`: Product constraints, formulas, imposition data
 - `/js/paperStocks.js`: Paper specs and costs
 - `/js/calculator.js`: Core pricing functions
-- `/js/universalConfigurator.js`: Main configurator logic
+- `/js/universalConfigurator.js`: Main configurator orchestrator (354 lines, refactored)
+- `/js/universalConfigurator/`: Modular architecture (14 files)
+  - `ConfigurationManager.js`: State management
+  - `UIManager.js`: DOM operations
+  - `PricingManager.js`: Pricing coordination
+  - `products/`: Product-specific handlers (FlatPrintHandler, FoldedPrintHandler, BookletHandler, PosterHandler, StickerHandler)
+  - `utils/`: Helper utilities (FormDataBuilder, ValidationHelper, EventBindingHelper)
 - `sw.js`: Service worker (increment version for cache updates)
 - `manifest.json`: PWA configuration
 
@@ -146,7 +152,7 @@ git push origin main
 - **Kept**: Essential pages only (6 total)
 
 ### Service Worker Versions
-- **Main App**: v164 (updated for streamlined app)
+- **Main App**: v178 (latest: modular refactoring + printing sides fix)
 - **Inventory App**: v1 (unchanged)
 
 ## Development Notes
@@ -166,10 +172,38 @@ git push origin main
 5. **View History**: Access previous quotes and cart items
 6. **Admin Functions**: Manage users and system settings (admin only)
 
+## Recent Updates (2025-10-08)
+
+### Modular Architecture Refactoring
+- **Refactored** `universalConfigurator.js` from 2,262 lines to 354 lines (84% reduction)
+- **Created** modular structure with separation of concerns:
+  - ConfigurationManager: Centralized state management
+  - UIManager: All DOM operations isolated
+  - PricingManager: Pricing calculation coordination
+  - ProductHandler base class with 5 product-specific handlers
+  - Utility classes for form building, validation, and event binding
+- **Maintained** backwards compatibility with existing calculator functions
+- **Updated** to ES6 module system (`type="module"`)
+
+### Critical Bug Fix: Printing Sides Logic
+- **Fixed** fundamental error where double-sided printing was incorrectly calculated as cheaper than single-sided for flat products
+- **Root Cause**: Imposition was incorrectly multiplied by sidesMultiplier, treating double-sided as if it fits MORE pieces per sheet
+- **Correct Logic**: For flat products (postcards, flyers, brochures), imposition doesn't change with printing sides - only click charges change (single = $0.05, double = $0.10)
+- **Functions Fixed** (8 total in calculator.js):
+  - calculateBrochurePrice()
+  - calculatePostcardPrice()
+  - calculateTableTentPrice()
+  - calculateNameTagPrice()
+  - calculateFlyerPrice()
+  - calculateBookmarkPrice()
+  - calculateFlatPrintPrice()
+  - calculateFoldedPrintPrice()
+- **Preserved** correct logic for folded products (booklets, notebooks, perfect bound books) where sidesMultiplier affects pages per sheet
+
 ## Next Session Priorities
 
-1. Performance optimization for universal configurator
+1. Performance optimization for modular configurator
 2. Enhanced material selection interface
-3. Improved imposition calculations
-4. Advanced quote management features
-5. Staff training documentation
+3. Advanced quote management features
+4. Staff training documentation
+5. Additional product handler implementations
