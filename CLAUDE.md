@@ -29,7 +29,7 @@ git push origin main
 ```
 
 ### Cache Busting
-- Increment `CACHE_NAME` in `sw.js` (current: v179) and `/inventory/sw.js` (current: v1)
+- Increment `CACHE_NAME` in `sw.js` (current: v183) and `/inventory/sw.js` (current: v1)
 - Required when deploying CSS/JS changes
 
 ## Architecture
@@ -45,7 +45,7 @@ git push origin main
 - **Standardized Values**: e=0.80 (all products), k=$1.50 (per sheet)
 - **Data Sources**: `/js/pricingConfig.js` + `/js/paperStocks.js` (authoritative)
 - **Database**: User data only (accounts, carts, quotes) - NO pricing data
-- **Cache**: Service worker v179 with cache-first strategy
+- **Cache**: Service worker v183 with cache-first strategy
 
 ### Supported Products (via Universal Configurator)
 - **Small Format**: brochures, postcards, flyers, bookmarks, name-tags, booklets, notebooks, notepads, table-tents
@@ -154,7 +154,7 @@ git push origin main
 - **Kept**: Essential pages only (6 total)
 
 ### Service Worker Versions
-- **Main App**: v179 (latest: sheet-based production costs + standardized efficiency exponent)
+- **Main App**: v183 (latest: material markup standardization + calculator streamlining)
 - **Inventory App**: v1 (unchanged)
 
 ## Development Notes
@@ -214,6 +214,35 @@ git push origin main
   - calculateFlatPrintPrice()
   - calculateFoldedPrintPrice()
 - **Preserved** correct logic for folded products (booklets, notebooks, perfect bound books) where sidesMultiplier affects pages per sheet
+
+### Material Cost Markup Standardization (2025-10-09)
+- **Implemented** differentiated markup strategy based on product complexity:
+  - **Multi-sheet products** (booklets, notebooks, notepads, perfect bound books): **1.25x markup**
+  - **Simple/flat products** (postcards, name tags, flyers, bookmarks, brochures, table tents): **1.5x markup**
+- **Rationale**: Prevents cost snowballing on high-page-count products while maintaining healthy margins on multi-up products
+- **Formula Impact**: `materialsCostPerUnit = (coverCost + textCost + clickCost) × multiplier`
+- **Benefits**: Balanced pricing that accounts for taxes, shipping, and service charges without excessive markup on complex products
+
+### Calculator Streamlining (2025-10-09)
+- **Removed** 6 legacy calculator functions (776 lines, 40% code reduction)
+- **Deleted Functions** (all replaced by Universal Configurator handlers):
+  - calculateBrochurePrice() → FoldedPrintHandler
+  - calculatePostcardPrice() → FlatPrintHandler
+  - calculateTableTentPrice() → FoldedPrintHandler
+  - calculateNameTagPrice() → FlatPrintHandler
+  - calculateFlyerPrice() → FlatPrintHandler
+  - calculateBookmarkPrice() → FlatPrintHandler
+- **File Size**: calculator.js reduced from 1,952 to 1,176 lines
+- **Cleaned Up**: Window exports (11 → 7 active functions)
+- **Active Functions**: calculateFlatPrintPrice, calculateFoldedPrintPrice, calculateBookletPrice, calculateNotebookPrice, calculateNotepadPrice, calculatePosterPrice, calculatePerfectBoundPrice
+- **Benefits**: Cleaner codebase, reduced bundle size, easier maintenance
+
+### New Product Handlers (2025-10-09)
+- **Created** PerfectBoundHandler.js (4-500 pages with flexible page counts)
+- **Created** NotebookHandler.js (plastic coil, wire-o, perfect binding options)
+- **Created** NotepadHandler.js (glue-bound tear-away pads with backing cardboard)
+- **Registered** all handlers in ProductHandlerFactory.js
+- **Features**: Full multi-paper support, proper material cost calculations, comprehensive configuration options
 
 ## Next Session Priorities
 
