@@ -56,7 +56,7 @@ Complete inventory management application at `/inventory/` featuring:
 - **Frontend**: Vanilla JavaScript (ES6 modules), CSS Grid & Flexbox, Bootstrap 5.3.3
 - **Backend**: Supabase (User Authentication, Quotes, Cart Sync, Inventory Requests)
 - **Hosting**: Netlify with custom domain (docsol.ca)
-- **PWA Features**: Dual Service Workers (v178 main, v1 inventory), Web App Manifests
+- **PWA Features**: Dual Service Workers (v183 main, v1 inventory), Web App Manifests
 - **Typography**: SFU custom fonts (November Condensed, Lava)
 - **Authentication**: Front-door security with session management
 - **Pricing**: Static files only - no database dependencies
@@ -88,7 +88,7 @@ Complete inventory management application at `/inventory/` featuring:
 ## 🔧 Configuration
 
 ### Service Worker Versions
-- **Main Application**: `v178` in `sw.js`
+- **Main Application**: `v183` in `sw.js`
 - **Inventory Application**: `v1` in `/inventory/sw.js`
 - Increment versions when deploying CSS/JS changes to force cache updates
 
@@ -153,31 +153,48 @@ git push origin main
 
 ## 📊 Pricing Engine (Static-First)
 
-The calculator uses a sophisticated pricing formula with data from static files only:
+The calculator uses a sophisticated sheet-based pricing formula with data from static files only:
 
 ```
-C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r
+C(Q) = (S + F_setup + S_total^e × k + Q × v + Q × f) × r
 ```
 
-Where:
+### Formula Components
 - **S** = Setup fee (varies: $30 standard, $15 name tags, $0-15 notepads)
 - **F_setup** = Finishing setup fee ($15, if applicable)
-- **Q** = Quantity
-- **e** = Efficiency exponent by product:
-  - 0.75: brochures, booklets
-  - 0.70: postcards, flyers
-  - 0.65: name tags, bookmarks, notepads
-  - 0.80: notebooks
-- **k** = Base production rate ($1.50)
-- **v** = Variable cost per piece (paper + clicks)
+- **S_total** = Total sheets through press (accounts for actual production time)
+- **e** = Efficiency exponent: **0.80** (standardized across all products)
+- **k** = Base production rate: **$1.50 per sheet**
+- **Q** = Quantity ordered
+- **v** = Variable cost per piece (paper + clicks with markup)
 - **f** = Finishing cost per piece
 - **r** = Rush multiplier (1.0-2.0x)
 
+### Sheet-Based Production (S_total)
+The formula uses **sheet-based production costs** instead of quantity-based to accurately reflect press time:
+- **Simple Products**: `S_total = ceil(Q / imposition)` (e.g., 100 postcards at 8-up = 13 sheets)
+- **Booklets**: `S_total = Q × (cover_sheets + text_sheets_per_booklet)`
+- **Perfect Bound Books**: `S_total = Q × (interior_sheets + cover_sheets_per_book)`
+- **Notebooks**: `S_total = Q × (cover_sheets + text_sheets_per_notebook)`
+- **Notepads**: `S_total = press_sheets_needed` (based on pad assembly)
+
+**Why Sheet-Based?** This approach accurately scales costs with actual press time rather than finished quantity, providing logical consistency with the k=$1.50 per-sheet derivation.
+
+### Material Cost Markup Strategy
+Variable costs include a markup to account for taxes, shipping, and service charges:
+- **Multi-sheet products** (booklets, notebooks, notepads, perfect bound): **1.25x markup**
+  - Prevents cost snowballing on high-page-count products
+- **Simple/flat products** (postcards, flyers, name tags, brochures): **1.5x markup**
+  - Higher margin justified by multi-up printing efficiency
+
+**Formula**: `v = (paper_cost + click_cost) × markup_multiplier`
+
 ### Special Pricing Features
 - **Universal Configurator**: Custom dimensions with real-time imposition calculations
-- **Bulk Optimization**: Aggressive discounts with quantity scaling
+- **Bulk Optimization**: Volume discounts with e=0.80 efficiency scaling
 - **Material-Specific Pricing**: Dynamic pricing based on paper stocks and finishing
 - **Large Format**: Square-footage pricing with substrate options
+- **Sheet Optimization**: Automatic calculation of optimal sheet usage
 
 ### How to Update Pricing
 1. Edit `/js/paperStocks.js` for paper costs
@@ -202,7 +219,7 @@ No database updates ever needed for pricing changes!
 │   ├── js/                    # Core pricing engine
 │   │   ├── calculator.js      # Pricing calculations
 │   │   ├── universalConfigurator.js   # Main configurator orchestrator (354 lines)
-│   │   ├── universalConfigurator/     # Modular architecture (14 files)
+│   │   ├── universalConfigurator/     # Modular architecture (17 files)
 │   │   │   ├── ConfigurationManager.js  # State management
 │   │   │   ├── UIManager.js             # DOM operations
 │   │   │   ├── PricingManager.js        # Pricing coordination
@@ -213,6 +230,9 @@ No database updates ever needed for pricing changes!
 │   │   │   │   ├── BookletHandler.js
 │   │   │   │   ├── PosterHandler.js
 │   │   │   │   ├── StickerHandler.js
+│   │   │   │   ├── PerfectBoundHandler.js
+│   │   │   │   ├── NotebookHandler.js
+│   │   │   │   ├── NotepadHandler.js
 │   │   │   │   └── ProductHandlerFactory.js
 │   │   │   └── utils/                   # Helper utilities
 │   │   │       ├── FormDataBuilder.js
@@ -220,7 +240,7 @@ No database updates ever needed for pricing changes!
 │   │   │       └── EventBindingHelper.js
 │   │   ├── pricingConfig.js   # Product constraints and formulas
 │   │   └── paperStocks.js     # Material specifications
-│   └── sw.js                  # Service worker v178
+│   └── sw.js                  # Service worker v183
 └── /inventory/                # Inventory Management System
     ├── js/                    # Inventory logic and data
     ├── sql/                   # Database schema
@@ -241,6 +261,47 @@ No database updates ever needed for pricing changes!
 - **Safari** on iOS/macOS
 - **Firefox**
 - Any modern browser with PWA and Service Worker support
+
+## 📋 Recent Updates
+
+### Sheet-Based Production Formula (2025-01-08)
+- **Implemented** sheet-based production costs: production term now uses `S_total^e × k` instead of `Q^e × k`
+- **Standardized** efficiency exponent to e=0.80 for all products (removed custom per-product exponents)
+- **Unified** production rate to k=$1.50 for all products (aligned with per-sheet cost derivation)
+- **S_total Calculation**: Accounts for actual sheets through press based on product complexity
+- **Benefits**: Logically consistent with k=$1.50 per-sheet derivation, accurate scaling with actual press time
+
+### Material Cost Markup Standardization (2025-10-09)
+- **Implemented** differentiated markup strategy based on product complexity
+- **Multi-sheet products**: 1.25x markup (booklets, notebooks, notepads, perfect bound books)
+- **Simple/flat products**: 1.5x markup (postcards, name tags, flyers, bookmarks, brochures, table tents)
+- **Rationale**: Prevents cost snowballing on high-page-count products while maintaining healthy margins
+- **Impact**: Balanced pricing that accounts for taxes, shipping, and service charges
+
+### Calculator Streamlining (2025-10-09)
+- **Removed** 6 legacy calculator functions (776 lines, 40% code reduction)
+- **Deleted Functions**: calculateBrochurePrice, calculatePostcardPrice, calculateTableTentPrice, calculateNameTagPrice, calculateFlyerPrice, calculateBookmarkPrice
+- **Replacement**: All functionality now handled by Universal Configurator handlers
+- **File Size**: calculator.js reduced from 1,952 to 1,176 lines
+- **Benefits**: Cleaner codebase, reduced bundle size, easier maintenance
+
+### New Product Handlers (2025-10-09)
+- **Created** PerfectBoundHandler.js (4-500 pages with flexible page counts)
+- **Created** NotebookHandler.js (plastic coil, wire-o, perfect binding options)
+- **Created** NotepadHandler.js (glue-bound tear-away pads with backing cardboard)
+- **Features**: Full multi-paper support, proper material cost calculations, comprehensive configuration options
+
+### Modular Architecture Refactoring (2025-10-08)
+- **Refactored** universalConfigurator.js from 2,262 lines to 354 lines (84% reduction)
+- **Created** modular structure with separation of concerns
+- **Maintained** backwards compatibility with existing calculator functions
+- **Updated** to ES6 module system (type="module")
+
+### Critical Bug Fix: Printing Sides Logic (2025-10-08)
+- **Fixed** fundamental error where double-sided printing was incorrectly calculated as cheaper than single-sided
+- **Correct Logic**: For flat products, imposition doesn't change with printing sides - only click charges change
+- **Functions Fixed**: 8 calculator functions corrected
+- **Preserved** correct logic for folded products where sidesMultiplier affects pages per sheet
 
 ## 📞 Support
 
