@@ -3,6 +3,9 @@ import { FoldedPrintHandler } from './FoldedPrintHandler.js';
 import { BookletHandler } from './BookletHandler.js';
 import { PosterHandler } from './PosterHandler.js';
 import { StickerHandler } from './StickerHandler.js';
+import { PerfectBoundHandler } from './PerfectBoundHandler.js';
+import { NotebookHandler } from './NotebookHandler.js';
+import { NotepadHandler } from './NotepadHandler.js';
 
 export class ProductHandlerFactory {
   constructor(pricingManager) {
@@ -17,6 +20,9 @@ export class ProductHandlerFactory {
     this.handlers.set('booklets', new BookletHandler());
     this.handlers.set('posters', new PosterHandler(this.pricingManager));
     this.handlers.set('stickers', new StickerHandler(this.pricingManager));
+    this.handlers.set('perfect-bound-books', new PerfectBoundHandler());
+    this.handlers.set('notebooks', new NotebookHandler());
+    this.handlers.set('notepads', new NotepadHandler());
   }
 
   getHandler(productType) {

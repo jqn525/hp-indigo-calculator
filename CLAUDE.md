@@ -29,7 +29,7 @@ git push origin main
 ```
 
 ### Cache Busting
-- Increment `CACHE_NAME` in `sw.js` (current: v178) and `/inventory/sw.js` (current: v1)
+- Increment `CACHE_NAME` in `sw.js` (current: v179) and `/inventory/sw.js` (current: v1)
 - Required when deploying CSS/JS changes
 
 ## Architecture
@@ -40,10 +40,12 @@ git push origin main
 - **Shared**: Authentication, branding, domain
 
 ### Pricing Engine (Static-First)
-- **Formula**: `C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r`
+- **Formula**: `C(Q) = (S + F_setup + S_total^e × k + Q × v + Q × f) × r`
+- **Sheet-Based Production**: S_total = total sheets through press (quantity × sheets per unit for complex products, or ceil(quantity / imposition) for simple products)
+- **Standardized Values**: e=0.80 (all products), k=$1.50 (per sheet)
 - **Data Sources**: `/js/pricingConfig.js` + `/js/paperStocks.js` (authoritative)
 - **Database**: User data only (accounts, carts, quotes) - NO pricing data
-- **Cache**: Service worker v178 with cache-first strategy
+- **Cache**: Service worker v179 with cache-first strategy
 
 ### Supported Products (via Universal Configurator)
 - **Small Format**: brochures, postcards, flyers, bookmarks, name-tags, booklets, notebooks, notepads, table-tents
@@ -152,7 +154,7 @@ git push origin main
 - **Kept**: Essential pages only (6 total)
 
 ### Service Worker Versions
-- **Main App**: v178 (latest: modular refactoring + printing sides fix)
+- **Main App**: v179 (latest: sheet-based production costs + standardized efficiency exponent)
 - **Inventory App**: v1 (unchanged)
 
 ## Development Notes
@@ -172,9 +174,22 @@ git push origin main
 5. **View History**: Access previous quotes and cart items
 6. **Admin Functions**: Manage users and system settings (admin only)
 
-## Recent Updates (2025-10-08)
+## Recent Updates
 
-### Modular Architecture Refactoring
+### Sheet-Based Production Cost Formula (2025-01-08)
+- **Implemented** sheet-based production costs: production term now uses S_total^e × k instead of Q^e × k
+- **Standardized** efficiency exponent to e=0.80 for all products (removed custom exponents)
+- **Unified** production rate to k=$1.50 for all products (aligned with per-sheet cost derivation)
+- **S_total Calculation**:
+  - Simple products: S_total = ceil(Q / imposition)
+  - Booklets: S_total = Q × (cover sheets + text sheets per booklet)
+  - Perfect Bound: S_total = Q × (interior sheets + cover sheets per book)
+  - Notebooks: S_total = Q × (cover sheets + text sheets per notebook)
+  - Notepads: S_total = press sheets needed
+- **Benefits**: Logically consistent with k=$1.50 per-sheet derivation, accurate scaling with actual press time
+- **Impact**: e=0.80 provides balanced volume discounts based on original research documentation
+
+### Modular Architecture Refactoring (2025-10-08)
 - **Refactored** `universalConfigurator.js` from 2,262 lines to 354 lines (84% reduction)
 - **Created** modular structure with separation of concerns:
   - ConfigurationManager: Centralized state management

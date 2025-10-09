@@ -7,7 +7,7 @@ const pricingConfig = {
     setupFee: 15.00,           // S = $15.00 (prepress and printing setup)
     finishingSetupFee: 15.00,  // F_setup = $15.00 (finishing setup when required)
     baseProductionRate: 1.50,  // k = $1.50
-    efficiencyExponent: 0.75,  // e = 0.75 (default, overridden by product-specific values)
+    efficiencyExponent: 0.80,  // e = 0.80 (standardized for all products)
     clicksCost: 0.10           // Double-sided printing cost
   },
 
@@ -15,7 +15,6 @@ const pricingConfig = {
   productFormulas: {
     // STREAMLINED CATEGORIES (Primary)
     'flat-prints': {
-      efficiencyExponent: 0.65,
       hasFinishing: 'conditional',
       finishingSetupFee: 0,
       finishingLogic: 'flat-print-addons',
@@ -23,7 +22,6 @@ const pricingConfig = {
       formula: 'standard'
     },
     'folded-prints': {
-      efficiencyExponent: 0.75,
       hasFinishing: 'conditional',
       finishingSetupFee: 15.00,
       finishingLogic: 'fold-based',
@@ -33,7 +31,6 @@ const pricingConfig = {
 
     // LEGACY PRODUCTS (Backward Compatibility)
     brochures: {
-      efficiencyExponent: 0.75,
       hasFinishing: 'conditional',
       finishingSetupFee: 15.00,
       finishingLogic: 'fold-based',
@@ -41,14 +38,12 @@ const pricingConfig = {
       formula: 'standard'
     },
     postcards: {
-      efficiencyExponent: 0.70,
       hasFinishing: false,
       finishingSetupFee: 0,
       setupFeeMultiplier: 1.0,
       formula: 'standard'
     },
     'table-tents': {
-      efficiencyExponent: 0.70,
       hasFinishing: true,
       finishingSetupFee: 15.00,
       finishingLogic: 'table-tent',
@@ -56,7 +51,6 @@ const pricingConfig = {
       formula: 'standard'
     },
     'name-tags': {
-      efficiencyExponent: 0.65,
       hasFinishing: 'conditional',
       finishingSetupFee: 0,
       finishingLogic: 'name-tag',
@@ -64,21 +58,18 @@ const pricingConfig = {
       formula: 'standard'
     },
     flyers: {
-      efficiencyExponent: 0.65,
       hasFinishing: false,
       finishingSetupFee: 0,
       setupFeeMultiplier: 1.0,
       formula: 'standard'
     },
     bookmarks: {
-      efficiencyExponent: 0.65,
       hasFinishing: false,
       finishingSetupFee: 0,
       setupFeeMultiplier: 1.0,
       formula: 'standard'
     },
     booklets: {
-      efficiencyExponent: 0.75,
       hasFinishing: true,
       finishingSetupFee: 15.00,
       finishingLogic: 'booklet',
@@ -86,7 +77,6 @@ const pricingConfig = {
       formula: 'booklet'
     },
     notebooks: {
-      efficiencyExponent: 0.80,
       hasFinishing: true,
       finishingSetupFee: 15.00,
       finishingLogic: 'notebook',
@@ -94,7 +84,6 @@ const pricingConfig = {
       formula: 'notebook'
     },
     notepads: {
-      efficiencyExponent: 0.65,
       hasFinishing: true,
       finishingSetupFee: 15.00,
       finishingLogic: 'notepad',
@@ -109,7 +98,6 @@ const pricingConfig = {
       finishingSetupFee: 0
     },
     'perfect-bound-books': {
-      efficiencyExponent: 0.80,
       hasFinishing: true,
       finishingSetupFee: 30.00,
       finishingLogic: 'perfectBinding',
@@ -182,8 +170,8 @@ const pricingConfig = {
     'perfect-bound-books': {
       minQuantity: 5,
       maxQuantity: 500,
-      minPages: 12,
-      maxPages: 300,
+      minPages: 4,
+      maxPages: 500,
       pageMultiple: 2,
       requiredCoverStock: true,
       allowsCustomDimensions: true

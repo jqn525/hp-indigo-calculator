@@ -87,971 +87,9 @@ function parseSizeString(sizeStr) {
   };
 }
 
-async function calculateBrochurePrice(formData) {
-  // Initialize pricing data
-  const data = await initializePricingData();
-  if (!data) {
-    return { error: 'Pricing data not available' };
-  }
-
-  const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
-  const paperCode = formData.get('paperType');
-  const foldType = formData.get('foldType');
-  const rushType = formData.get('rushType') || 'standard';
-
-  // Get printing sides configuration
-  const printingSides = formData.get('printingSides') || 'double-sided';
-  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
-  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
-
-  // Validate quantity constraints
-  const validation = ValidationUtils.validateQuantity(quantity, 'brochures', data.pricingConfigs.product_constraints);
-  if (!validation.valid) {
-    return {
-      error: validation.message
-    };
-  }
-
-  // Get configuration values
-  const config = data.pricingConfigs.formula;
-  const S = config.setupFee;               // $15.00 (printing setup)
-  const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
-  const k = config.baseProductionRate;     // $1.50
-  const e = config.efficiencyExponent;     // 0.75
-
-  // Get paper and imposition data
-  const selectedPaper = data.paperStocks[paperCode];
-  if (!selectedPaper) {
-    return { error: 'Invalid paper selection' };
-  }
-
-  const paperCost = selectedPaper.costPerSheet;
-
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const impositionPerSide = dynamicImposition || data.pricingConfigs.imposition_data.brochures[size];
-  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
-
-  if (!impositionPerSide) {
-    return { error: 'Invalid size selection' };
-  }
-
-  console.log(`Brochure ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.brochures[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
-
-  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
-  
-  // Get finishing cost per unit
-  const f = data.pricingConfigs.finishing_costs.folding[foldType] || 0;
-  
-  // Determine if finishing is required
-  const needsFinishing = foldType && foldType !== 'none' && f > 0;
-  
-  // Get rush multiplier
-  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
-  
-  // Calculate cost components
-  const printingSetupCost = S;
-  const finishingSetupCost = needsFinishing ? F_setup : 0;
-  const productionCost = Math.pow(quantity, e) * k;
-  const materialCost = quantity * v;
-  const finishingCost = quantity * f;
-  
-  // Calculate subtotal and apply rush multiplier
-  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
-  const totalCost = subtotal * rushMultiplier;
-  
-  // Calculate additional info
-  const sheetsRequired = Math.ceil(quantity / imposition);
-  const unitPrice = totalCost / quantity;
-  
-  
-  return {
-    printingSetupCost: printingSetupCost.toFixed(2),
-    finishingSetupCost: finishingSetupCost.toFixed(2),
-    needsFinishing: needsFinishing,
-    productionCost: productionCost.toFixed(2),
-    materialCost: materialCost.toFixed(2),
-    finishingCost: finishingCost.toFixed(2),
-    subtotal: subtotal.toFixed(2),
-    rushMultiplier: rushMultiplier,
-    rushType: rushType,
-    totalCost: totalCost.toFixed(2),
-    unitPrice: unitPrice.toFixed(3),
-    sheetsRequired: sheetsRequired,
-    paperUsed: selectedPaper.displayName,
-    imposition: imposition
-  };
-}
-
-async function calculatePostcardPrice(formData) {
-  // Initialize pricing data
-  const data = await initializePricingData();
-  if (!data) {
-    return { error: 'Pricing data not available' };
-  }
-
-  const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
-  const paperCode = formData.get('paperType');
-  const rushType = formData.get('rushType') || 'standard';
-
-  // Get printing sides configuration
-  const printingSides = formData.get('printingSides') || 'double-sided';
-  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
-  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
-
-  // Validate quantity constraints
-  const validation = ValidationUtils.validateQuantity(quantity, 'postcards', data.pricingConfigs.product_constraints);
-  if (!validation.valid) {
-    return {
-      error: validation.message
-    };
-  }
-
-  // Get configuration values
-  const config = data.pricingConfigs.formula;
-  const S = config.setupFee;               // $15.00 (printing setup)
-  const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
-  const k = config.baseProductionRate;     // $1.50
-  const e = 0.70;                          // 0.70 for postcards (greater economy of scale)
-
-  // Get paper and imposition data
-  const selectedPaper = data.paperStocks[paperCode];
-  if (!selectedPaper) {
-    return { error: 'Invalid paper selection' };
-  }
-
-  const paperCost = selectedPaper.costPerSheet;
-
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const impositionPerSide = dynamicImposition || data.pricingConfigs.imposition_data.postcards[size];
-  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
-
-  if (!impositionPerSide) {
-    return { error: 'Invalid size selection' };
-  }
-
-  console.log(`Postcard ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.postcards[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
-
-  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
-  
-  // Postcards have no finishing costs
-  const f = 0;
-  const needsFinishing = false;
-  
-  // Get rush multiplier
-  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
-  
-  // Calculate cost components
-  const printingSetupCost = S;
-  const finishingSetupCost = needsFinishing ? F_setup : 0;
-  const productionCost = Math.pow(quantity, e) * k;
-  const materialCost = quantity * v;
-  const finishingCost = quantity * f;
-  
-  // Calculate subtotal and apply rush multiplier
-  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
-  const totalCost = subtotal * rushMultiplier;
-  
-  // Calculate additional info
-  const sheetsRequired = Math.ceil(quantity / imposition);
-  const unitPrice = totalCost / quantity;
-  
-  
-  return {
-    printingSetupCost: printingSetupCost.toFixed(2),
-    finishingSetupCost: finishingSetupCost.toFixed(2),
-    needsFinishing: needsFinishing,
-    productionCost: productionCost.toFixed(2),
-    materialCost: materialCost.toFixed(2),
-    finishingCost: finishingCost.toFixed(2),
-    subtotal: subtotal.toFixed(2),
-    rushMultiplier: rushMultiplier,
-    rushType: rushType,
-    totalCost: totalCost.toFixed(2),
-    unitPrice: unitPrice.toFixed(3),
-    sheetsRequired: sheetsRequired,
-    paperUsed: selectedPaper.displayName,
-    imposition: imposition
-  };
-}
-
-// Calculate Table Tent pricing (similar to postcards but with finishing)
-async function calculateTableTentPrice(formData) {
-  // Initialize pricing data
-  const data = await initializePricingData();
-  if (!data) {
-    return { error: 'Pricing data not available' };
-  }
-
-  const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
-  const paperCode = formData.get('paperType');
-  const rushType = formData.get('rushType') || 'standard';
-
-  // Get printing sides configuration
-  const printingSides = formData.get('printingSides') || 'double-sided';
-  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
-  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
-
-  // Validate quantity constraints
-  const validation = ValidationUtils.validateQuantity(quantity, 'table-tents', data.pricingConfigs.product_constraints);
-  if (!validation.valid) {
-    return {
-      error: validation.message
-    };
-  }
-
-  // Get configuration values
-  const config = data.pricingConfigs.formula;
-  const S = config.setupFee;               // $15.00 (printing setup)
-  const F_setup = config.finishingSetupFee; // $15.00 (finishing setup)
-  const k = config.baseProductionRate;     // $1.50
-  const e = 0.70;                          // 0.70 for table tents (same as postcards)
-
-  // Get paper and imposition data
-  const selectedPaper = data.paperStocks[paperCode];
-  if (!selectedPaper) {
-    return { error: 'Invalid paper selection' };
-  }
-
-  const paperCost = selectedPaper.costPerSheet;
-
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  // Table tents need ~2.5x the height for folds and base
-  const materialHeight = dimensions.height * 2.5;
-  const dynamicImposition = getDynamicImposition(dimensions.width, materialHeight);
-  const impositionPerSide = dynamicImposition || data.pricingConfigs.imposition_data['table-tents'][size];
-  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
-
-  if (!impositionPerSide) {
-    return { error: 'Invalid size selection' };
-  }
-
-  console.log(`Table Tent ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data['table-tents'][size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
-
-  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
-  
-  // Table tents require comprehensive finishing (delivered flat/unassembled)
-  // Scoring (2 scores): $0.10 + Folding: $0.10 + Double-sided tape + application: $0.30
-  const f = 0.50; // $0.50 per piece total finishing
-  const needsFinishing = true;
-  
-  // Get rush multiplier
-  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
-  
-  // Calculate cost components
-  const printingSetupCost = S;
-  const finishingSetupCost = needsFinishing ? F_setup : 0;
-  const productionCost = Math.pow(quantity, e) * k;
-  const materialCost = quantity * v;
-  const finishingCost = quantity * f;
-  
-  // Calculate subtotal and apply rush multiplier
-  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
-  const totalCost = subtotal * rushMultiplier;
-  
-  // Calculate additional info
-  const sheetsRequired = Math.ceil(quantity / imposition);
-  const unitPrice = totalCost / quantity;
-  
-  
-  return {
-    printingSetupCost: printingSetupCost.toFixed(2),
-    finishingSetupCost: finishingSetupCost.toFixed(2),
-    needsFinishing: needsFinishing,
-    productionCost: productionCost.toFixed(2),
-    materialCost: materialCost.toFixed(2),
-    finishingCost: finishingCost.toFixed(2),
-    subtotal: subtotal.toFixed(2),
-    rushMultiplier: rushMultiplier,
-    rushType: rushType,
-    totalCost: totalCost.toFixed(2),
-    unitPrice: unitPrice.toFixed(3),
-    sheetsRequired: sheetsRequired,
-    paperUsed: selectedPaper.displayName,
-    imposition: imposition
-  };
-}
-
-// Calculate Name Tag pricing (identical to postcards)
-async function calculateNameTagPrice(formData) {
-  // Initialize pricing data
-  const data = await initializePricingData();
-  if (!data) {
-    return { error: 'Pricing data not available' };
-  }
-  const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
-  const customWidth = parseFloat(formData.get('customWidth'));
-  const customHeight = parseFloat(formData.get('customHeight'));
-  const paperCode = formData.get('paperType');
-  const rushType = formData.get('rushType') || 'standard';
-  const hasHolePunch = formData.get('holePunch') === 'true';
-  const hasLanyard = formData.get('lanyard') === 'true';
-
-  // Get printing sides configuration
-  const printingSides = formData.get('printingSides') || 'double-sided';
-  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
-  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
-
-  // Validate quantity constraints
-  const validation = ValidationUtils.validateQuantity(quantity, 'name-tags', data.pricingConfigs.product_constraints);
-  if (!validation.valid) {
-    return {
-      error: validation.message
-    };
-  }
-
-  // Get configuration values
-  const config = data.pricingConfigs.formula;
-  const S = config.setupFee;               // $15.00 (printing setup)
-  const F_setup = 0;                       // No setup fee for finishing (standalone unit)
-  const k = config.baseProductionRate;     // $1.50
-  const e = 0.65;                          // 0.65 for name tags (better volume discounts)
-
-  // Get paper and imposition data
-  const selectedPaper = data.paperStocks[paperCode];
-  if (!selectedPaper) {
-    return { error: 'Invalid paper selection' };
-  }
-
-  const paperCost = selectedPaper.costPerSheet;
-
-  // Determine dimensions to use - custom dimensions take priority
-  let width, height, displaySize;
-  if (customWidth && customHeight) {
-    width = customWidth;
-    height = customHeight;
-    displaySize = `${customWidth}"×${customHeight}"`;
-  } else if (size) {
-    const dimensions = parseSizeString(size);
-    width = dimensions.width;
-    height = dimensions.height;
-    displaySize = size;
-  } else {
-    return { error: 'Size or custom dimensions required' };
-  }
-
-  // Always use dynamic imposition calculation for name tags
-  const dynamicImposition = getDynamicImposition(width, height);
-
-  if (!dynamicImposition) {
-    return { error: 'Unable to calculate imposition for given dimensions' };
-  }
-
-  const impositionPerSide = dynamicImposition;
-  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
-  console.log(`Name Tag ${displaySize}: Dynamic imposition per side=${impositionPerSide}, Sides=${sidesMultiplier}, Final=${imposition}`);
-
-  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
-  
-  // Calculate finishing costs based on paper type and selections
-  // Only allow finishing for cover stock, not adhesive
-  const isAdhesive = paperCode === 'PAC51319WP';
-  let f = 0;
-  if (!isAdhesive) {
-    if (hasHolePunch) f += 0.05;  // $0.05 per tag for hole punch
-    if (hasLanyard) f += 1.25;    // $1.25 per tag for basic lanyard
-  }
-  const needsFinishing = f > 0;
-  
-  // Get rush multiplier
-  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
-  
-  // Calculate cost components
-  const printingSetupCost = S;
-  const finishingSetupCost = needsFinishing ? F_setup : 0;
-  const productionCost = Math.pow(quantity, e) * k;
-  const materialCost = quantity * v;
-  const finishingCost = quantity * f;
-  
-  // Calculate subtotal and apply rush multiplier
-  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
-  const totalCost = subtotal * rushMultiplier;
-  
-  // Calculate additional info
-  const sheetsRequired = Math.ceil(quantity / imposition);
-  const unitPrice = totalCost / quantity;
-  
-  
-  return {
-    printingSetupCost: printingSetupCost.toFixed(2),
-    finishingSetupCost: finishingSetupCost.toFixed(2),
-    needsFinishing: needsFinishing,
-    productionCost: productionCost.toFixed(2),
-    materialCost: materialCost.toFixed(2),
-    finishingCost: finishingCost.toFixed(2),
-    subtotal: subtotal.toFixed(2),
-    rushMultiplier: rushMultiplier,
-    rushType: rushType,
-    totalCost: totalCost.toFixed(2),
-    unitPrice: unitPrice.toFixed(3),
-    sheetsRequired: sheetsRequired,
-    paperUsed: selectedPaper.displayName,
-    imposition: imposition,
-    breakdown: {
-      setupFee: printingSetupCost,
-      finishingSetupFee: finishingSetupCost,
-      productionCost: productionCost,
-      materialCost: materialCost,
-      finishingCost: finishingCost,
-      subtotal: subtotal,
-      rushMultiplier: rushMultiplier
-    }
-  };
-}
-
-// Handle brochure form
-const brochureForm = document.getElementById('brochureForm');
-const brochureResults = document.getElementById('resultsSection');
-
-if (brochureForm) {
-  brochureForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Show loading state
-    const submitBtn = brochureForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Calculating...';
-    submitBtn.disabled = true;
-    
-    try {
-      const formData = new FormData(brochureForm);
-      const pricing = await calculateBrochurePrice(formData);
-      
-      // Handle errors
-      if (pricing.error) {
-        alert(pricing.error);
-        return;
-      }
-    
-    // Update the display
-    document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
-    document.getElementById('productionCost').textContent = `$${pricing.productionCost}`;
-    document.getElementById('materialCost').textContent = `$${pricing.materialCost}`;
-    document.getElementById('finishingCost').textContent = `$${pricing.finishingCost}`;
-    document.getElementById('subtotal').textContent = `$${pricing.subtotal}`;
-    document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
-    document.getElementById('totalPrice').textContent = `$${pricing.totalCost}`;
-    document.getElementById('sheetsRequired').textContent = pricing.sheetsRequired;
-    
-    // Show/hide finishing setup fee
-    const finishingSetupItem = document.getElementById('finishingSetupItem');
-    const finishingSetupCost = document.getElementById('finishingSetupCost');
-    
-    if (pricing.needsFinishing) {
-      finishingSetupItem.style.display = 'flex';
-      finishingSetupCost.textContent = `$${pricing.finishingSetupCost}`;
-    } else {
-      finishingSetupItem.style.display = 'none';
-    }
-    
-    // Show/hide rush multiplier
-    const rushMultiplierItem = document.getElementById('rushMultiplierItem');
-    const rushMultiplierSpan = document.getElementById('rushMultiplier');
-    
-    if (pricing.rushMultiplier > 1.0) {
-      rushMultiplierItem.style.display = 'flex';
-      rushMultiplierSpan.textContent = `${pricing.rushMultiplier}x`;
-    } else {
-      rushMultiplierItem.style.display = 'none';
-    }
-    
-      brochureResults.style.display = 'block';
-      brochureResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      
-      // Show Add to Cart button
-      const addToCartBtn = document.getElementById('addToCartBtn');
-      if (addToCartBtn) {
-        addToCartBtn.style.display = 'inline-block';
-        addToCartBtn.onclick = () => {
-          if (window.cartManager) {
-            window.cartManager.addCurrentConfiguration('brochures', formData, pricing);
-          }
-        };
-      }
-    } catch (error) {
-      console.error('Calculation error:', error);
-      alert('Error calculating price. Please try again.');
-    } finally {
-      // Restore button state
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
-    }
-  });
-  
-  brochureForm.addEventListener('reset', () => {
-    brochureResults.style.display = 'none';
-    
-    // Hide Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'none';
-    }
-  });
-}
-
-// Handle postcard form
-const postcardForm = document.getElementById('postcardForm');
-const postcardResults = document.getElementById('resultsSection');
-
-if (postcardForm) {
-  postcardForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Show loading state
-    const submitBtn = postcardForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Calculating...';
-    submitBtn.disabled = true;
-    
-    try {
-      const formData = new FormData(postcardForm);
-      const pricing = await calculatePostcardPrice(formData);
-      
-      // Handle errors
-      if (pricing.error) {
-        alert(pricing.error);
-        return;
-      }
-    
-    // Update the display
-    document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
-    document.getElementById('productionCost').textContent = `$${pricing.productionCost}`;
-    document.getElementById('materialCost').textContent = `$${pricing.materialCost}`;
-    document.getElementById('subtotal').textContent = `$${pricing.subtotal}`;
-    document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
-    document.getElementById('totalPrice').textContent = `$${pricing.totalCost}`;
-    document.getElementById('sheetsRequired').textContent = pricing.sheetsRequired;
-    
-    // Show/hide rush multiplier
-    const rushMultiplierItem = document.getElementById('rushMultiplierItem');
-    const rushMultiplierSpan = document.getElementById('rushMultiplier');
-    
-    if (pricing.rushMultiplier > 1.0) {
-      rushMultiplierItem.style.display = 'flex';
-      rushMultiplierSpan.textContent = `${pricing.rushMultiplier}x`;
-    } else {
-      rushMultiplierItem.style.display = 'none';
-    }
-    
-    postcardResults.style.display = 'block';
-      postcardResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      
-      // Show Add to Cart button
-      const addToCartBtn = document.getElementById('addToCartBtn');
-      if (addToCartBtn) {
-        addToCartBtn.style.display = 'inline-block';
-        addToCartBtn.onclick = () => {
-          if (window.cartManager) {
-            window.cartManager.addCurrentConfiguration('postcards', formData, pricing);
-          }
-        };
-      }
-    } catch (error) {
-      console.error('Calculation error:', error);
-      alert('Error calculating price. Please try again.');
-    } finally {
-      // Restore button state
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
-    }
-  });
-  
-  postcardForm.addEventListener('reset', () => {
-    postcardResults.style.display = 'none';
-    
-    // Hide Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'none';
-    }
-  });
-}
-
-// Handle name tag form
-const nameTagForm = document.getElementById('nameTagForm');
-if (nameTagForm) {
-  nameTagForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(nameTagForm);
-    const pricing = await calculateNameTagPrice(formData);
-    
-    // Handle errors
-    if (pricing.error) {
-      alert(pricing.error);
-      return;
-    }
-    
-    // Update the display - Name tags use same elements as postcards
-    document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
-    document.getElementById('productionCost').textContent = `$${pricing.productionCost}`;
-    document.getElementById('materialCost').textContent = `$${pricing.materialCost}`;
-    document.getElementById('subtotal').textContent = `$${pricing.subtotal}`;
-    document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
-    document.getElementById('totalPrice').textContent = `$${pricing.totalCost}`;
-    document.getElementById('sheetsRequired').textContent = pricing.sheetsRequired;
-    
-    // Show/hide rush multiplier
-    const rushMultiplierItem = document.getElementById('rushMultiplierItem');
-    const rushMultiplierSpan = document.getElementById('rushMultiplier');
-    if (pricing.rushMultiplier > 1) {
-      rushMultiplierItem.style.display = 'flex';
-      rushMultiplierSpan.textContent = `${pricing.rushMultiplier}x`;
-    } else {
-      rushMultiplierItem.style.display = 'none';
-    }
-    
-    // Show results
-    const resultsSection = document.getElementById('resultsSection');
-    if (resultsSection) {
-      resultsSection.style.display = 'block';
-      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    
-    // Show Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'inline-block';
-      addToCartBtn.disabled = false;
-      addToCartBtn.onclick = () => {
-        if (window.cartManager) {
-          window.cartManager.addCurrentConfiguration('name-tags', formData, pricing);
-        }
-      };
-    }
-  });
-  
-  nameTagForm.addEventListener('reset', () => {
-    const resultsSection = document.getElementById('resultsSection');
-    if (resultsSection) {
-      resultsSection.style.display = 'none';
-    }
-    
-    // Hide Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'none';
-    }
-  });
-}
-
-function calculateFlyerPrice(formData) {
-  const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
-  const paperCode = formData.get('paperType');
-  const rushType = formData.get('rushType') || 'standard';
-
-  // Get printing sides configuration
-  const printingSides = formData.get('printingSides') || 'double-sided';
-  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
-  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
-
-  // Validate quantity constraints
-  const validation = ValidationUtils.validateQuantity(quantity, 'flyers');
-  if (!validation.valid) {
-    return {
-      error: validation.message
-    };
-  }
-
-  // Get configuration values
-  const config = pricingConfig.formula;
-  const S = config.setupFee;               // $15.00 (printing setup)
-  const k = config.baseProductionRate;     // $1.50
-  const e = 0.65;                          // 0.65 for flyers (excellent bulk discount)
-
-  // Get paper and imposition data
-  const selectedPaper = paperStocks[paperCode];
-  if (!selectedPaper) {
-    return { error: 'Invalid paper selection' };
-  }
-
-  const paperCost = selectedPaper.costPerSheet;
-
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const impositionPerSide = dynamicImposition || pricingConfig.impositionData.flyers[size];
-  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
-  console.log(`Flyers ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.flyers[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
-
-  if (!impositionPerSide) {
-    return { error: 'Invalid size selection' };
-  }
-
-  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
-  
-  // Flyers have no finishing costs
-  const f = 0;
-  const needsFinishing = false;
-  
-  // Get rush multiplier
-  const rushMultiplier = pricingConfig.rushMultipliers[rushType]?.multiplier || 1.0;
-  
-  // Calculate cost components
-  const printingSetupCost = S;
-  const finishingSetupCost = 0;
-  const productionCost = Math.pow(quantity, e) * k;
-  const materialCost = quantity * v;
-  const finishingCost = 0;
-  
-  // Calculate subtotal and apply rush multiplier
-  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
-  const totalCost = subtotal * rushMultiplier;
-  
-  // Calculate additional info
-  const sheetsRequired = Math.ceil(quantity / imposition);
-  const unitPrice = totalCost / quantity;
-  
-  
-  return {
-    printingSetupCost: printingSetupCost.toFixed(2),
-    finishingSetupCost: finishingSetupCost.toFixed(2),
-    needsFinishing: needsFinishing,
-    productionCost: productionCost.toFixed(2),
-    materialCost: materialCost.toFixed(2),
-    finishingCost: finishingCost.toFixed(2),
-    subtotal: subtotal.toFixed(2),
-    rushMultiplier: rushMultiplier,
-    rushType: rushType,
-    totalCost: totalCost.toFixed(2),
-    unitPrice: unitPrice.toFixed(3),
-    sheetsRequired: sheetsRequired,
-    paperUsed: selectedPaper.displayName,
-    imposition: imposition
-  };
-}
-
-// Handle flyer form
-const flyerForm = document.getElementById('flyerForm');
-const flyerResults = document.getElementById('resultsSection');
-
-if (flyerForm) {
-  flyerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(flyerForm);
-    const pricing = calculateFlyerPrice(formData);
-    
-    // Handle errors
-    if (pricing.error) {
-      alert(pricing.error);
-      return;
-    }
-    
-    // Update the display
-    document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
-    document.getElementById('productionCost').textContent = `$${pricing.productionCost}`;
-    document.getElementById('materialCost').textContent = `$${pricing.materialCost}`;
-    document.getElementById('subtotal').textContent = `$${pricing.subtotal}`;
-    document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
-    document.getElementById('totalPrice').textContent = `$${pricing.totalCost}`;
-    document.getElementById('sheetsRequired').textContent = pricing.sheetsRequired;
-    
-    // Show/hide rush multiplier
-    const rushMultiplierItem = document.getElementById('rushMultiplierItem');
-    const rushMultiplierSpan = document.getElementById('rushMultiplier');
-    
-    if (pricing.rushMultiplier > 1.0) {
-      rushMultiplierItem.style.display = 'flex';
-      rushMultiplierSpan.textContent = `${pricing.rushMultiplier}x`;
-    } else {
-      rushMultiplierItem.style.display = 'none';
-    }
-    
-    flyerResults.style.display = 'block';
-    flyerResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    // Show Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'inline-block';
-      addToCartBtn.onclick = () => {
-        if (window.cartManager) {
-          window.cartManager.addCurrentConfiguration('flyers', formData, pricing);
-        }
-      };
-    }
-  });
-  
-  flyerForm.addEventListener('reset', () => {
-    flyerResults.style.display = 'none';
-    
-    // Hide Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'none';
-    }
-  });
-}
-
-function calculateBookmarkPrice(formData) {
-  const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
-  const paperCode = formData.get('paperType');
-  const rushType = formData.get('rushType') || 'standard';
-
-  // Get printing sides configuration
-  const printingSides = formData.get('printingSides') || 'double-sided';
-  const sidesMultiplier = printingSides === 'double-sided' ? 2 : 1;
-  const clicksPerPiece = printingSides === 'double-sided' ? 0.10 : 0.05;
-
-  // Validate quantity constraints
-  const validation = ValidationUtils.validateQuantity(quantity, 'bookmarks');
-  if (!validation.valid) {
-    return {
-      error: validation.message
-    };
-  }
-
-  // Get configuration values
-  const config = pricingConfig.formula;
-  const S = config.setupFee;               // $15.00 (printing setup)
-  const k = config.baseProductionRate;     // $1.50
-  const e = 0.65;                          // 0.65 for bookmarks (excellent volume discounts)
-
-  // Get paper and imposition data
-  const selectedPaper = paperStocks[paperCode];
-  if (!selectedPaper) {
-    return { error: 'Invalid paper selection' };
-  }
-
-  const paperCost = selectedPaper.costPerSheet;
-
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const impositionPerSide = dynamicImposition || pricingConfig.impositionData.bookmarks[size];
-  const imposition = impositionPerSide; // Flat products: imposition doesn't change with sides
-  console.log(`Bookmarks ${size}: Dynamic=${dynamicImposition}, Static=${pricingConfig.impositionData.bookmarks[size]}, Sides=${sidesMultiplier}, Final=${imposition}`);
-
-  if (!impositionPerSide) {
-    return { error: 'Invalid size selection' };
-  }
-
-  // Calculate variable cost per piece: v = (paper + clicks) × 1.5 / imposition
-  const v = (paperCost + clicksPerPiece) * 1.5 / imposition;
-  
-  // Bookmarks have no finishing costs
-  const f = 0;
-  const needsFinishing = false;
-  
-  // Get rush multiplier
-  const rushMultiplier = pricingConfig.rushMultipliers[rushType]?.multiplier || 1.0;
-  
-  // Calculate cost components
-  const printingSetupCost = S;
-  const finishingSetupCost = 0;
-  const productionCost = Math.pow(quantity, e) * k;
-  const materialCost = quantity * v;
-  const finishingCost = 0;
-  
-  // Calculate subtotal and apply rush multiplier
-  const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
-  const totalCost = subtotal * rushMultiplier;
-  
-  // Calculate additional info
-  const sheetsRequired = Math.ceil(quantity / imposition);
-  const unitPrice = totalCost / quantity;
-  
-  
-  return {
-    printingSetupCost: printingSetupCost.toFixed(2),
-    finishingSetupCost: finishingSetupCost.toFixed(2),
-    needsFinishing: needsFinishing,
-    productionCost: productionCost.toFixed(2),
-    materialCost: materialCost.toFixed(2),
-    finishingCost: finishingCost.toFixed(2),
-    subtotal: subtotal.toFixed(2),
-    rushMultiplier: rushMultiplier,
-    rushType: rushType,
-    totalCost: totalCost.toFixed(2),
-    unitPrice: unitPrice.toFixed(3),
-    sheetsRequired: sheetsRequired,
-    paperUsed: selectedPaper.displayName,
-    imposition: imposition
-  };
-}
-
-// Handle bookmark form
-const bookmarkForm = document.getElementById('bookmarkForm');
-const bookmarkResults = document.getElementById('resultsSection');
-
-if (bookmarkForm) {
-  bookmarkForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(bookmarkForm);
-    const pricing = calculateBookmarkPrice(formData);
-    
-    // Handle errors
-    if (pricing.error) {
-      alert(pricing.error);
-      return;
-    }
-    
-    // Update the display
-    document.getElementById('printingSetupCost').textContent = `$${pricing.printingSetupCost}`;
-    document.getElementById('productionCost').textContent = `$${pricing.productionCost}`;
-    document.getElementById('materialCost').textContent = `$${pricing.materialCost}`;
-    document.getElementById('subtotal').textContent = `$${pricing.subtotal}`;
-    document.getElementById('unitPrice').textContent = `$${pricing.unitPrice}`;
-    document.getElementById('totalPrice').textContent = `$${pricing.totalCost}`;
-    document.getElementById('sheetsRequired').textContent = pricing.sheetsRequired;
-    
-    // Show/hide rush multiplier
-    const rushMultiplierItem = document.getElementById('rushMultiplierItem');
-    const rushMultiplierSpan = document.getElementById('rushMultiplier');
-    
-    if (pricing.rushMultiplier > 1.0) {
-      rushMultiplierItem.style.display = 'flex';
-      rushMultiplierSpan.textContent = `${pricing.rushMultiplier}x`;
-    } else {
-      rushMultiplierItem.style.display = 'none';
-    }
-    
-    bookmarkResults.style.display = 'block';
-    bookmarkResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    // Show Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'inline-block';
-      addToCartBtn.onclick = () => {
-        if (window.cartManager) {
-          window.cartManager.addCurrentConfiguration('bookmarks', formData, pricing);
-        }
-      };
-    }
-  });
-  
-  bookmarkForm.addEventListener('reset', () => {
-    bookmarkResults.style.display = 'none';
-    
-    // Hide Add to Cart button
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) {
-      addToCartBtn.style.display = 'none';
-    }
-  });
-}
-
 async function calculateBookletPrice(formData) {
   // Initialize pricing data
-  const data = await initializePricingData();
+  const data = await window.pricingDataManager.getPricingData();
   if (!data) {
     return { error: 'Pricing data not available' };
   }
@@ -1133,12 +171,13 @@ async function calculateBookletPrice(formData) {
   const multiUpFactor = (dimensions.width <= 6.5 && dimensions.height <= 9) ? 2 : 1;
   console.log(`Booklets ${size}: Multi-up factor=${multiUpFactor} booklets per sheet set`);
 
-  // Calculate clicks per booklet accounting for printing sides
-  const clicksPerBooklet = (pages / sidesMultiplier) / multiUpFactor;  // Pages/sides = impressions, divided by multi-up
+  // Calculate clicks per booklet based on actual sheets (not impressions)
+  const sheetsPerBooklet = coverSheetsPerBooklet + textSheetsPerBooklet;
+  const clicksPerBooklet = sheetsPerBooklet / multiUpFactor;
 
   // Calculate material cost per booklet (account for multi-up production)
   const coverCost = (coverSheetsPerBooklet * coverPaper.costPerSheet) / multiUpFactor;
-  const textCost = (textSheetsPerBooklet * textPaper.costPerSheet) / multiUpFactor;  
+  const textCost = (textSheetsPerBooklet * textPaper.costPerSheet) / multiUpFactor;
   const clickCost = clicksPerBooklet * clicksCost;
   const materialsCostPerUnit = (coverCost + textCost + clickCost) * 1.25;
   
@@ -1152,7 +191,10 @@ async function calculateBookletPrice(formData) {
   // Apply formula: C(Q) = S_base + S_pages + P(Q) + M(Q) + F_base + F_variable
   // Where M(Q) includes paper costs + click charges
   const baseSetup = (pricingConfig.formula.setupFee * 2) + (2 * pages);
-  const production = Math.pow(quantity, 0.75) * 6;
+  const S_total = quantity * sheetsPerBooklet;
+  const k = pricingConfig.formula.baseProductionRate;
+  const e = pricingConfig.formula.efficiencyExponent;
+  const production = Math.pow(S_total, e) * k;
   const materials = quantity * materialsCostPerUnit;
   const finishingSetup = pricingConfig.formula.finishingSetupFee;
   const finishing = quantity * finishingPerUnit;
@@ -1211,7 +253,7 @@ async function calculateBookletPrice(formData) {
 
 async function calculateNotebookPrice(formData) {
   // Initialize pricing data
-  const data = await initializePricingData();
+  const data = await window.pricingDataManager.getPricingData();
   if (!data) {
     return { error: 'Pricing data not available' };
   }
@@ -1268,14 +310,19 @@ async function calculateNotebookPrice(formData) {
   const coverCost = coverSheetsPerNotebook * coverPaper.costPerSheet;
   const textCost = textSheetsPerNotebook * textPaper.costPerSheet;
   const clickCost = totalClicks * clicksCost;
-  const materialsCostPerUnit = (coverCost + textCost + clickCost) * 1.25; // 25% markup
+  const materialsCostPerUnit = (coverCost + textCost + clickCost) * 1.25;
   
   // Binding costs based on type
   const bindingHardware = data.pricingConfigs.finishing_costs.notebookBinding[bindingType] || 0;
   const laborCost = data.pricingConfigs.finishing_costs.notebookLabor[bindingType] || 2.50;
-  
-  // Apply formula: C(Q) = S + F_setup + Q^0.80 × 1.50 + Q × (M + L + B)
-  const productionCost = Math.pow(quantity, 0.80) * 1.50;
+
+  // Apply formula: C(Q) = S + F_setup + S_total^e × k + Q × (M + L + B)
+  const sheetsPerNotebook = coverSheetsPerNotebook + textSheetsPerNotebook;
+  const S_total = quantity * sheetsPerNotebook;
+  const config = data.pricingConfigs.formula;
+  const k = config.baseProductionRate;
+  const e = config.efficiencyExponent;
+  const productionCost = Math.pow(S_total, e) * k;
   const materialsCostTotal = quantity * materialsCostPerUnit;
   const laborCostTotal = quantity * laborCost;
   const bindingCostTotal = quantity * bindingHardware;
@@ -1319,7 +366,7 @@ async function calculateNotebookPrice(formData) {
 
 async function calculateNotepadPrice(formData) {
   // Initialize pricing data
-  const data = await initializePricingData();
+  const data = await window.pricingDataManager.getPricingData();
   if (!data) {
     return { error: 'Pricing data not available' };
   }
@@ -1389,14 +436,18 @@ async function calculateNotepadPrice(formData) {
   const textCostPerUnit = (pressSheetsNeeded * textPaper.costPerSheet) / quantity;
   const backingCost = backingSheetsPerPad * backingPaper.costPerSheet;
   const clickCostPerUnit = (totalClicks * clicksCost) / quantity;
-  const materialsCostPerUnit = (textCostPerUnit + backingCost + clickCostPerUnit) * 1.25; // 25% markup
+  const materialsCostPerUnit = (textCostPerUnit + backingCost + clickCostPerUnit) * 1.25;
   
   // Padding labor cost - $0.01 per sheet
   const paddingLaborPerSheet = 0.01;
   const paddingLabor = sheets * paddingLaborPerSheet;  // $0.01 per sheet per notepad
-  
-  // Apply formula: C(Q) = S + F_setup + Q^0.65 × 1.50 + Q × (M + L)
-  const productionCost = Math.pow(quantity, 0.65) * 1.50;
+
+  // Apply formula: C(Q) = S + F_setup + S_total^e × k + Q × (M + L)
+  const S_total = pressSheetsNeeded;  // Total sheets through press
+  const config = data.pricingConfigs.formula;
+  const k = config.baseProductionRate;
+  const e = config.efficiencyExponent;
+  const productionCost = Math.pow(S_total, e) * k;
   const materialsCostTotal = quantity * materialsCostPerUnit;
   const laborCostTotal = quantity * paddingLabor;
   
@@ -1653,7 +704,7 @@ class CardSelection {
 // Poster Price Calculator (Large Format)
 async function calculatePosterPrice(formData) {
   // Initialize pricing data if not already loaded
-  const data = await initializePricingData();
+  const data = await window.pricingDataManager.getPricingData();
   
   const size = formData.get('size');
   const material = formData.get('material');
@@ -1774,7 +825,7 @@ async function calculatePosterPrice(formData) {
 
 async function calculatePerfectBoundPrice(formData) {
   // Initialize pricing data
-  const data = await initializePricingData();
+  const data = await window.pricingDataManager.getPricingData();
   if (!data) {
     return { error: 'Pricing data not available' };
   }
@@ -1849,8 +900,8 @@ async function calculatePerfectBoundPrice(formData) {
 
   const S = config.setupFee * (perfectBoundConfig.setupFeeMultiplier || 1); // $15.00 × 2 = $30.00
   const F_setup = perfectBoundConfig.finishingSetupFee; // $30.00 perfect binding setup
-  const k = 6.00; // Higher production rate for perfect binding complexity
-  const e = perfectBoundConfig.efficiencyExponent; // 0.80
+  const k = config.baseProductionRate; // $1.50 per sheet
+  const e = config.efficiencyExponent; // 0.75
 
   // Calculate material costs with variable click charges
   const interiorCost = interiorSheets * textPaper.costPerSheet;
@@ -1858,7 +909,7 @@ async function calculatePerfectBoundPrice(formData) {
   const interiorClicks = interiorSheets * clicksPerSheet; // Interior uses variable click cost
   const coverClicks = coverSheets * 0.10; // Cover always double-sided
   const clickCost = interiorClicks + coverClicks;
-  const materialCost = (interiorCost + coverCost + clickCost) * 1.5; // 1.5x multiplier for waste
+  const materialCost = (interiorCost + coverCost + clickCost) * 1.25;
 
   console.log('Material Debug:', {
     pages,
@@ -1879,49 +930,44 @@ async function calculatePerfectBoundPrice(formData) {
   // Get finishing cost per unit
   const f = data.pricingConfigs.finishing_costs.perfectBinding.baseLabor; // $4.50
 
-  // Apply formula: C(Q) = (S + F_setup + Q^e × k + Q × v + Q × f) × r
-  const setupCost = S + F_setup;
-  const productionCost = Math.pow(quantity, e) * k;
+  // Apply formula: C(Q) = (S + F_setup + S_total^e × k + Q × v + Q × f) × r
+  const S_total = quantity * totalSheets;
+  const productionCost = Math.pow(S_total, e) * k;
   const materialsCost = quantity * v;
-  const laborCost = quantity * f;
+  const finishingCost = quantity * f;
 
-  let totalCost = setupCost + productionCost + materialsCost + laborCost;
+  const subtotal = S + F_setup + productionCost + materialsCost + finishingCost;
 
   // Apply rush multiplier
   const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
-  totalCost *= rushMultiplier;
+  const totalCost = subtotal * rushMultiplier;
 
   const unitPrice = totalCost / quantity;
 
   return {
-    quantity,
-    pages,
+    printingSetupCost: S.toFixed(2),
+    finishingSetupCost: F_setup.toFixed(2),
+    productionCost: productionCost.toFixed(2),
+    materialCost: materialsCost.toFixed(2),
+    finishingCost: finishingCost.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(3),
+    sheetsRequired: totalSheets,
     size: `${customWidth}" × ${customHeight}"`,
     textPaper: textPaper.displayName,
     coverPaper: coverPaper.displayName,
-    rushType,
-    breakdown: {
-      setupCost: setupCost.toFixed(2),
-      productionCost: productionCost.toFixed(2),
-      materialsCost: materialsCost.toFixed(2),
-      laborCost: laborCost.toFixed(2),
-      rushMultiplier: rushMultiplier,
-      sheets: {
-        interior: interiorSheets,
-        cover: coverSheets,
-        total: totalSheets,
-        pagesPerSheet: pagesPerSheet
-      }
-    },
-    totalCost: `$${totalCost.toFixed(2)}`,
-    unitPrice: `$${unitPrice.toFixed(2)}`,
-    totalCost_numeric: totalCost,
-    unitPrice_numeric: unitPrice
+    pages: pages,
+    quantity: quantity,
+    interiorSheets: interiorSheets,
+    coverSheets: coverSheets
   };
 }
 
 async function calculateFlatPrintPrice(formData) {
-  const data = await initializePricingData();
+  const data = await window.pricingDataManager.getPricingData();
   if (!data) {
     return { error: 'Pricing data not available' };
   }
@@ -1948,7 +994,7 @@ async function calculateFlatPrintPrice(formData) {
   const config = data.pricingConfigs.formula;
   const S = config.setupFee;
   const k = config.baseProductionRate;
-  const e = 0.65;
+  const e = config.efficiencyExponent;     // 0.80 (standardized)
 
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
@@ -1992,14 +1038,15 @@ async function calculateFlatPrintPrice(formData) {
 
   const printingSetupCost = S;
   const finishingSetupCost = 0;
-  const productionCost = Math.pow(quantity, e) * k;
+  const S_total = Math.ceil(quantity / imposition);
+  const productionCost = Math.pow(S_total, e) * k;
   const materialCost = quantity * v;
   const finishingCost = quantity * f;
 
   const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
   const totalCost = subtotal * rushMultiplier;
 
-  const sheetsRequired = Math.ceil(quantity / imposition);
+  const sheetsRequired = S_total;
   const unitPrice = totalCost / quantity;
 
   return {
@@ -2022,7 +1069,7 @@ async function calculateFlatPrintPrice(formData) {
 }
 
 async function calculateFoldedPrintPrice(formData) {
-  const data = await initializePricingData();
+  const data = await window.pricingDataManager.getPricingData();
   if (!data) {
     return { error: 'Pricing data not available' };
   }
@@ -2047,7 +1094,7 @@ async function calculateFoldedPrintPrice(formData) {
   const S = config.setupFee;
   const F_setup = config.finishingSetupFee;
   const k = config.baseProductionRate;
-  const e = 0.75;
+  const e = config.efficiencyExponent;     // 0.80 (standardized)
 
   const selectedPaper = data.paperStocks[paperCode];
   if (!selectedPaper) {
@@ -2081,14 +1128,15 @@ async function calculateFoldedPrintPrice(formData) {
 
   const printingSetupCost = S;
   const finishingSetupCost = needsFinishing ? F_setup : 0;
-  const productionCost = Math.pow(quantity, e) * k;
+  const S_total = Math.ceil(quantity / imposition);
+  const productionCost = Math.pow(S_total, e) * k;
   const materialCost = quantity * v;
   const finishingCost = quantity * f;
 
   const subtotal = printingSetupCost + finishingSetupCost + productionCost + materialCost + finishingCost;
   const totalCost = subtotal * rushMultiplier;
 
-  const sheetsRequired = Math.ceil(quantity / imposition);
+  const sheetsRequired = S_total;
   const unitPrice = totalCost / quantity;
 
   return {
@@ -2114,15 +1162,9 @@ async function calculateFoldedPrintPrice(formData) {
 if (typeof window !== 'undefined') {
   window.calculateFlatPrintPrice = calculateFlatPrintPrice;
   window.calculateFoldedPrintPrice = calculateFoldedPrintPrice;
-  window.calculateBrochurePrice = calculateBrochurePrice;
-  window.calculatePostcardPrice = calculatePostcardPrice;
-  window.calculateFlyerPrice = calculateFlyerPrice;
-  window.calculateBookmarkPrice = calculateBookmarkPrice;
-  window.calculateNameTagPrice = calculateNameTagPrice;
   window.calculateBookletPrice = calculateBookletPrice;
   window.calculateNotebookPrice = calculateNotebookPrice;
   window.calculateNotepadPrice = calculateNotepadPrice;
-  window.calculateTableTentPrice = calculateTableTentPrice;
   window.calculatePosterPrice = calculatePosterPrice;
   window.calculatePerfectBoundPrice = calculatePerfectBoundPrice;
 }
