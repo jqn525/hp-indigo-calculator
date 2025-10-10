@@ -171,9 +171,14 @@ export class PricingManager {
       const baseMaterialCost = squareFeet * costPerSqFt * quantity;
       const totalSqFt = squareFeet * quantity;
 
+      // Tiered volume discount structure for stickers (15 sq ft increments, max 25% off)
       let volumeDiscount = 1.0;
-      if (totalSqFt >= 50) volumeDiscount = 0.90;
-      else if (totalSqFt >= 25) volumeDiscount = 0.95;
+      if (totalSqFt >= 75) volumeDiscount = 0.75;        // 25% OFF (max discount)
+      else if (totalSqFt >= 60) volumeDiscount = 0.80;   // 20% OFF
+      else if (totalSqFt >= 45) volumeDiscount = 0.85;   // 15% OFF
+      else if (totalSqFt >= 30) volumeDiscount = 0.90;   // 10% OFF
+      else if (totalSqFt >= 15) volumeDiscount = 0.95;   // 5% OFF
+      else volumeDiscount = 1.0;                          // Standard rate
 
       const materialCost = baseMaterialCost * volumeDiscount;
       const subtotal = setupFee + materialCost;
