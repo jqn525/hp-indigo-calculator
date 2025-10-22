@@ -372,7 +372,8 @@ async function calculateNotepadPrice(formData) {
   }
 
   const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
+  const customWidth = parseFloat(formData.get('customWidth'));
+  const customHeight = parseFloat(formData.get('customHeight'));
   const sheets = parseInt(formData.get('sheets'));
   const paperCode = formData.get('textPaper');
   const backingPaperCode = formData.get('backingPaper') || 'LYNOC95FSC'; // Default to 100# Cover Uncoated
@@ -411,31 +412,27 @@ async function calculateNotepadPrice(formData) {
   const finishingSetup = pricingConfig.formula.finishingSetupFee;  // Always applied for padding
   const totalSetup = baseSetup + finishingSetup;
 
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.notepads[size] || 2;
-  console.log(`Notepads ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.notepads[size]}, Using=${imposition}`);
+  // Use dynamic imposition calculation for custom dimensions
+  const imposition = getDynamicImposition(customWidth, customHeight);
+
+  if (!imposition) {
+    return { error: 'Unable to calculate imposition for given dimensions' };
+  }
+
+  console.log(`Notepads ${customWidth}×${customHeight}: Imposition=${imposition}`);
 
   // Calculate sheets needed per notepad
-  // Each notepad has 'sheets' number of physical sheets
-  const textSheetsPerPad = sheets;  // Physical sheets per notepad
   const backingSheetsPerPad = 1 / imposition;  // Backing sheet (cardstock)
 
-  // Calculate 13x19" press sheets needed for production (accounting for printing sides)
-  const pressSheetsNeeded = (quantity * sheets) / (imposition * sidesMultiplier);  // Total press sheets for all notepads
-
-  // Click calculations - based on press sheets (all notepads run through press)
-  // Blank pages still incur clicks, they just save the $15 setup fee
-  const totalClicksForProduction = pressSheetsNeeded;  // All pages need clicks
-  // Backing is not printed, so no clicks for backing
-  const totalClicks = totalClicksForProduction;
+  // Calculate 13x19" press sheets needed for production
+  const pressSheetsNeeded = (quantity * sheets) / imposition;  // Total press sheets for all notepads
 
   // Material costs per notepad
   // Text paper cost: based on press sheets needed divided by quantity
   const textCostPerUnit = (pressSheetsNeeded * textPaper.costPerSheet) / quantity;
   const backingCost = backingSheetsPerPad * backingPaper.costPerSheet;
-  const clickCostPerUnit = (totalClicks * clicksCost) / quantity;
+  // Click charges: all pages need clicks (blank pages save $15 setup but still incur clicks)
+  const clickCostPerUnit = (pressSheetsNeeded * clicksCost) / quantity;
   const materialsCostPerUnit = (textCostPerUnit + backingCost + clickCostPerUnit) * 1.25;
   
   // Padding labor cost - $0.01 per sheet
@@ -459,7 +456,7 @@ async function calculateNotepadPrice(formData) {
   
   return {
     quantity: quantity,
-    size: size,
+    size: `${customWidth}" × ${customHeight}"`,
     sheets: sheets,
     textPaper: textPaper.displayName,
     backingPaper: backingPaper.displayName,
@@ -472,16 +469,18 @@ async function calculateNotepadPrice(formData) {
     productionCost: productionCost.toFixed(2),
     materialCost: materialsCostTotal.toFixed(2),
     laborCost: laborCostTotal.toFixed(2),
+    finishingCost: laborCostTotal.toFixed(2),
     subtotal: subtotal.toFixed(2),
     rushMultiplier: rushMultiplier,
+    sheetsRequired: pressSheetsNeeded,
     // Detailed breakdown for display
     textCost: textCostPerUnit.toFixed(4),
     backingCost: backingCost.toFixed(4),
     clickCost: clickCostPerUnit.toFixed(4),
     materialsCostPerUnit: materialsCostPerUnit.toFixed(4),
-    textSheetsPerPad: textSheetsPerPad.toFixed(2),
+    textSheetsPerPad: sheets,
     backingSheetsPerPad: backingSheetsPerPad.toFixed(2),
-    totalClicks: totalClicks,
+    totalClicks: pressSheetsNeeded,
     imposition: imposition
   };
 }

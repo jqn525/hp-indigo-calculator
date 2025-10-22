@@ -13,16 +13,6 @@ export class NotepadHandler extends ProductHandler {
   createOptionsHTML() {
     return `
       <div class="form-group">
-        <label class="form-label">Size</label>
-        <select class="form-select" id="size" name="size">
-          <option value="4x6">4" × 6"</option>
-          <option value="5x7">5" × 7"</option>
-          <option value="5.5x8.5" selected>5.5" × 8.5"</option>
-          <option value="8.5x11">8.5" × 11"</option>
-        </select>
-      </div>
-
-      <div class="form-group mt-3">
         <label class="form-label">Number of Sheets</label>
         <input type="number" class="form-control" id="sheets" name="sheets" value="50" min="25" max="100" step="1">
         <small class="form-text text-muted">Number of tear-away sheets per notepad (25-100)</small>
@@ -34,31 +24,30 @@ export class NotepadHandler extends ProductHandler {
           <option value="blank" selected>Blank Pages</option>
           <option value="lined">Lined Pages</option>
           <option value="graph">Graph Paper</option>
+          <option value="custom">Custom Design</option>
         </select>
+        <small class="form-text text-muted">Custom designs include $15 setup fee</small>
       </div>
 
       <div class="form-group mt-3">
         <label class="form-label">Paper Selection</label>
         <div class="alert alert-info">
-          <small>Select text paper for notepad pages and cover paper for backing cardboard. Text paper will be used for sheets, cover paper for rigid backing.</small>
+          <small><strong>Both papers required:</strong> Select text paper for notepad pages and cover paper for backing cardboard. Text paper will be used for sheets, cover paper for rigid backing.</small>
         </div>
       </div>
     `;
   }
 
   bindEventListeners(onConfigChange) {
-    EventBindingHelper.bindChange('size', onConfigChange);
     EventBindingHelper.bindChange('sheets', onConfigChange);
     EventBindingHelper.bindChange('pageContent', onConfigChange);
   }
 
   getFormDataOptions() {
-    const size = document.getElementById('size')?.value || '5.5x8.5';
     const sheets = document.getElementById('sheets')?.value || '50';
     const pageContent = document.getElementById('pageContent')?.value || 'blank';
 
     return [
-      ['size', size],
       ['sheets', sheets],
       ['pageContent', pageContent]
     ];
@@ -68,9 +57,22 @@ export class NotepadHandler extends ProductHandler {
     const quantity = parseInt(formData.get('quantity'));
     const rushType = formData.get('rushType') || 'standard';
 
+    // Validate paper selections - notepads require both text and cover paper
+    const textPaper = formData.get('textPaper');
+    const coverPaper = formData.get('coverPaper');
+
+    if (!textPaper) {
+      return { error: 'Please select text paper for notepad sheets' };
+    }
+
+    if (!coverPaper) {
+      return { error: 'Please select cover paper for backing cardboard' };
+    }
+
     const notepadFormData = new FormData();
 
-    notepadFormData.append('size', formData.get('size') || '5.5x8.5');
+    notepadFormData.append('customWidth', formData.get('customWidth') || '5.5');
+    notepadFormData.append('customHeight', formData.get('customHeight') || '8.5');
     notepadFormData.append('quantity', quantity);
     notepadFormData.append('sheets', formData.get('sheets') || '50');
     notepadFormData.append('pageContent', formData.get('pageContent') || 'blank');
@@ -93,8 +95,10 @@ export class NotepadHandler extends ProductHandler {
         productionCost: result.productionCost,
         materialCost: result.materialCost,
         laborCost: result.laborCost,
+        finishingCost: result.finishingCost,
         subtotal: result.subtotal,
-        rushMultiplier: result.rushMultiplier
+        rushMultiplier: result.rushMultiplier,
+        sheetsRequired: result.sheetsRequired
       };
     }
 
@@ -104,13 +108,9 @@ export class NotepadHandler extends ProductHandler {
   getDisplayConfiguration(config) {
     const displayConfig = super.getDisplayConfiguration(config);
 
-    const size = document.getElementById('size')?.value;
     const sheets = document.getElementById('sheets')?.value;
     const pageContent = document.getElementById('pageContent')?.value;
 
-    if (size) {
-      displayConfig.push(`Size: ${size}`);
-    }
     if (sheets) {
       displayConfig.push(`Sheets: ${sheets}`);
     }
@@ -118,7 +118,8 @@ export class NotepadHandler extends ProductHandler {
       const contentNames = {
         'blank': 'Blank',
         'lined': 'Lined',
-        'graph': 'Graph'
+        'graph': 'Graph',
+        'custom': 'Custom Design'
       };
       displayConfig.push(`Content: ${contentNames[pageContent] || pageContent}`);
     }
