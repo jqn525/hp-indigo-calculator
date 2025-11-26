@@ -13,14 +13,6 @@ export class NotebookHandler extends ProductHandler {
   createOptionsHTML() {
     return `
       <div class="form-group">
-        <label class="form-label">Size</label>
-        <select class="form-select" id="size" name="size">
-          <option value="5.5x8.5">5.5" × 8.5"</option>
-          <option value="8.5x11" selected>8.5" × 11"</option>
-        </select>
-      </div>
-
-      <div class="form-group mt-3">
         <label class="form-label">Number of Pages</label>
         <input type="number" class="form-control" id="pages" name="pages" value="50" min="20" max="200" step="4">
         <small class="form-text text-muted">Pages must be in multiples of 4 (minimum 20, maximum 200)</small>
@@ -54,20 +46,17 @@ export class NotebookHandler extends ProductHandler {
   }
 
   bindEventListeners(onConfigChange) {
-    EventBindingHelper.bindChange('size', onConfigChange);
     EventBindingHelper.bindChange('pages', onConfigChange);
     EventBindingHelper.bindChange('bindingType', onConfigChange);
     EventBindingHelper.bindChange('pageContent', onConfigChange);
   }
 
   getFormDataOptions() {
-    const size = document.getElementById('size')?.value || '8.5x11';
     const pages = document.getElementById('pages')?.value || '50';
     const bindingType = document.getElementById('bindingType')?.value || 'plasticCoil';
     const pageContent = document.getElementById('pageContent')?.value || 'blank';
 
     return [
-      ['size', size],
       ['pages', pages],
       ['bindingType', bindingType],
       ['pageContent', pageContent]
@@ -80,7 +69,8 @@ export class NotebookHandler extends ProductHandler {
 
     const notebookFormData = new FormData();
 
-    notebookFormData.append('size', formData.get('size') || '8.5x11');
+    notebookFormData.append('customWidth', formData.get('customWidth') || '8.5');
+    notebookFormData.append('customHeight', formData.get('customHeight') || '11');
     notebookFormData.append('quantity', quantity);
     notebookFormData.append('pages', formData.get('pages') || '50');
     notebookFormData.append('bindingType', formData.get('bindingType') || 'plasticCoil');
@@ -116,14 +106,10 @@ export class NotebookHandler extends ProductHandler {
   getDisplayConfiguration(config) {
     const displayConfig = super.getDisplayConfiguration(config);
 
-    const size = document.getElementById('size')?.value;
     const pages = document.getElementById('pages')?.value;
     const bindingType = document.getElementById('bindingType')?.value;
     const pageContent = document.getElementById('pageContent')?.value;
 
-    if (size) {
-      displayConfig.push(`Size: ${size}`);
-    }
     if (pages) {
       displayConfig.push(`Pages: ${pages}`);
     }

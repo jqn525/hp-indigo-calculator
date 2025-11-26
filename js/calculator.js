@@ -259,7 +259,8 @@ async function calculateNotebookPrice(formData) {
   }
 
   const quantity = parseInt(formData.get('quantity'));
-  const size = formData.get('size');
+  const customWidth = parseFloat(formData.get('customWidth')) || 8.5;
+  const customHeight = parseFloat(formData.get('customHeight')) || 11;
   const pages = parseInt(formData.get('pages'));
   const bindingType = formData.get('bindingType');
   const coverPaperCode = formData.get('coverPaper');
@@ -291,11 +292,10 @@ async function calculateNotebookPrice(formData) {
   const finishingSetup = pricingConfig.formula.finishingSetupFee;  // Always applied
   const totalSetup = baseSetup + finishingSetup;
 
-  // Use dynamic imposition calculation with static fallback
-  const dimensions = parseSizeString(size);
-  const dynamicImposition = getDynamicImposition(dimensions.width, dimensions.height);
-  const imposition = dynamicImposition || data.pricingConfigs.imposition_data.notebooks[size] || 2;
-  console.log(`Notebooks ${size}: Dynamic=${dynamicImposition}, Static=${data.pricingConfigs.imposition_data.notebooks[size]}, Using=${imposition}`);
+  // Use dynamic imposition calculation based on custom dimensions
+  const dynamicImposition = getDynamicImposition(customWidth, customHeight);
+  const imposition = dynamicImposition || 2;
+  console.log(`Notebooks ${customWidth}x${customHeight}: Imposition=${imposition}`);
 
   // Calculate sheets needed per notebook
   const coverSheetsPerNotebook = 1 / imposition;
@@ -335,7 +335,8 @@ async function calculateNotebookPrice(formData) {
   
   return {
     quantity: quantity,
-    size: size,
+    width: customWidth,
+    height: customHeight,
     pages: pages,
     bindingType: bindingType,
     coverPaper: coverPaper.displayName,
