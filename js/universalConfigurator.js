@@ -11,7 +11,7 @@ class UniversalConfigurator {
     this.configManager = new ConfigurationManager();
     this.uiManager = new UIManager(this.impositionCalc);
     this.pricingManager = new PricingManager();
-    this.productHandlerFactory = new ProductHandlerFactory(this.pricingManager);
+    this.productHandlerFactory = new ProductHandlerFactory(this.pricingManager, this.configManager);
 
     this.currentProductHandler = null;
     this.debounceTimer = null;

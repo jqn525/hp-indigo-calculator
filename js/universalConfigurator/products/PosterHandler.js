@@ -2,9 +2,10 @@ import { ProductHandler } from './ProductHandler.js';
 import { EventBindingHelper } from '../utils/EventBindingHelper.js';
 
 export class PosterHandler extends ProductHandler {
-  constructor(pricingManager) {
+  constructor(pricingManager, configManager) {
     super('posters');
     this.pricingManager = pricingManager;
+    this.configManager = configManager;
   }
 
   shouldShowPaperSection() {
@@ -49,10 +50,12 @@ export class PosterHandler extends ProductHandler {
       if (posterMaterialSelect) {
         if (posterMaterialSelect.value) {
           this.handleMaterialChange(posterMaterialSelect.value);
+          this.configManager.setPaper('poster', posterMaterialSelect.value);
         }
 
         posterMaterialSelect.addEventListener('change', (e) => {
           this.handleMaterialChange(e.target.value);
+          this.configManager.setPaper('poster', e.target.value);
           onConfigChange();
         });
       }

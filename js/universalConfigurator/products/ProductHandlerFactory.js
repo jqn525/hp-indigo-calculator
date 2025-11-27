@@ -8,8 +8,9 @@ import { NotebookHandler } from './NotebookHandler.js';
 import { NotepadHandler } from './NotepadHandler.js';
 
 export class ProductHandlerFactory {
-  constructor(pricingManager) {
+  constructor(pricingManager, configManager) {
     this.pricingManager = pricingManager;
+    this.configManager = configManager;
     this.handlers = new Map();
     this.initializeHandlers();
   }
@@ -18,7 +19,7 @@ export class ProductHandlerFactory {
     this.handlers.set('flat-prints', new FlatPrintHandler());
     this.handlers.set('folded-prints', new FoldedPrintHandler());
     this.handlers.set('booklets', new BookletHandler());
-    this.handlers.set('posters', new PosterHandler(this.pricingManager));
+    this.handlers.set('posters', new PosterHandler(this.pricingManager, this.configManager));
     this.handlers.set('stickers', new StickerHandler(this.pricingManager));
     this.handlers.set('perfect-bound-books', new PerfectBoundHandler());
     this.handlers.set('notebooks', new NotebookHandler());
