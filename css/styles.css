@@ -2541,6 +2541,11 @@ footer {
   font-weight: 600;
 }
 
+/* Override green text to white inside pricing display for better contrast */
+.live-pricing .text-success {
+  color: #ffffff !important;
+}
+
 /* Expiration Badge Animations */
 .badge.bg-danger {
   animation: pulse-red 2s infinite;
