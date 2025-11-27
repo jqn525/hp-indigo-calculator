@@ -227,6 +227,7 @@ export class UIManager {
 
     const volumeItem = document.getElementById('redVolumeDiscountItem');
     if (pricing.volumeDiscount && pricing.volumeDiscount > 0) {
+      document.getElementById('redVolumeDiscountPercent').textContent = `(${pricing.volumeDiscount}%)`;
       document.getElementById('redVolumeDiscount').textContent =
         `${pricing.volumeDiscount}% (${pricing.volumeDiscountDescription || 'Volume Discount'})`;
       volumeItem.style.display = 'flex';
