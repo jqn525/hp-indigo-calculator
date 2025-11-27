@@ -54,31 +54,36 @@ export class StickerHandler extends ProductHandler {
   }
 
   bindEventListeners(onConfigChange) {
-    const productionTypeSelect = document.getElementById('stickerProductionType');
+    this.onConfigChange = onConfigChange;
 
+    const productionTypeSelect = document.getElementById('stickerProductionType');
     if (productionTypeSelect) {
       EventBindingHelper.bindWithCleanup('stickerProductionType', 'change', this, 'handleProductionChange');
-
-      const self = this;
-      this.handleProductionChange = () => {
-        const productionType = productionTypeSelect.value;
-        const standardOptions = document.getElementById('standardStickerOptions');
-        const premiumOptions = document.getElementById('premiumStickerOptions');
-
-        if (productionType === 'standard') {
-          standardOptions.style.display = 'block';
-          premiumOptions.style.display = 'none';
-        } else {
-          standardOptions.style.display = 'none';
-          premiumOptions.style.display = 'block';
-        }
-
-        onConfigChange();
-      };
     }
 
     EventBindingHelper.bindChange('stickerFinish', onConfigChange);
     EventBindingHelper.bindChange('premiumStickerFinish', onConfigChange);
+  }
+
+  handleProductionChange() {
+    const productionTypeSelect = document.getElementById('stickerProductionType');
+    if (!productionTypeSelect) return;
+
+    const productionType = productionTypeSelect.value;
+    const standardOptions = document.getElementById('standardStickerOptions');
+    const premiumOptions = document.getElementById('premiumStickerOptions');
+
+    if (productionType === 'standard') {
+      standardOptions.style.display = 'block';
+      premiumOptions.style.display = 'none';
+    } else {
+      standardOptions.style.display = 'none';
+      premiumOptions.style.display = 'block';
+    }
+
+    if (this.onConfigChange) {
+      this.onConfigChange();
+    }
   }
 
   getFormDataOptions() {

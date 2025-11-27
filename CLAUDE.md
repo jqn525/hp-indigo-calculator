@@ -29,7 +29,7 @@ git push origin main
 ```
 
 ### Cache Busting
-- Increment `CACHE_NAME` in `sw.js` (current: v183) and `/inventory/sw.js` (current: v1)
+- Increment `CACHE_NAME` in `sw.js` (current: v185) and `/inventory/sw.js` (current: v1)
 - Required when deploying CSS/JS changes
 
 ## Architecture
@@ -45,7 +45,7 @@ git push origin main
 - **Standardized Values**: e=0.80 (all products), k=$1.50 (per sheet)
 - **Data Sources**: `/js/pricingConfig.js` + `/js/paperStocks.js` (authoritative)
 - **Database**: User data only (accounts, carts, quotes) - NO pricing data
-- **Cache**: Service worker v183 with cache-first strategy
+- **Cache**: Service worker v185 with cache-first strategy
 
 ### Supported Products (via Universal Configurator)
 - **Small Format**: brochures, postcards, flyers, bookmarks, name-tags, booklets, notebooks, notepads, table-tents
@@ -154,7 +154,7 @@ git push origin main
 - **Kept**: Essential pages only (6 total)
 
 ### Service Worker Versions
-- **Main App**: v183 (latest: material markup standardization + calculator streamlining)
+- **Main App**: v185 (latest: codebase cleanup - removed unused legacy files)
 - **Inventory App**: v1 (unchanged)
 
 ## Development Notes

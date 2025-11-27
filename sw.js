@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sfu-calc-v184';
+const CACHE_NAME = 'sfu-calc-v185';
 
 // Determine hosting environment and set appropriate base path
 const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -26,10 +26,7 @@ const urlsToCache = [
   `${basePath}/js/auth.js`,
   `${basePath}/js/auth-guard.js`,
   `${basePath}/js/db.js`,
-  `${basePath}/js/migrate-data.js`,
   `${basePath}/js/header.js`,
-  `${basePath}/js/configurator.js`,
-  `${basePath}/js/domCache.js`,
   `${basePath}/js/universalConfigurator.js`,
   `${basePath}/js/impositionCalculator.js`,
   `${basePath}/js/admin.js`,
