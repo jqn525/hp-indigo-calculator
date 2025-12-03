@@ -30,7 +30,7 @@ class AuthGuard {
 
   isLoginPage() {
     const path = window.location.pathname.toLowerCase();
-    return path.includes('signin.html') || path.includes('login.html') || path.endsWith('/login');
+    return path.includes('signin.html') || path.endsWith('/signin');
   }
 
   isAuthenticated() {

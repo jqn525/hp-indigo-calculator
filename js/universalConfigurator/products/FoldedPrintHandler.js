@@ -1,5 +1,6 @@
 import { ProductHandler } from './ProductHandler.js';
 import { EventBindingHelper } from '../utils/EventBindingHelper.js';
+import { ResponseMapper } from '../utils/ResponseMapper.js';
 
 export class FoldedPrintHandler extends ProductHandler {
   constructor() {
@@ -65,22 +66,7 @@ export class FoldedPrintHandler extends ProductHandler {
 
     if (typeof calculateFoldedPrintPrice === 'function') {
       const result = await calculateFoldedPrintPrice(foldedPrintFormData);
-      if (result.error) {
-        return { error: result.error };
-      }
-
-      return {
-        totalCost: parseFloat(result.totalCost),
-        unitPrice: parseFloat(result.unitPrice),
-        printingSetupCost: result.printingSetupCost,
-        finishingSetupCost: result.finishingSetupCost,
-        productionCost: result.productionCost,
-        materialCost: result.materialCost,
-        finishingCost: result.finishingCost,
-        subtotal: result.subtotal,
-        rushMultiplier: result.rushMultiplier,
-        sheetsRequired: result.sheetsRequired
-      };
+      return ResponseMapper.mapStandardResponse(result);
     }
 
     return { error: 'Folded print calculator not available' };

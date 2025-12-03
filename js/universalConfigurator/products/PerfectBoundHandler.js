@@ -1,5 +1,6 @@
 import { ProductHandler } from './ProductHandler.js';
 import { EventBindingHelper } from '../utils/EventBindingHelper.js';
+import { ResponseMapper } from '../utils/ResponseMapper.js';
 
 export class PerfectBoundHandler extends ProductHandler {
   constructor() {
@@ -64,22 +65,7 @@ export class PerfectBoundHandler extends ProductHandler {
 
     if (typeof calculatePerfectBoundPrice === 'function') {
       const result = await calculatePerfectBoundPrice(perfectBoundFormData);
-      if (result.error) {
-        return { error: result.error };
-      }
-
-      return {
-        totalCost: parseFloat(result.totalCost),
-        unitPrice: parseFloat(result.unitPrice),
-        printingSetupCost: result.printingSetupCost,
-        finishingSetupCost: result.finishingSetupCost,
-        productionCost: result.productionCost,
-        materialCost: result.materialCost,
-        finishingCost: result.finishingCost,
-        subtotal: result.subtotal,
-        rushMultiplier: result.rushMultiplier,
-        sheetsRequired: result.sheetsRequired
-      };
+      return ResponseMapper.mapStandardResponse(result);
     }
 
     return { error: 'Perfect bound calculator not available' };

@@ -1,5 +1,6 @@
 import { ProductHandler } from './ProductHandler.js';
 import { EventBindingHelper } from '../utils/EventBindingHelper.js';
+import { ResponseMapper } from '../utils/ResponseMapper.js';
 
 export class NotepadHandler extends ProductHandler {
   constructor() {
@@ -83,23 +84,7 @@ export class NotepadHandler extends ProductHandler {
 
     if (typeof calculateNotepadPrice === 'function') {
       const result = await calculateNotepadPrice(notepadFormData);
-      if (result.error) {
-        return { error: result.error };
-      }
-
-      return {
-        totalCost: parseFloat(result.totalCost),
-        unitPrice: parseFloat(result.unitPrice),
-        printingSetupCost: result.printingSetupCost,
-        finishingSetupCost: result.finishingSetupCost,
-        productionCost: result.productionCost,
-        materialCost: result.materialCost,
-        laborCost: result.laborCost,
-        finishingCost: result.finishingCost,
-        subtotal: result.subtotal,
-        rushMultiplier: result.rushMultiplier,
-        sheetsRequired: result.sheetsRequired
-      };
+      return ResponseMapper.mapNotepadResponse(result);
     }
 
     return { error: 'Notepad calculator not available' };
