@@ -185,6 +185,10 @@ class UniversalConfigurator {
       this.uiManager.hideSections(['printingSidesSection']);
     }
 
+    if (!this.currentProductHandler.shouldShowDimensions()) {
+      this.uiManager.hideSections(['dimensionsSection']);
+    }
+
     const optionsHTML = this.currentProductHandler.createOptionsHTML();
     if (optionsHTML) {
       this.uiManager.showSpecificOptions(
