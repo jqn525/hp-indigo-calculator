@@ -23,73 +23,26 @@
             <div class="auth-card">
                 <h2 class="text-center mb-4">Sign In</h2>
                 
-                <!-- Tab Navigation -->
-                <ul class="nav nav-tabs mb-4" id="authTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="signin-tab" data-bs-toggle="tab" data-bs-target="#signin" type="button" role="tab">
-                            Sign In
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="signup-tab" data-bs-toggle="tab" data-bs-target="#signup" type="button" role="tab">
-                            Create Account
-                        </button>
-                    </li>
-                </ul>
-
-                <!-- Tab Content -->
-                <div class="tab-content" id="authTabContent">
-                    <!-- Sign In Tab -->
-                    <div class="tab-pane fade show active" id="signin" role="tabpanel">
-                        <form id="signinForm">
-                            <div class="mb-3">
-                                <label for="signinEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="signinEmail" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="signinPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="signinPassword" required>
-                            </div>
-                            <div class="mb-3">
-                                <a href="#" class="link-primary" id="forgotPasswordLink">Forgot password?</a>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Sign In</button>
-                        </form>
+                <!-- Sign In Form -->
+                <form id="signinForm">
+                    <div class="mb-3">
+                        <label for="signinEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="signinEmail" required>
                     </div>
-
-                    <!-- Sign Up Tab -->
-                    <div class="tab-pane fade" id="signup" role="tabpanel">
-                        <form id="signupForm">
-                            <div class="mb-3">
-                                <label for="signupEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="signupEmail" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="signupPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="signupPassword" required minlength="6">
-                                <div class="form-text">Minimum 6 characters</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="signupFullName" class="form-label">Full Name (optional)</label>
-                                <input type="text" class="form-control" id="signupFullName">
-                            </div>
-                            <div class="mb-3">
-                                <label for="signupCompany" class="form-label">Company (optional)</label>
-                                <input type="text" class="form-control" id="signupCompany">
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Create Account</button>
-                        </form>
+                    <div class="mb-3">
+                        <label for="signinPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="signinPassword" required>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <a href="#" class="link-primary" id="forgotPasswordLink">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                </form>
 
                 <!-- Error/Success Messages -->
                 <div id="authMessage" class="alert mt-3" style="display: none;"></div>
 
-                <!-- Guest Mode -->
-                <div class="text-center mt-4">
-                    <p class="text-muted">Or continue without an account</p>
-                    <a href="universal-configurator.html" class="btn btn-outline-secondary">Continue as Guest</a>
-                </div>
+                <p class="text-muted text-center mt-4 mb-0"><small>Staff access only</small></p>
             </div>
         </div>
     </main>
@@ -128,34 +81,6 @@
                     // Redirect to previous page or universal configurator
                     const returnUrl = new URLSearchParams(window.location.search).get('return') || 'universal-configurator.html';
                     setTimeout(() => window.location.href = returnUrl, 1000);
-                } catch (error) {
-                    showMessage('danger', error.message);
-                }
-            });
-            
-            // Sign Up Form Handler
-            document.getElementById('signupForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const email = document.getElementById('signupEmail').value;
-                const password = document.getElementById('signupPassword').value;
-                const fullName = document.getElementById('signupFullName').value;
-                const company = document.getElementById('signupCompany').value;
-                
-                try {
-                    showMessage('info', 'Creating account...');
-                    await authManager.signUp(email, password, {
-                        full_name: fullName,
-                        company_name: company
-                    });
-                    
-                    showMessage('success', 'Account created! Please check your email to confirm your account.');
-                    
-                    // Clear form
-                    document.getElementById('signupForm').reset();
-                    
-                    // Switch to sign in tab
-                    document.getElementById('signin-tab').click();
                 } catch (error) {
                     showMessage('danger', error.message);
                 }
@@ -217,16 +142,6 @@
             padding: 2rem;
             width: 100%;
             max-width: 400px;
-        }
-        
-        .nav-tabs .nav-link {
-            color: #666;
-            border-color: #dee2e6;
-        }
-        
-        .nav-tabs .nav-link.active {
-            color: #0096D6;
-            border-color: #dee2e6 #dee2e6 #fff;
         }
         
         .form-control:focus {
