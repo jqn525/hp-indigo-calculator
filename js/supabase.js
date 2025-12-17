@@ -19,7 +19,7 @@ let supabase = null;
 if (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
   // Load Supabase from CDN
   const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10';
   script.onload = () => {
     // Initialize client after script loads
     const { createClient } = window.supabase;

@@ -1,7 +1,7 @@
 // Service Worker for SFU Inventory Management
 // Version: v1.0.0
 
-const CACHE_NAME = 'sfu-inventory-v2';
+const CACHE_NAME = 'sfu-inventory-v3';
 
 // Files to cache
 const urlsToCache = [
