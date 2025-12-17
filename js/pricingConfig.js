@@ -103,6 +103,12 @@ const pricingConfig = {
       finishingLogic: 'perfectBinding',
       setupFeeMultiplier: 2.0,
       formula: 'perfectBound'
+    },
+    envelopes: {
+      hasFinishing: false,
+      finishingSetupFee: 0,
+      setupFeeMultiplier: 1.0,
+      formula: 'envelope'
     }
   },
 
@@ -180,6 +186,12 @@ const pricingConfig = {
     businessCards: {
       minQuantity: 100,  // Higher min due to high imposition
       maxQuantity: 5000
+    },
+    // Envelopes - Printed on Ricoh/Xante envelope printer
+    envelopes: {
+      minQuantity: 1,
+      maxQuantity: 1000,
+      allowsCustomDimensions: false
     }
   },
 
@@ -320,6 +332,36 @@ const pricingConfig = {
       { minSqft: 60, maxSqft: 89.99, discount: 10, multiplier: 0.90, description: '10% Volume Discount (60-89 sqft)' },
       { minSqft: 90, maxSqft: 119.99, discount: 15, multiplier: 0.85, description: '15% Volume Discount (90-119 sqft)' },
       { minSqft: 120, maxSqft: Infinity, discount: 20, multiplier: 0.80, description: '20% Volume Discount (120+ sqft) - Maximum' }
+    ]
+  },
+
+  // Envelope Pricing Configuration (Ricoh/Xante envelope printer)
+  envelopeConfig: {
+    setupFee: 15.00,
+    envelopeMarkup: 1.5,
+    maxQuantity: 1000,
+    impressionRates: {
+      color: {
+        base: 0.32,
+        250: 0.30,
+        500: 0.28,
+        750: 0.26,
+        1000: 0.24
+      },
+      bw: {
+        base: 0.13,
+        250: 0.12,
+        500: 0.11,
+        750: 0.10,
+        1000: 0.09
+      }
+    },
+    volumeDiscountTiers: [
+      { minQty: 1, maxQty: 249, colorRate: 0.32, bwRate: 0.13, discount: 0, description: 'Standard Rate' },
+      { minQty: 250, maxQty: 499, colorRate: 0.30, bwRate: 0.12, discount: 6, description: '6% Volume Discount' },
+      { minQty: 500, maxQty: 749, colorRate: 0.28, bwRate: 0.11, discount: 12, description: '12% Volume Discount' },
+      { minQty: 750, maxQty: 999, colorRate: 0.26, bwRate: 0.10, discount: 19, description: '19% Volume Discount' },
+      { minQty: 1000, maxQty: 1000, colorRate: 0.24, bwRate: 0.09, discount: 25, description: '25% Volume Discount' }
     ]
   }
 };
