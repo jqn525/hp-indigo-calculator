@@ -1158,6 +1158,110 @@ async function calculateFoldedPrintPrice(formData) {
   };
 }
 
+// Helper function to get envelope impression rate based on quantity tier
+function getEnvelopeImpressionRate(quantity, printType) {
+  const envelopeConfig = pricingConfig.envelopeConfig;
+  const rates = envelopeConfig.impressionRates[printType];
+
+  if (quantity >= 1000) return rates['1000'];
+  if (quantity >= 750) return rates['750'];
+  if (quantity >= 500) return rates['500'];
+  if (quantity >= 250) return rates['250'];
+  return rates.base;
+}
+
+// Helper function to get volume discount description
+function getEnvelopeVolumeDiscount(quantity) {
+  const envelopeConfig = pricingConfig.envelopeConfig;
+  const tiers = envelopeConfig.volumeDiscountTiers;
+
+  for (const tier of tiers) {
+    if (quantity >= tier.minQty && quantity <= tier.maxQty) {
+      return tier;
+    }
+  }
+  return tiers[0];
+}
+
+async function calculateEnvelopePrice(formData) {
+  const data = await window.pricingDataManager.getPricingData();
+  if (!data) {
+    return { error: 'Pricing data not available' };
+  }
+
+  const quantity = parseInt(formData.get('quantity'));
+  const envelopeStock = formData.get('envelopeStock');
+  const printType = formData.get('printType') || 'color';
+  const rushType = formData.get('rushType') || 'standard';
+
+  // Validate quantity
+  const envelopeConstraints = data.pricingConfigs.product_constraints.envelopes;
+  if (quantity < envelopeConstraints.minQuantity) {
+    return { error: `Minimum quantity is ${envelopeConstraints.minQuantity}` };
+  }
+  if (quantity > envelopeConstraints.maxQuantity) {
+    return { error: `Maximum quantity is ${envelopeConstraints.maxQuantity}. For larger orders, please contact us for a custom quote.` };
+  }
+
+  // Get envelope data
+  const envelope = data.paperStocks[envelopeStock];
+  if (!envelope || envelope.type !== 'envelope_stock') {
+    return { error: 'Please select an envelope' };
+  }
+
+  // Get envelope pricing config
+  const envelopeConfig = pricingConfig.envelopeConfig;
+
+  // Calculate costs
+  const setupFee = envelopeConfig.setupFee;
+  const envelopeCostRaw = envelope.costPerUnit * quantity;
+  const envelopeCost = envelopeCostRaw * envelopeConfig.envelopeMarkup;
+
+  // Get volume-discounted impression rate
+  const impressionRate = getEnvelopeImpressionRate(quantity, printType);
+  const printingCost = impressionRate * quantity;
+
+  // Get volume discount info for display
+  const volumeDiscount = getEnvelopeVolumeDiscount(quantity);
+
+  // Calculate subtotal
+  const subtotal = setupFee + envelopeCost + printingCost;
+
+  // Apply rush multiplier
+  const rushMultiplier = data.pricingConfigs.rush_multipliers[rushType]?.multiplier || 1.0;
+  const totalCost = subtotal * rushMultiplier;
+
+  // Calculate unit price
+  const unitPrice = totalCost / quantity;
+
+  return {
+    printingSetupCost: setupFee.toFixed(2),
+    finishingSetupCost: "0.00",
+    needsFinishing: false,
+    productionCost: "0.00",
+    envelopeCost: envelopeCost.toFixed(2),
+    materialCost: envelopeCost.toFixed(2),
+    printingCost: printingCost.toFixed(2),
+    finishingCost: "0.00",
+    subtotal: subtotal.toFixed(2),
+    rushMultiplier: rushMultiplier,
+    rushType: rushType,
+    totalCost: totalCost.toFixed(2),
+    unitPrice: unitPrice.toFixed(3),
+    quantity: quantity,
+    envelopeUsed: envelope.displayName,
+    envelopeSize: envelope.envelopeSize,
+    envelopeDimensions: envelope.dimensions,
+    envelopeCategory: envelope.category,
+    printType: printType,
+    impressionRate: impressionRate.toFixed(2),
+    volumeDiscount: volumeDiscount.discount,
+    volumeDiscountDescription: volumeDiscount.description,
+    envelopeCostPerUnit: envelope.costPerUnit.toFixed(4),
+    envelopeCostWithMarkup: (envelope.costPerUnit * envelopeConfig.envelopeMarkup).toFixed(4)
+  };
+}
+
 // Export functions globally for universal configurator
 if (typeof window !== 'undefined') {
   window.calculateFlatPrintPrice = calculateFlatPrintPrice;
@@ -1167,6 +1271,7 @@ if (typeof window !== 'undefined') {
   window.calculateNotepadPrice = calculateNotepadPrice;
   window.calculatePosterPrice = calculatePosterPrice;
   window.calculatePerfectBoundPrice = calculatePerfectBoundPrice;
+  window.calculateEnvelopePrice = calculateEnvelopePrice;
 }
 
 // Initialize card selection when DOM is loaded
