@@ -6,6 +6,7 @@ import { StickerHandler } from './StickerHandler.js';
 import { PerfectBoundHandler } from './PerfectBoundHandler.js';
 import { NotebookHandler } from './NotebookHandler.js';
 import { NotepadHandler } from './NotepadHandler.js';
+import { EnvelopeHandler } from './EnvelopeHandler.js';
 
 export class ProductHandlerFactory {
   constructor(pricingManager, configManager) {
@@ -24,6 +25,7 @@ export class ProductHandlerFactory {
     this.handlers.set('perfect-bound-books', new PerfectBoundHandler());
     this.handlers.set('notebooks', new NotebookHandler());
     this.handlers.set('notepads', new NotepadHandler());
+    this.handlers.set('envelopes', new EnvelopeHandler());
   }
 
   getHandler(productType) {
