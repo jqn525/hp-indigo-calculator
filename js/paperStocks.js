@@ -234,6 +234,269 @@ const paperStocks = {
     "displayName": "Aluminum Composite",
     "fixedWidth": 48,
     "fixedHeight": 96
+  },
+
+  // Envelope Stock - SupremeX/Spicers Pre-made Envelopes
+  // #10 Business Envelopes (4-1/8 × 9-1/2)
+  "SUPX10WSFSC-S": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "business",
+    "envelopeSize": "#10",
+    "dimensions": "4-1/8 x 9-1/2",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.0362,
+    "displayName": "#10 Business White (4-1/8\" × 9-1/2\")"
+  },
+  "SUPX10ASFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "business",
+    "envelopeSize": "#10",
+    "dimensions": "4-1/8 x 9-1/2",
+    "color": "artline",
+    "feature": "security",
+    "paperWeight": "24#",
+    "costPerUnit": 0.0692,
+    "displayName": "#10 Business Artline/Security (4-1/8\" × 9-1/2\")"
+  },
+  "SUPX10WWSFSCDNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "business",
+    "envelopeSize": "#10",
+    "dimensions": "4-1/8 x 9-1/2",
+    "color": "white",
+    "feature": "window",
+    "paperWeight": "24#",
+    "costPerUnit": 0.0529,
+    "displayName": "#10 Business Window (4-1/8\" × 9-1/2\")"
+  },
+
+  // Invitation Envelopes
+  "SUPX2IWSDSSFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "invitation",
+    "envelopeSize": "#2",
+    "dimensions": "4-1/8 x 6-1/8",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1174,
+    "displayName": "#2 Invitation White (4-1/8\" × 6-1/8\")"
+  },
+  "SUPX4IWSDSSFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "invitation",
+    "envelopeSize": "#4",
+    "dimensions": "5 x 6-1/2",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1224,
+    "displayName": "#4 Invitation White (5\" × 6-1/2\")"
+  },
+  "SUPXA6WSFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "invitation",
+    "envelopeSize": "A6",
+    "dimensions": "4-3/4 x 6-1/2",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.0881,
+    "displayName": "A6 Invitation White (4-3/4\" × 6-1/2\")"
+  },
+  "SUPXT41WASFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "invitation",
+    "envelopeSize": "T-4",
+    "dimensions": "5-3/4 x 9",
+    "color": "artline",
+    "feature": "window",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1918,
+    "displayName": "T-4 Window Artline (5-3/4\" × 9\")"
+  },
+
+  // Booklet Envelopes (Side Opening)
+  "SUPX3BWSFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "booklet",
+    "envelopeSize": "#3",
+    "dimensions": "6-1/2 x 9-1/2",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1686,
+    "displayName": "#3 Booklet White (6-1/2\" × 9-1/2\")"
+  },
+  "SUPX7BWSFSC-S": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "booklet",
+    "envelopeSize": "#7",
+    "dimensions": "9 x 12",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1363,
+    "displayName": "#7 Booklet White (9\" × 12\")"
+  },
+  "SUPX7BNKRSFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "booklet",
+    "envelopeSize": "#7",
+    "dimensions": "9 x 12",
+    "color": "kraft",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.2262,
+    "displayName": "#7 Booklet Kraft (9\" × 12\")"
+  },
+  "SUPX8BWSFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "booklet",
+    "envelopeSize": "#8",
+    "dimensions": "10 x 13",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1743,
+    "displayName": "#8 Booklet White (10\" × 13\")"
+  },
+  "SUPX8BNKRSFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "booklet",
+    "envelopeSize": "#8",
+    "dimensions": "10 x 13",
+    "color": "kraft",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.2619,
+    "displayName": "#8 Booklet Kraft (10\" × 13\")"
+  },
+
+  // Catalogue Envelopes (End Opening)
+  "SUPX69WEFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "catalogue",
+    "envelopeSize": "#3",
+    "dimensions": "6-1/2 x 9-1/2",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1601,
+    "displayName": "#3 Catalogue White (6-1/2\" × 9-1/2\")"
+  },
+  "SUPX710WEFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "catalogue",
+    "envelopeSize": "#5",
+    "dimensions": "7-1/2 x 10-1/2",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.2058,
+    "displayName": "#5 Catalogue White (7-1/2\" × 10-1/2\")"
+  },
+  "SUPX912WEFSC-S": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "catalogue",
+    "envelopeSize": "#7",
+    "dimensions": "9 x 12",
+    "color": "white",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1349,
+    "displayName": "#7 Catalogue White (9\" × 12\")"
+  },
+  "SUPX912NKEFSC-S": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "catalogue",
+    "envelopeSize": "#7",
+    "dimensions": "9 x 12",
+    "color": "kraft",
+    "feature": "plain",
+    "paperWeight": "24#",
+    "costPerUnit": 0.1357,
+    "displayName": "#7 Catalogue Kraft (9\" × 12\")"
+  },
+  "SUPX912WAEFSCNL": {
+    "brand": "SupremeX",
+    "type": "envelope_stock",
+    "category": "catalogue",
+    "envelopeSize": "#7",
+    "dimensions": "9 x 12",
+    "color": "white",
+    "feature": "artline",
+    "paperWeight": "24#",
+    "costPerUnit": 0.2745,
+    "displayName": "#7 Catalogue White Artline (9\" × 12\")"
+  },
+
+  // Premium Envelopes (Classic Crest 80#)
+  "CLACCNWA6FSC": {
+    "brand": "Classic Crest",
+    "type": "envelope_stock",
+    "category": "premium",
+    "envelopeSize": "A6",
+    "dimensions": "4-3/4 x 6-1/2",
+    "color": "natural white",
+    "feature": "premium",
+    "paperWeight": "80#",
+    "costPerUnit": 0.3931,
+    "displayName": "A6 Classic Crest Natural White (4-3/4\" × 6-1/2\")"
+  },
+  "CLACCNWA7FSC": {
+    "brand": "Classic Crest",
+    "type": "envelope_stock",
+    "category": "premium",
+    "envelopeSize": "A7",
+    "dimensions": "5-1/4 x 7-1/4",
+    "color": "natural white",
+    "feature": "premium",
+    "paperWeight": "80#",
+    "costPerUnit": 0.4428,
+    "displayName": "A7 Classic Crest Natural White (5-1/4\" × 7-1/4\")"
+  },
+  "CLACSRWA6FSC": {
+    "brand": "Classic Crest",
+    "type": "envelope_stock",
+    "category": "premium",
+    "envelopeSize": "A6",
+    "dimensions": "4-3/4 x 6-1/2",
+    "color": "solar white",
+    "feature": "premium",
+    "paperWeight": "80#",
+    "costPerUnit": 0.3980,
+    "displayName": "A6 Classic Crest Solar White (4-3/4\" × 6-1/2\")"
+  },
+  "CLACSRWA7FSC": {
+    "brand": "Classic Crest",
+    "type": "envelope_stock",
+    "category": "premium",
+    "envelopeSize": "A7",
+    "dimensions": "5-1/4 x 7-1/4",
+    "color": "solar white",
+    "feature": "premium",
+    "paperWeight": "80#",
+    "costPerUnit": 0.4486,
+    "displayName": "A7 Classic Crest Solar White (5-1/4\" × 7-1/4\")"
   }
 };
 
