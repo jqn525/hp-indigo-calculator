@@ -25,7 +25,8 @@ export class ProductHandler {
       'magnets': 'Magnets',
       'stickers': 'Stickers',
       'apparel': 'Apparel',
-      'tote-bags': 'Tote Bags'
+      'tote-bags': 'Tote Bags',
+      'envelopes': 'Envelopes'
     };
     return names[this.productType] || this.productType;
   }

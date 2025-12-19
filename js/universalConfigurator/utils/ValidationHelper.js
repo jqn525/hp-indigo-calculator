@@ -5,7 +5,9 @@ export class ValidationHelper {
     }
 
     if (!config.customWidth || !config.customHeight) {
-      return { valid: false, error: 'Dimensions are required' };
+      if (config.productType !== 'envelopes') {
+        return { valid: false, error: 'Dimensions are required' };
+      }
     }
 
     if (!config.quantity || config.quantity <= 0) {
@@ -20,7 +22,7 @@ export class ValidationHelper {
       if (!config.posterMaterial) {
         return { valid: false, error: 'Material selection is required for posters' };
       }
-    } else if (config.productType === 'stickers') {
+    } else if (config.productType === 'stickers' || config.productType === 'envelopes') {
       return { valid: true };
     } else {
       if (!config.specialtyStock && !config.textPaper && !config.coverPaper) {
