@@ -191,7 +191,7 @@ async function calculateBookletPrice(formData) {
   // Apply formula: C(Q) = S_base + S_pages + P(Q) + M(Q) + F_base + F_variable
   // Where M(Q) includes paper costs + click charges
   const baseSetup = (pricingConfig.formula.setupFee * 2) + (2 * pages);
-  const S_total = quantity * sheetsPerBooklet;
+  const S_total = quantity * sheetsPerBooklet / multiUpFactor;
   const k = pricingConfig.formula.baseProductionRate;
   const e = pricingConfig.formula.efficiencyExponent;
   const production = Math.pow(S_total, e) * k;
